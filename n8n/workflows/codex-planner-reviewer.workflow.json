@@ -1,0 +1,449 @@
+{
+  "name": "Codex Planner Reviewer Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "codex-planner-reviewer",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "projectName",
+              "value": "={{ ($json.body && $json.body.projectName) || $json.projectName || 'unknown-project' }}"
+            },
+            {
+              "name": "goal",
+              "value": "={{ ($json.body && $json.body.goal) || $json.goal || '' }}"
+            },
+            {
+              "name": "repoPath",
+              "value": "={{ ($json.body && $json.body.repoPath) || $json.repoPath || '' }}"
+            },
+            {
+              "name": "branchName",
+              "value": "={{ ($json.body && $json.body.branchName) || $json.branchName || '' }}"
+            },
+            {
+              "name": "mode",
+              "value": "={{ ($json.body && $json.body.mode) || $json.mode || 'prepare_codex_task' }}"
+            },
+            {
+              "name": "gitDiffSummary",
+              "value": "={{ ($json.body && $json.body.gitDiffSummary) || $json.gitDiffSummary || '' }}"
+            },
+            {
+              "name": "testResults",
+              "value": "={{ ($json.body && $json.body.testResults) || $json.testResults || '' }}"
+            },
+            {
+              "name": "codexNotes",
+              "value": "={{ ($json.body && $json.body.codexNotes) || $json.codexNotes || '' }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "maxIterations",
+              "value": "={{ Number((($json.body && $json.body.maxIterations) || $json.maxIterations || 1)) }}"
+            }
+          ],
+          "boolean": [
+            {
+              "name": "humanApproved",
+              "value": "={{ Boolean((($json.body && $json.body.humanApproved) || $json.humanApproved || false)) }}"
+            }
+          ],
+          "array": [
+            {
+              "name": "constraints",
+              "value": "={{ ($json.body && $json.body.constraints) || $json.constraints || [] }}"
+            },
+            {
+              "name": "acceptanceCriteria",
+              "value": "={{ ($json.body && $json.body.acceptanceCriteria) || $json.acceptanceCriteria || [] }}"
+            },
+            {
+              "name": "changedFiles",
+              "value": "={{ ($json.body && $json.body.changedFiles) || $json.changedFiles || [] }}"
+            },
+            {
+              "name": "knownIssues",
+              "value": "={{ ($json.body && $json.body.knownIssues) || $json.knownIssues || [] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "normalize-input",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const allowedModes = ['plan_only', 'prepare_codex_task', 'review_result'];\nconst searchableText = [\n  $json.goal,\n  ...($json.constraints || []),\n  ...($json.acceptanceCriteria || []),\n  ...($json.knownIssues || [])\n].join(' ').toLowerCase();\nconst riskScanText = searchableText\n  .replace(/do\\s+not\\s+expose\\s+api\\s*keys?/g, '')\n  .replace(/don't\\s+expose\\s+api\\s*keys?/g, '')\n  .replace(/不要暴露\\s*api\\s*keys?/g, '');\n\nconst highRiskPatterns = [\n  /delete\\s+(the\\s+)?entire\\s+project/,\n  /remove\\s+(the\\s+)?entire\\s+project/,\n  /删除整个项目/,\n  /提交密钥/,\n  /commit\\s+secret/,\n  /expose\\s+(?:the\\s+)?api\\s*key/,\n  /include\\s+(?:an\\s+)?api\\s*key/,\n  /写入\\s*api\\s*key/,\n  /自动部署生产环境/,\n  /auto(?:matic)?\\s+deploy\\s+to\\s+production/,\n  /覆盖线上工作流/,\n  /overwrite\\s+production\\s+workflow/,\n  /git\\s+reset\\s+--hard/,\n  /rm\\s+-rf/\n];\n\nconst mediumRiskPatterns = [\n  /production/,\n  /deploy/,\n  /credential/,\n  /token/,\n  /secret/,\n  /workflow/,\n  /数据库/,\n  /迁移/,\n  /重构/\n];\n\nconst errors = [];\nconst warnings = [];\n\nif (!$json.goal) errors.push('goal is required');\nif (!allowedModes.includes($json.mode)) errors.push(`unsupported mode: ${$json.mode}`);\nif (!Array.isArray($json.constraints)) errors.push('constraints must be an array');\nif (!Array.isArray($json.acceptanceCriteria)) errors.push('acceptanceCriteria must be an array');\nif (!Number.isFinite($json.maxIterations) || $json.maxIterations < 1) {\n  warnings.push('maxIterations was invalid and should be reviewed manually');\n}\n\nconst highRiskMatches = highRiskPatterns.filter((pattern) => pattern.test(riskScanText));\nconst mediumRiskMatches = mediumRiskPatterns.filter((pattern) => pattern.test(searchableText));\n\nlet riskLevel = 'low';\nif (errors.length > 0 || highRiskMatches.length > 0) {\n  riskLevel = 'high';\n} else if (mediumRiskMatches.length > 0) {\n  riskLevel = 'medium';\n}\n\nconst requireHumanApproval = riskLevel === 'medium' || riskLevel === 'high';\nconst blockedBySafety = riskLevel === 'high';\nconst humanApprovalPending = requireHumanApproval && !$json.humanApproved;\n\nif (blockedBySafety) {\n  warnings.push('High-risk input detected. Stop and require explicit human review before any execution.');\n}\nif (humanApprovalPending && !blockedBySafety) {\n  warnings.push('Human approval is required before continuing because the task is medium risk.');\n}\n\nreturn [{\n  json: {\n    ...$json,\n    riskLevel,\n    requireHumanApproval,\n    humanApprovalPending,\n    blockedBySafety,\n    validationErrors: errors,\n    warnings,\n    safetySummary: {\n      highRiskMatches: highRiskMatches.map((pattern) => pattern.toString()),\n      mediumRiskMatches: mediumRiskMatches.map((pattern) => pattern.toString())\n    },\n    status: blockedBySafety\n      ? 'blocked'\n      : humanApprovalPending\n        ? 'needs_human_approval'\n        : 'ready'\n  }\n}];"
+      },
+      "id": "safety-guard",
+      "name": "Safety Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.blockedBySafety || $json.humanApprovalPending }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "human-approval-gate",
+      "name": "Human Approval Gate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.mode }}",
+                    "operation": "equal",
+                    "value2": "plan_only"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "plan_only"
+            },
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.mode }}",
+                    "operation": "equal",
+                    "value2": "prepare_codex_task"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "prepare_codex_task"
+            },
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.mode }}",
+                    "operation": "equal",
+                    "value2": "review_result"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "review_result"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "mode-router",
+      "name": "Mode Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "plannerAgentStatus",
+              "value": "placeholder"
+            },
+            {
+              "name": "plannerModelRef",
+              "value": "{{ $env.PLANNER_MODEL }}"
+            },
+            {
+              "name": "plannerAuthRef",
+              "value": "{{ $env.OPENAI_API_KEY }}"
+            }
+          ],
+          "json": [
+            {
+              "name": "taskBreakdown",
+              "value": "={{ [\n  `Clarify goal: ${$json.goal}`,\n  'Inspect repository state before editing',\n  'Implement the smallest reviewable change',\n  'Run validation and capture evidence'\n] }}"
+            },
+            {
+              "name": "implementationPlan",
+              "value": "={{ [\n  'Review relevant files and current git state',\n  'Make staged, reversible edits only',\n  'Validate behavior against acceptance criteria',\n  'Prepare rollback notes and next-step guidance'\n] }}"
+            },
+            {
+              "name": "filesLikelyAffected",
+              "value": "={{ $json.changedFiles && $json.changedFiles.length > 0 ? $json.changedFiles : ['TBD after repository inspection'] }}"
+            },
+            {
+              "name": "validationPlan",
+              "value": "={{ [\n  'Inspect git diff',\n  'Run relevant tests or manual checks',\n  'Confirm no secrets are exposed'\n] }}"
+            },
+            {
+              "name": "rollbackPlan",
+              "value": "={{ [\n  'Keep changes in a small commit',\n  'Revert the commit or restore the previous workflow JSON if validation fails',\n  'Do not activate workflow changes until manually reviewed'\n] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "planner-agent-placeholder",
+      "name": "Planner Agent Placeholder",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const forbiddenActions = [\n  'Do not expose API keys or credentials',\n  'Do not run destructive git or shell commands without explicit human approval',\n  'Do not auto-deploy to production',\n  'Do not assume a direct Codex API exists'\n];\n\nconst testCommands = [\n  'git status',\n  'git diff',\n  'Run project-specific validation commands after inspecting the repo'\n];\n\nconst codexTaskPrompt = $json.mode === 'prepare_codex_task'\n  ? [\n      '# Codex Task',\n      '',\n      `## 背景`,\n      `项目：${$json.projectName}`,\n      `目标：${$json.goal}`,\n      '',\n      '## 修改范围',\n      ...($json.taskBreakdown || []).map((item) => `- ${item}`),\n      '',\n      '## 禁止事项',\n      ...forbiddenActions.map((item) => `- ${item}`),\n      '',\n      '## 验收标准',\n      ...($json.acceptanceCriteria || []).map((item) => `- ${item}`),\n      '',\n      '## 测试命令 / 验证动作',\n      ...testCommands.map((item) => `- ${item}`),\n      '',\n      '## 回滚方案',\n      ...($json.rollbackPlan || []).map((item) => `- ${item}`),\n      '',\n      '## Git 提交建议',\n      '- 建议先完成小步修改并人工查看 diff，再决定是否提交',\n      '- 建议提交信息：feat: prepare safe codex task workflow iteration',\n      '',\n      '## 任务承载方式',\n      '- 当前不假设存在 Codex 官方 API',\n      '- 可先通过手动复制、GitHub Issue、本地任务文件或 webhook payload 传递任务'\n    ].join('\\n')\n  : null;\n\nreturn [{\n  json: {\n    ...$json,\n    codexAdapter: {\n      strategy: 'task-prompt',\n      supportedTransports: ['manual_copy', 'github_issue', 'local_task_file', 'webhook_payload']\n    },\n    codexTaskPrompt,\n    status: $json.mode === 'plan_only' ? 'planned' : 'codex_task_ready',\n    nextAction: $json.mode === 'plan_only' ? 'ask_human' : 'ask_human'\n  }\n}];"
+      },
+      "id": "codex-task-builder",
+      "name": "Codex Task Builder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const reviewInput = {\n  gitDiffSummary: $json.gitDiffSummary || '',\n  testResults: $json.testResults || '',\n  changedFiles: Array.isArray($json.changedFiles) ? $json.changedFiles : [],\n  codexNotes: $json.codexNotes || '',\n  knownIssues: Array.isArray($json.knownIssues) ? $json.knownIssues : []\n};\n\nconst missingFields = Object.entries(reviewInput)\n  .filter(([key, value]) => {\n    if (Array.isArray(value)) return value.length === 0 && key !== 'knownIssues';\n    return !value && key !== 'knownIssues';\n  })\n  .map(([key]) => key);\n\nreturn [{\n  json: {\n    ...$json,\n    reviewInput,\n    missingReviewFields: missingFields\n  }\n}];"
+      },
+      "id": "review-result-parser",
+      "name": "Review Result Parser",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const issues = [];\nconst knownIssues = $json.reviewInput?.knownIssues || [];\nconst missingFields = $json.missingReviewFields || [];\n\nif (($json.acceptanceCriteria || []).length === 0) {\n  issues.push('No acceptance criteria were provided.');\n}\nif (missingFields.length > 0) {\n  issues.push(`Missing review evidence: ${missingFields.join(', ')}`);\n}\nif (knownIssues.length > 0) {\n  issues.push(...knownIssues.map((issue) => `Known issue: ${issue}`));\n}\n\nlet score = 100;\nscore -= missingFields.length * 20;\nscore -= knownIssues.length * 15;\nif (($json.acceptanceCriteria || []).length === 0) score -= 20;\nscore = Math.max(0, score);\n\nconst riskyIssueDetected = knownIssues.some((issue) => /secret|token|production|rollback/i.test(issue));\nconst passed = score >= 80 && issues.length === 0;\n\nlet nextAction = 'ask_human';\nif (riskyIssueDetected) {\n  nextAction = 'rollback';\n} else if (!passed) {\n  nextAction = 'revise';\n}\n\nconst nextCodexTaskPrompt = passed\n  ? null\n  : [\n      '# Follow-up Codex Task',\n      '',\n      `Original goal: ${$json.goal}`,\n      '',\n      'Please revise the implementation using the findings below:',\n      ...issues.map((issue) => `- ${issue}`),\n      '',\n      'Preserve reversibility, keep the diff small, and report updated validation evidence.'\n    ].join('\\n');\n\nreturn [{\n  json: {\n    ...$json,\n    reviewerAgentStatus: 'placeholder',\n    reviewerModelRef: '{{ $env.REVIEWER_MODEL }}',\n    review: {\n      score,\n      passed,\n      issues,\n      nextAction,\n      nextCodexTaskPrompt\n    },\n    status: passed ? 'review_complete' : 'review_needs_attention',\n    nextAction,\n    nextCodexTaskPrompt\n  }\n}];"
+      },
+      "id": "reviewer-agent-placeholder",
+      "name": "Reviewer Agent Placeholder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    status: $json.status || 'unknown',\n    riskLevel: $json.riskLevel || 'unknown',\n    requireHumanApproval: Boolean($json.requireHumanApproval),\n    codexTaskPrompt: $json.codexTaskPrompt || null,\n    review: $json.review || null,\n    nextAction: $json.nextAction || ($json.blockedBySafety ? 'ask_human' : 'ask_human'),\n    warnings: $json.warnings || [],\n    validationErrors: $json.validationErrors || [],\n    planner: $json.taskBreakdown\n      ? {\n          taskBreakdown: $json.taskBreakdown,\n          implementationPlan: $json.implementationPlan,\n          filesLikelyAffected: $json.filesLikelyAffected,\n          validationPlan: $json.validationPlan,\n          rollbackPlan: $json.rollbackPlan\n        }\n      : null,\n    codexAdapter: $json.codexAdapter || null,\n    note: $json.blockedBySafety\n      ? 'High-risk task blocked. Manual review is required before any execution.'\n      : $json.humanApprovalPending\n        ? 'Human approval is required before continuing.'\n        : 'Workflow completed without automatic execution.'\n  }\n}];"
+      },
+      "id": "response-formatter",
+      "name": "Response Formatter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "response-node",
+      "name": "Response Node",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Safety Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safety Guard": {
+      "main": [
+        [
+          {
+            "node": "Human Approval Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Approval Gate": {
+      "main": [
+        [
+          {
+            "node": "Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mode Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mode Router": {
+      "main": [
+        [
+          {
+            "node": "Planner Agent Placeholder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Planner Agent Placeholder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Review Result Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Planner Agent Placeholder": {
+      "main": [
+        [
+          {
+            "node": "Codex Task Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Codex Task Builder": {
+      "main": [
+        [
+          {
+            "node": "Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Result Parser": {
+      "main": [
+        [
+          {
+            "node": "Reviewer Agent Placeholder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reviewer Agent Placeholder": {
+      "main": [
+        [
+          {
+            "node": "Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response Formatter": {
+      "main": [
+        [
+          {
+            "node": "Response Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "active": false
+}
