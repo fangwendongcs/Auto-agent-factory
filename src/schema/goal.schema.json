@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/goal.schema.json",
+  "title": "Goal Request",
+  "description": "User-supplied goal request that starts a Goal-Driven Agent Workflow run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "goal",
+    "criteria"
+  ],
+  "properties": {
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The user-visible outcome the workflow should achieve."
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Observable success criteria used by the checker workflow."
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": true,
+      "default": {},
+      "description": "Optional non-secret context the agents may use."
+    },
+    "max_iterations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "default": 5,
+      "description": "Maximum number of executor/checker loops before the workflow stops."
+    },
+    "timeout_minutes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30,
+      "default": 30,
+      "description": "Maximum wall-clock runtime before the workflow stops."
+    },
+    "require_human_approval": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the workflow should preserve a manual approval checkpoint."
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low",
+      "description": "Initial risk classification for routing and approval decisions."
+    },
+    "requester": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "human",
+            "system"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "Optional caller identity metadata without secrets."
+    }
+  }
+}
+

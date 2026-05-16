@@ -1,0 +1,44 @@
+{
+  "run_id": "gd_20260516_001",
+  "task_id": "task_002",
+  "status": "partial",
+  "summary": "已完成初版工作流设计，但尚未补充失败重试和人工审核节点。",
+  "artifacts": [
+    "docs/WORKFLOW_DESIGN.md"
+  ],
+  "known_issues": [
+    "缺少失败重试逻辑",
+    "缺少人工审核节点",
+    "尚未生成最终 Markdown 报告"
+  ],
+  "evidence": [
+    {
+      "criterion": "必须输出完整流程图",
+      "status": "pass",
+      "detail": "docs/WORKFLOW_DESIGN.md 中包含总体流程图。"
+    },
+    {
+      "criterion": "必须包含 n8n 节点设计",
+      "status": "pass",
+      "detail": "文档中已列出主要节点。"
+    },
+    {
+      "criterion": "必须包含失败重试逻辑",
+      "status": "fail",
+      "detail": "当前设计还没有 retry 分支。"
+    },
+    {
+      "criterion": "必须包含人工审核节点",
+      "status": "fail",
+      "detail": "当前设计还没有 Human Approval Gate。"
+    },
+    {
+      "criterion": "必须生成最终 Markdown 报告",
+      "status": "fail",
+      "detail": "尚未生成报告文件。"
+    }
+  ],
+  "next_action_suggestion": "补充 retry 分支、Human Approval Gate，并生成最终 Markdown 报告。",
+  "error": null
+}
+

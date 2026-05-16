@@ -1,0 +1,8 @@
+{
+  "goal": "生成一个测试报告",
+  "max_iterations": 5,
+  "timeout_minutes": 30,
+  "require_human_approval": true,
+  "risk_level": "low"
+}
+

@@ -1,0 +1,19 @@
+{
+  "goal": "生成一个可以自动分析小红书爆款选题的工作流方案",
+  "criteria": [
+    "必须输出完整流程图",
+    "必须包含 n8n 节点设计",
+    "必须包含失败重试逻辑",
+    "必须包含人工审核节点",
+    "必须生成最终 Markdown 报告"
+  ],
+  "context": {
+    "target_platform": "xiaohongshu",
+    "deliverable_format": "markdown"
+  },
+  "max_iterations": 5,
+  "timeout_minutes": 30,
+  "require_human_approval": true,
+  "risk_level": "low"
+}
+

@@ -1,0 +1,15 @@
+{
+  "name": "goal-driven-agent-workflow-with-n8n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Mock-first Goal-Driven Agent Workflow templates for n8n.",
+  "scripts": {
+    "test": "node --test",
+    "workflow:validate": "node scripts/validate-n8n-workflow.mjs workflows/goal_driven_master.workflow.json",
+    "workflow:validate:all": "node scripts/validate-all-workflows.mjs workflows",
+    "workflow:dry-run": "node scripts/deploy-n8n-workflow.mjs workflows/goal_driven_master.workflow.json",
+    "smoke:goal-driven": "node scripts/smoke-test-goal-driven-workflow.mjs",
+    "import:check": "node scripts/check-import-readiness.mjs"
+  }
+}

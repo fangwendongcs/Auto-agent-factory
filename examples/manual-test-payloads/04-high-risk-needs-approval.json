@@ -1,0 +1,11 @@
+{
+  "goal": "修改生产工作流并自动发布",
+  "criteria": [
+    "必须保留回滚方案"
+  ],
+  "max_iterations": 3,
+  "timeout_minutes": 20,
+  "require_human_approval": true,
+  "risk_level": "high"
+}
+

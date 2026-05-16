@@ -140,9 +140,11 @@ max_iterations_reached
 {
   "goal": "string",
   "criteria": ["string"],
+  "context": {},
   "max_iterations": 5,
   "timeout_minutes": 30,
-  "require_human_approval": true
+  "require_human_approval": true,
+  "risk_level": "low"
 }
 ```
 
@@ -150,12 +152,21 @@ max_iterations_reached
 
 ```json
 {
+  "run_id": "gd_example",
   "task_id": "string",
   "status": "completed",
   "summary": "string",
   "artifacts": ["string"],
   "known_issues": ["string"],
-  "next_action_suggestion": "string"
+  "evidence": [
+    {
+      "criterion": "string",
+      "status": "pass",
+      "detail": "string"
+    }
+  ],
+  "next_action_suggestion": "string",
+  "error": null
 }
 ```
 
@@ -238,3 +249,49 @@ n8n/workflows/codex-planner-reviewer.workflow.json
 3. Phase 4：用 mock mode 做本地测试
 4. Phase 5：补 runbook、test cases 和最终报告样例
 
+## 12. Phase 3 导出模板说明
+
+当前仓库中的四个正式 workflow JSON 已经落地：
+
+```text
+workflows/goal_driven_master.workflow.json
+workflows/agent_task_executor.workflow.json
+workflows/criteria_checker.workflow.json
+workflows/error_handler.workflow.json
+```
+
+### 12.1 当前实现边界
+
+Phase 3 采用 **mock-first** 设计：
+
+- `Goal-Driven Master Workflow`
+  - 接收 goal
+  - 校验 payload
+  - 生成 `run_id / task_id`
+  - 体现 executor 与 checker 的调度关系
+  - 在 mock 模式下返回一次 orchestration turn 的结果
+- `Agent Task Executor Workflow`
+  - 通过 `When Executed by Another Workflow` 触发
+  - 校验 task payload
+  - 返回结构化 mock result
+- `Criteria Checker Workflow`
+  - 通过 `When Executed by Another Workflow` 触发
+  - 基于 evidence 逐项输出 pass / fail / unknown
+- `Goal-Driven Error Handler Workflow`
+  - 通过 `Error Trigger` 接收失败执行
+  - 输出错误摘要和恢复建议
+
+### 12.2 导入后的人工检查项
+
+不同 n8n 实例导入后会生成不同 workflow ID，因此当前模板不会硬编码生产 ID。  
+导入后应在 n8n UI 中人工完成：
+
+1. 将 Master 中的 executor 调度占位替换或接成真正的 `Execute Sub-workflow` 调用，并指向 `Agent Task Executor Workflow`
+2. 将 Master 中的 checker 调度占位替换或接成真正的 `Execute Sub-workflow` 调用，并指向 `Criteria Checker Workflow`
+3. 将 `Goal-Driven Error Handler Workflow` 设置为 Master 的 error workflow
+4. 先用 sample payload 手动执行，再决定是否激活
+
+### 12.3 为什么先 mock
+
+先让输入、输出、分支和失败路径稳定，再接真实 provider。  
+这能把“workflow 是否正确”与“模型是否聪明”分开验证，降低 Phase 4 / Phase 5 的调试成本。
