@@ -12,5 +12,9 @@
   "risk_level": "low",
   "require_human_approval": false,
   "manual_approval_required": false,
-  "human_approved": true
+  "human_approved": true,
+  "context": {
+    "agent_mode": "dry-run",
+    "provider_mode": "dry-run"
+  }
 }
