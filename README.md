@@ -338,3 +338,7 @@ human approval gate verified
 1. 真实 provider adapter 设计
 2. 发布前 credential / webhook / 回滚清单
 3. 更完整的日志、评估和观测方案
+
+进入真实 provider 接入前，请先完成：
+
+- `docs/PRODUCTION_READINESS.md`

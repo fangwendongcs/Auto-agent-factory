@@ -363,7 +363,26 @@ examples/manual-test-payloads/
 - 已确认 high-risk 人工审核拦截仍生效
 - 已人工检查 workflow diff 和 credential 配置
 
-## 13. 成本与安全提醒
+## 13. 进入真实 provider 前
+
+在把 mock-first MVP 继续推进到真实 provider / LLM / HTTP adapter 之前，必须先完成：
+
+```text
+docs/PRODUCTION_READINESS.md
+```
+
+这份清单负责确认：
+
+- 发布状态是否可控
+- credential 与 secret 是否安全
+- webhook 是否适合进入公网
+- execution / logging 是否足够排错
+- rollback / restore 是否已经有明确路径
+- real provider 接入是否仍然保留 mock、dry-run 和人工审批边界
+
+如果 `PRODUCTION_READINESS` 仍有关键项未完成，不建议直接接入真实 provider。
+
+## 14. 成本与安全提醒
 
 - Agent 自动化可能消耗大量 token 和时间
 - `max_iterations` 与 `timeout_minutes` 不是装饰项，而是停止边界
