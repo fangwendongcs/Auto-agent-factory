@@ -8,3 +8,5 @@ logs/
 .cache/
 dist/
 build/
+workflows/_backup_before_n8n_export_sync/
+workflows/_n8n_exports_synced/
