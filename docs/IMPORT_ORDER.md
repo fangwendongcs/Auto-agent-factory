@@ -10,10 +10,10 @@
 请按这个顺序导入：
 
 ```text
-1. Agent Task Executor Workflow
-2. Criteria Checker Workflow
-3. Goal-Driven Error Handler Workflow
-4. Goal-Driven Master Workflow
+1. [GoalDriven] 02 Agent Task Executor
+2. [GoalDriven] 03 Criteria Checker
+3. [GoalDriven] 04 Error Handler
+4. [GoalDriven] 01 Master
 ```
 
 对应文件：
@@ -35,35 +35,36 @@ workflows/goal_driven_master.workflow.json
 
 ```mermaid
 flowchart LR
-    Master["Goal-Driven Master Workflow"] --> Executor["Agent Task Executor Workflow"]
-    Master --> Checker["Criteria Checker Workflow"]
-    Master -. error workflow .-> ErrorHandler["Goal-Driven Error Handler Workflow"]
+    Master["[GoalDriven] 01 Master"] --> Executor["[GoalDriven] 02 Agent Task Executor"]
+    Master --> Checker["[GoalDriven] 03 Criteria Checker"]
+    Master -. error workflow .-> ErrorHandler["[GoalDriven] 04 Error Handler"]
 ```
 
-## 4. 你需要手动完成的 3 件事
+## 4. 导入后需要核对的 3 件事
 
 ### 4.1 Executor
 
-把 Master 中与 executor 有关的调度占位，替换或接成真正的：
+当前仓库中的正式 JSON 已保留你在 n8n UI 中跑通的 `Execute Sub-workflow` 绑定。  
+重新导入到**同一个 n8n 实例**时，通常可以继续沿用原有绑定；如果迁移到**另一台 n8n 实例**，需要在 Master 中重新选择：
 
 ```text
-Execute Sub-workflow → Agent Task Executor Workflow
+Execute Sub-workflow → [GoalDriven] 02 Agent Task Executor
 ```
 
 ### 4.2 Checker
 
-把 Master 中与 checker 有关的调度占位，替换或接成真正的：
+同理，跨实例迁移时需要在 Master 中重新选择：
 
 ```text
-Execute Sub-workflow → Criteria Checker Workflow
+Execute Sub-workflow → [GoalDriven] 03 Criteria Checker
 ```
 
 ### 4.3 Error Handler
 
-在 Master 的 workflow settings 里选择：
+在跨实例迁移后，重新在 Master 的 workflow settings 里选择：
 
 ```text
-Error workflow → Goal-Driven Error Handler Workflow
+Error workflow → [GoalDriven] 04 Error Handler
 ```
 
 ## 5. 导入后别急着做的事
@@ -76,4 +77,3 @@ Error workflow → Goal-Driven Error Handler Workflow
 - 改 `max_iterations`
 
 先让 sample payload 在你的 n8n 里跑通，再继续升级。
-

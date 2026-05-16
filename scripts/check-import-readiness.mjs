@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 
 const expectedWorkflows = {
   'workflows/agent_task_executor.workflow.json': {
-    name: 'Agent Task Executor Workflow',
+    name: '[GoalDriven] 02 Agent Task Executor',
     requiredNodes: [
       'When Executed by Another Workflow',
       'Task Validator',
@@ -14,7 +14,7 @@ const expectedWorkflows = {
     ]
   },
   'workflows/criteria_checker.workflow.json': {
-    name: 'Criteria Checker Workflow',
+    name: '[GoalDriven] 03 Criteria Checker',
     requiredNodes: [
       'When Executed by Another Workflow',
       'Criteria Evaluator',
@@ -22,7 +22,7 @@ const expectedWorkflows = {
     ]
   },
   'workflows/error_handler.workflow.json': {
-    name: 'Goal-Driven Error Handler Workflow',
+    name: '[GoalDriven] 04 Error Handler',
     requiredNodes: [
       'Error Trigger',
       'Error Normalizer',
@@ -30,19 +30,22 @@ const expectedWorkflows = {
     ]
   },
   'workflows/goal_driven_master.workflow.json': {
-    name: 'Goal-Driven Master Workflow',
+    name: '[GoalDriven] 01 Master',
     requiredNodes: [
       'Webhook Trigger',
       'Payload Validator',
+      'Approval or Invalid Router',
       'Task Initializer',
       'Agent Dispatcher',
-      'Mock Executor Result',
+      "Call '[GoalDriven] 02 Agent Task Executor'",
       'Criteria Router',
+      "Call '[GoalDriven] 03 Criteria Checker'",
+      'Criteria Met Router',
       'Final Reporter'
     ],
-    placeholderNodes: [
-      'Agent Dispatcher',
-      'Criteria Router'
+    linkedWorkflowNodes: [
+      "Call '[GoalDriven] 02 Agent Task Executor'",
+      "Call '[GoalDriven] 03 Criteria Checker'"
     ]
   }
 };
@@ -65,8 +68,8 @@ async function main() {
       missingNodes.forEach((node) => console.log(`- missing node: ${node}`));
     }
 
-    if (expectation.placeholderNodes) {
-      console.log(`Manual wiring placeholders: ${expectation.placeholderNodes.join(', ')}`);
+    if (expectation.linkedWorkflowNodes) {
+      console.log(`Linked sub-workflow nodes: ${expectation.linkedWorkflowNodes.join(', ')}`);
     }
 
     console.log('');
@@ -78,10 +81,11 @@ async function main() {
   });
 
   console.log('');
-  console.log('Manual wiring required after import:');
-  console.log('- Master → Agent Task Executor Workflow');
-  console.log('- Master → Criteria Checker Workflow');
-  console.log('- Master error workflow → Goal-Driven Error Handler Workflow');
+  console.log('Bindings to verify after import:');
+  console.log("- Master → [GoalDriven] 02 Agent Task Executor");
+  console.log("- Master → [GoalDriven] 03 Criteria Checker");
+  console.log("- Master error workflow → [GoalDriven] 04 Error Handler");
+  console.log('- Same-instance re-import can keep exported IDs; cross-instance import requires manual reselection.');
 
   process.exitCode = hasErrors ? 1 : 0;
 }
@@ -90,4 +94,3 @@ main().catch((error) => {
   console.error(`ERROR: ${error.message}`);
   process.exitCode = 1;
 });
-

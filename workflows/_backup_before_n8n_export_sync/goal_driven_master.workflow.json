@@ -1,0 +1,326 @@
+{
+  "name": "Goal-Driven Master Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "goal-driven-master",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json.body || $json;\nconst goal = typeof input.goal === 'string' ? input.goal.trim() : '';\nconst criteria = Array.isArray(input.criteria)\n  ? input.criteria.map((item) => String(item).trim()).filter(Boolean)\n  : [];\nconst maxIterations = Number.isInteger(input.max_iterations)\n  ? input.max_iterations\n  : Number($env.MAX_ITERATIONS_DEFAULT || 5);\nconst timeoutMinutes = Number.isInteger(input.timeout_minutes)\n  ? input.timeout_minutes\n  : Number($env.TIMEOUT_MINUTES_DEFAULT || 30);\nconst riskLevel = ['low', 'medium', 'high'].includes(input.risk_level)\n  ? input.risk_level\n  : 'low';\nconst requireHumanApproval = input.require_human_approval ?? ($env.MANUAL_APPROVAL_REQUIRED !== 'false');\nconst humanApproved = Boolean(input.human_approved);\nconst errors = [];\n\nif (!goal) errors.push('goal is required');\nif (criteria.length === 0) errors.push('criteria must contain at least one item');\nif (!Number.isInteger(maxIterations) || maxIterations < 1 || maxIterations > 5) {\n  errors.push('max_iterations must be an integer between 1 and 5');\n}\nif (!Number.isInteger(timeoutMinutes) || timeoutMinutes < 1 || timeoutMinutes > 30) {\n  errors.push('timeout_minutes must be an integer between 1 and 30');\n}\n\nconst requiresApprovalNow = requireHumanApproval && ['medium', 'high'].includes(riskLevel) && !humanApproved;\n\nreturn [{\n  json: {\n    goal,\n    criteria,\n    context: input.context || {},\n    max_iterations: maxIterations,\n    timeout_minutes: timeoutMinutes,\n    require_human_approval: Boolean(requireHumanApproval),\n    human_approved: humanApproved,\n    risk_level: riskLevel,\n    validation_errors: errors,\n    requires_approval_now: requiresApprovalNow,\n    status: errors.length > 0\n      ? 'invalid_request'\n      : requiresApprovalNow\n        ? 'needs_human_approval'\n        : 'validated'\n  }\n}];"
+      },
+      "id": "payload-validator",
+      "name": "Payload Validator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.validation_errors.length > 0 || $json.requires_approval_now }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "approval-or-invalid-router",
+      "name": "Approval or Invalid Router",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst compactDate = now.toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);\nconst runId = `gd_${compactDate}_${Math.random().toString(36).slice(2, 6)}`;\nconst taskId = `task_${compactDate}_001`;\n\nreturn [{\n  json: {\n    ...$json,\n    run_id: runId,\n    task_id: taskId,\n    iteration: 1,\n    instruction: `Work toward the goal and satisfy the criteria: ${$json.goal}`,\n    previous_feedback: '',\n    requires_human_approval: $json.require_human_approval,\n    status: 'initialized'\n  }\n}];"
+      },
+      "id": "task-initializer",
+      "name": "Task Initializer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    executor_dispatch: {\n      target_workflow: 'agent_task_executor.workflow.json',\n      workflow_id_placeholder: '{{ $env.N8N_EXECUTOR_WORKFLOW_ID }}',\n      transport: 'execute_subworkflow',\n      note: 'After import, bind this dispatcher to the imported Agent Task Executor workflow in n8n.'\n    },\n    status: 'dispatched'\n  }\n}];"
+      },
+      "id": "agent-dispatcher",
+      "name": "Agent Dispatcher",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "notes": "Manual wiring placeholder: after import, replace or connect this step with Execute Sub-workflow → Agent Task Executor Workflow.",
+      "position": [
+        -560,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = {\n  run_id: $json.run_id,\n  task_id: $json.task_id,\n  status: 'partial',\n  summary: 'Mock executor generated an initial artifact draft for checker review.',\n  artifacts: ['docs/WORKFLOW_DESIGN.md'],\n  known_issues: ['Mock mode intentionally leaves some criteria unresolved.'],\n  evidence: ($json.criteria || []).map((criterion, index) => ({\n    criterion,\n    status: index < 2 ? 'pass' : 'fail',\n    detail: index < 2\n      ? `Mock evidence collected for criterion ${index + 1}.`\n      : `Mock mode requires another iteration for criterion ${index + 1}.`\n  })),\n  next_action_suggestion: 'Run criteria checker and generate the next iteration instruction.',\n  error: null\n};\n\nreturn [{ json: { ...$json, agent_result: result, status: 'checking' } }];"
+      },
+      "id": "mock-executor-result",
+      "name": "Mock Executor Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checks = ($json.criteria || []).map((criterion) => {\n  const evidence = ($json.agent_result?.evidence || []).find((item) => item.criterion === criterion);\n  return {\n    criterion,\n    status: evidence?.status || 'unknown',\n    evidence: evidence?.detail || 'No evidence provided.'\n  };\n});\nconst scoreMap = { pass: 1, unknown: 0.5, fail: 0 };\nconst score = checks.length === 0\n  ? 0\n  : checks.reduce((sum, item) => sum + scoreMap[item.status], 0) / checks.length;\nconst criteriaMet = checks.length > 0 && checks.every((item) => item.status === 'pass');\nconst canRetry = !criteriaMet && $json.iteration < $json.max_iterations;\nconst nextInstruction = criteriaMet\n  ? null\n  : checks\n      .filter((item) => item.status !== 'pass')\n      .map((item) => `Improve criterion: ${item.criterion}`)\n      .join('; ');\n\nreturn [{\n  json: {\n    ...$json,\n    checker_dispatch: {\n      target_workflow: 'criteria_checker.workflow.json',\n      workflow_id_placeholder: '{{ $env.N8N_CRITERIA_CHECKER_WORKFLOW_ID }}',\n      transport: 'execute_subworkflow',\n      note: 'After import, bind this checker call to the imported Criteria Checker workflow in n8n.'\n    },\n    criteria_result: {\n      criteria_met: criteriaMet,\n      score: Number(score.toFixed(2)),\n      checks,\n      next_iteration_instruction: nextInstruction,\n      should_stop: !criteriaMet && !canRetry,\n      stop_reason: !criteriaMet && !canRetry ? 'max_iterations_reached' : null\n    },\n    status: criteriaMet\n      ? 'completed'\n      : canRetry\n        ? 'needs_iteration'\n        : 'max_iterations_reached'\n  }\n}];"
+      },
+      "id": "criteria-router",
+      "name": "Criteria Router",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "notes": "Manual wiring placeholder: after import, replace or connect this step with Execute Sub-workflow → Criteria Checker Workflow.",
+      "position": [
+        -80,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.criteria_result.criteria_met }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "criteria-met-router",
+      "name": "Criteria Met Router",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        160,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    run_id: $json.run_id,\n    status: 'completed',\n    criteria_met: true,\n    iterations: $json.iteration,\n    final_report: {\n      summary: 'All criteria passed in the current mock orchestration turn.',\n      artifacts: $json.agent_result.artifacts,\n      checks: $json.criteria_result.checks\n    },\n    next_action: 'stop'\n  }\n}];"
+      },
+      "id": "final-reporter",
+      "name": "Final Reporter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    run_id: $json.run_id,\n    status: $json.status,\n    criteria_met: false,\n    iterations: $json.iteration,\n    next_iteration_instruction: $json.criteria_result.next_iteration_instruction,\n    retry_allowed: !$json.criteria_result.should_stop,\n    stop_reason: $json.criteria_result.stop_reason,\n    next_action: $json.criteria_result.should_stop ? 'finalize_failed_run' : 'dispatch_next_iteration'\n  }\n}];"
+      },
+      "id": "retry-or-stop-reporter",
+      "name": "Retry or Stop Reporter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    status: $json.status,\n    validation_errors: $json.validation_errors || [],\n    requires_human_approval: $json.requires_approval_now || false,\n    note: $json.status === 'needs_human_approval'\n      ? 'Manual approval is required before dispatching work.'\n      : 'Request rejected before task initialization.'\n  }\n}];"
+      },
+      "id": "blocked-response-builder",
+      "name": "Blocked Response Builder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "response-node",
+      "name": "Response Node",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        680,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Payload Validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload Validator": {
+      "main": [
+        [
+          {
+            "node": "Approval or Invalid Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval or Invalid Router": {
+      "main": [
+        [
+          {
+            "node": "Blocked Response Builder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Task Initializer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task Initializer": {
+      "main": [
+        [
+          {
+            "node": "Agent Dispatcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent Dispatcher": {
+      "main": [
+        [
+          {
+            "node": "Mock Executor Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Executor Result": {
+      "main": [
+        [
+          {
+            "node": "Criteria Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criteria Router": {
+      "main": [
+        [
+          {
+            "node": "Criteria Met Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criteria Met Router": {
+      "main": [
+        [
+          {
+            "node": "Final Reporter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retry or Stop Reporter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Reporter": {
+      "main": [
+        [
+          {
+            "node": "Response Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry or Stop Reporter": {
+      "main": [
+        [
+          {
+            "node": "Response Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blocked Response Builder": {
+      "main": [
+        [
+          {
+            "node": "Response Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "active": false
+}

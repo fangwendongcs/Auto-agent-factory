@@ -1,71 +1,70 @@
 {
-  "name": "[GoalDriven] 02 Agent Task Executor",
+  "name": "Agent Task Executor Workflow",
   "nodes": [
     {
       "parameters": {},
-      "id": "b13ab5cd-e7df-4758-88fd-956dbaadcf1f",
+      "id": "execute-subworkflow-trigger",
       "name": "When Executed by Another Workflow",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1,
       "position": [
-        -208,
-        -192
+        -880,
+        0
       ]
     },
     {
       "parameters": {
         "jsCode": "const errors = [];\nfor (const field of ['run_id', 'task_id', 'goal', 'criteria', 'iteration', 'instruction', 'status']) {\n  if ($json[field] === undefined || $json[field] === null || $json[field] === '') {\n    errors.push(`${field} is required`);\n  }\n}\nif (!Array.isArray($json.criteria) || $json.criteria.length === 0) {\n  errors.push('criteria must contain at least one item');\n}\nreturn [{ json: { ...$json, validation_errors: errors } }];"
       },
-      "id": "34ab767a-aa85-45b0-b734-eed0cdfa6d6e",
+      "id": "task-validator",
       "name": "Task Validator",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        32,
-        -192
+        -640,
+        0
       ]
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\n\nconst context =\n  input.context && typeof input.context === 'object'\n    ? input.context\n    : {};\n\nconst agentMode =\n  typeof input.agent_mode === 'string' && input.agent_mode.trim()\n    ? input.agent_mode.trim()\n    : typeof context.agent_mode === 'string' && context.agent_mode.trim()\n      ? context.agent_mode.trim()\n      : 'mock';\n\nreturn [\n  {\n    json: {\n      ...input,\n      context: {\n        ...context,\n        agent_mode: agentMode,\n      },\n      prompt_reference: 'src/prompts/subagent_prompt.md',\n      prompt_contract: {\n        output: 'result.schema.json',\n        format: 'json_only',\n      },\n      agent_mode: agentMode,\n    },\n  },\n];"
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    prompt_reference: 'src/prompts/subagent_prompt.md',\n    prompt_contract: {\n      output: 'result.schema.json',\n      format: 'json_only'\n    },\n    agent_mode: $env.AGENT_MODE || 'mock'\n  }\n}];"
       },
-      "id": "41dd8d68-de84-4264-8f9e-4d911a3d52bf",
+      "id": "prompt-builder",
       "name": "Prompt Builder",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        272,
-        -192
+        -400,
+        0
       ]
     },
     {
       "parameters": {
         "jsCode": "if (($json.validation_errors || []).length > 0) {\n  return [{\n    json: {\n      run_id: $json.run_id || 'unknown',\n      task_id: $json.task_id || 'unknown',\n      status: 'failed',\n      summary: 'Task validation failed before execution.',\n      artifacts: [],\n      known_issues: $json.validation_errors,\n      evidence: ($json.criteria || ['task payload']).map((criterion) => ({\n        criterion,\n        status: 'fail',\n        detail: 'Executor could not run because the task payload was invalid.'\n      })),\n      next_action_suggestion: 'Fix the task payload and retry.',\n      error: {\n        code: 'TASK_VALIDATION_FAILED',\n        message: $json.validation_errors.join('; ')\n      }\n    }\n  }];\n}\n\nconst evidence = ($json.criteria || []).map((criterion, index) => ({\n  criterion,\n  status: index < 2 ? 'pass' : 'fail',\n  detail: index < 2\n    ? `Mock executor produced evidence for criterion ${index + 1}.`\n    : `Mock executor intentionally leaves criterion ${index + 1} unresolved.`\n}));\n\nreturn [{\n  json: {\n    run_id: $json.run_id,\n    task_id: $json.task_id,\n    status: evidence.every((item) => item.status === 'pass') ? 'completed' : 'partial',\n    summary: 'Mock executor completed one bounded task iteration.',\n    artifacts: ['docs/WORKFLOW_DESIGN.md'],\n    known_issues: evidence.filter((item) => item.status !== 'pass').map((item) => item.detail),\n    evidence,\n    next_action_suggestion: 'Run Criteria Checker to assess whether another iteration is required.',\n    error: null\n  }\n}];"
       },
-      "id": "fefafe83-20d7-4989-a772-b52e66914291",
+      "id": "mock-agent-adapter",
       "name": "Mock Agent Adapter",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        512,
-        -192
+        -160,
+        0
       ]
     },
     {
       "parameters": {
-        "jsCode": "const agentOutput = $json || {};\n\nlet taskInput = {};\ntry {\n  taskInput = $('Task Validator').item.json || {};\n} catch (error) {\n  taskInput = {};\n}\n\nconst context =\n  taskInput.context && typeof taskInput.context === 'object'\n    ? taskInput.context\n    : agentOutput.context && typeof agentOutput.context === 'object'\n      ? agentOutput.context\n      : {};\n\nconst runId =\n  taskInput.run_id ||\n  agentOutput.run_id ||\n  `gd_${Date.now()}`;\n\nconst taskId =\n  taskInput.task_id ||\n  agentOutput.task_id ||\n  `task_${Date.now()}`;\n\nconst goal =\n  typeof taskInput.goal === 'string'\n    ? taskInput.goal\n    : typeof agentOutput.goal === 'string'\n      ? agentOutput.goal\n      : '';\n\nconst criteria = Array.isArray(taskInput.criteria)\n  ? taskInput.criteria\n  : Array.isArray(agentOutput.criteria)\n    ? agentOutput.criteria\n    : [];\n\nconst iteration =\n  Number.isInteger(taskInput.iteration)\n    ? taskInput.iteration\n    : Number.isInteger(agentOutput.iteration)\n      ? agentOutput.iteration\n      : 1;\n\nconst artifacts = Array.isArray(agentOutput.artifacts)\n  ? agentOutput.artifacts\n  : [];\n\nconst knownIssues = Array.isArray(agentOutput.known_issues)\n  ? agentOutput.known_issues\n  : [];\n\nconst evidence = Array.isArray(agentOutput.evidence)\n  ? agentOutput.evidence\n  : [];\n\nreturn [\n  {\n    json: {\n      ...taskInput,\n      ...agentOutput,\n\n      run_id: runId,\n      task_id: taskId,\n      goal,\n      criteria,\n      context,\n      iteration,\n\n      agent_result: {\n        run_id: runId,\n        task_id: taskId,\n        status: agentOutput.status || 'mock_completed',\n        summary: agentOutput.summary || 'Mock agent execution completed.',\n        artifacts,\n        known_issues: knownIssues,\n        evidence,\n      },\n\n      execution_log: {\n        logged_at: new Date().toISOString(),\n        summary: agentOutput.summary || 'Mock agent execution completed.',\n        artifact_count: artifacts.length,\n        issue_count: knownIssues.length,\n        criteria_count: criteria.length,\n      },\n    },\n  },\n];"
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    execution_log: {\n      logged_at: new Date().toISOString(),\n      summary: $json.summary,\n      artifact_count: ($json.artifacts || []).length,\n      issue_count: ($json.known_issues || []).length\n    }\n  }\n}];"
       },
-      "id": "b516888e-8a4f-43d7-afcc-f09d576b486e",
+      "id": "execution-logger",
       "name": "Execution Logger",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        752,
-        -192
+        80,
+        0
       ]
     }
   ],
-  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -112,22 +111,12 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
   },
-  "versionId": "daf89e29-6a3d-461a-b78c-af81377fb58d",
-  "meta": {
-    "instanceId": "d9c729e92b662dc5f146ef50d3d545d6cc3b31fd2f3d1ac27bbb3e7d25b09eab"
-  },
-  "id": "0ZnWCVvMibFKcFD8",
-  "tags": [
-    {
-      "updatedAt": "2026-05-16T10:56:00.194Z",
-      "createdAt": "2026-05-16T10:56:00.194Z",
-      "id": "TOjNhCQb3cHP6KAF",
-      "name": "自动工作流"
-    }
-  ]
+  "active": false
 }
+

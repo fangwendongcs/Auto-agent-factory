@@ -231,13 +231,16 @@ workflows/
 导入后请人工检查：
 
 1. 4 个 workflow 都保持 inactive
-2. `Goal-Driven Master Workflow` 中的调度说明节点是否仍然指向：
-   - `agent_task_executor.workflow.json`
-   - `criteria_checker.workflow.json`
-3. 在 n8n UI 中把 Master 的调度占位节点替换或接成真正的 `Execute Sub-workflow` 调用：
-   - Master → Agent Task Executor
-   - Master → Criteria Checker
-4. 将 `Goal-Driven Error Handler Workflow` 配置为主 workflow 的 error workflow
+2. UI 中显示名称与标准文件的对应关系是否正确：
+   - `[GoalDriven] 02 Agent Task Executor` → `workflows/agent_task_executor.workflow.json`
+   - `[GoalDriven] 03 Criteria Checker` → `workflows/criteria_checker.workflow.json`
+   - `[GoalDriven] 04 Error Handler` → `workflows/error_handler.workflow.json`
+   - `[GoalDriven] 01 Master` → `workflows/goal_driven_master.workflow.json`
+3. 如果是在同一个 n8n 实例重导入，确认 Master 中已存在的两个 `Execute Sub-workflow` 绑定仍然可用
+4. 如果迁移到另一台 n8n 实例，重新选择：
+   - Master → `[GoalDriven] 02 Agent Task Executor`
+   - Master → `[GoalDriven] 03 Criteria Checker`
+   - Error workflow → `[GoalDriven] 04 Error Handler`
 5. 在真正激活前，先使用 sample payload 手动执行
 
 更短的联调前清单见：
@@ -247,7 +250,7 @@ workflows/
 
 ## 如何手动测试
 
-1. 打开 `Goal-Driven Master Workflow`
+1. 打开 `[GoalDriven] 01 Master`
 2. 使用：
 
    ```text
@@ -286,7 +289,7 @@ workflows/
    - 最后执行节点
    - 节点输入 / 输出
    - 错误信息
-3. 确认 `Goal-Driven Error Handler Workflow` 已被绑定为 error workflow
+3. 确认 `[GoalDriven] 04 Error Handler` 已被绑定为 error workflow
 4. 修复后先手动重跑，再考虑恢复自动运行
 
 详细步骤见：

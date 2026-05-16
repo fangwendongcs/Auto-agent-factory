@@ -30,10 +30,10 @@
 
 建议按这个顺序导入：
 
-1. [ ] `Agent Task Executor Workflow`
-2. [ ] `Criteria Checker Workflow`
-3. [ ] `Goal-Driven Error Handler Workflow`
-4. [ ] `Goal-Driven Master Workflow`
+1. [ ] `[GoalDriven] 02 Agent Task Executor`
+2. [ ] `[GoalDriven] 03 Criteria Checker`
+3. [ ] `[GoalDriven] 04 Error Handler`
+4. [ ] `[GoalDriven] 01 Master`
 
 更短的一页版说明：
 
@@ -48,19 +48,26 @@
 - [ ] Master 仍然包含：
   - [ ] `Webhook Trigger`
   - [ ] `Payload Validator`
+  - [ ] `Approval or Invalid Router`
   - [ ] `Task Initializer`
   - [ ] `Agent Dispatcher`
+  - [ ] `Call '[GoalDriven] 02 Agent Task Executor'`
   - [ ] `Criteria Router`
+  - [ ] `Call '[GoalDriven] 03 Criteria Checker'`
+  - [ ] `Criteria Met Router`
   - [ ] `Final Reporter`
 
-## D. 手动接线
+## D. 绑定复核
 
-- [ ] 在 Master 中将 executor 调度占位替换或接成真正的 `Execute Sub-workflow`
-- [ ] 目标选择 `Agent Task Executor Workflow`
-- [ ] 在 Master 中将 checker 调度占位替换或接成真正的 `Execute Sub-workflow`
-- [ ] 目标选择 `Criteria Checker Workflow`
-- [ ] 在 Master 设置中指定：
-  - [ ] `Goal-Driven Error Handler Workflow` 为 error workflow
+- [ ] 已确认当前导入场景：
+  - [ ] 同一 n8n 实例重导入
+  - [ ] 迁移到另一台 n8n 实例
+- [ ] 如果是同一实例重导入，已确认 Master 中已有两个 `Execute Sub-workflow` 绑定仍然可用
+- [ ] 如果是跨实例迁移，已在 Master 中重新选择：
+  - [ ] `[GoalDriven] 02 Agent Task Executor`
+  - [ ] `[GoalDriven] 03 Criteria Checker`
+- [ ] 如果是跨实例迁移，已在 Master 设置中重新选择：
+  - [ ] `[GoalDriven] 04 Error Handler` 为 error workflow
 
 ## E. 首次手动测试
 

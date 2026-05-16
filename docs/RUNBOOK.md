@@ -111,17 +111,17 @@ npm run import:check
 
 - 打印 4 个正式 workflow 的名称
 - 标记全部为 inactive
-- 列出 Master 中仍需手工接线的占位节点
+- 列出 Master 中需要复核的子 workflow 绑定
 - 打印建议导入顺序
 
 ## 5. 如何导入 n8n
 
-按以下顺序手动导入：
+按以下顺序手动导入；左侧是 UI 中看到的 workflow 名称，右侧是仓库里的标准文件路径：
 
-1. `workflows/agent_task_executor.workflow.json`
-2. `workflows/criteria_checker.workflow.json`
-3. `workflows/error_handler.workflow.json`
-4. `workflows/goal_driven_master.workflow.json`
+1. `[GoalDriven] 02 Agent Task Executor` → `workflows/agent_task_executor.workflow.json`
+2. `[GoalDriven] 03 Criteria Checker` → `workflows/criteria_checker.workflow.json`
+3. `[GoalDriven] 04 Error Handler` → `workflows/error_handler.workflow.json`
+4. `[GoalDriven] 01 Master` → `workflows/goal_driven_master.workflow.json`
 
 导入后检查：
 
@@ -137,16 +137,14 @@ docs/MANUAL_IMPORT_CHECKLIST.md
 docs/IMPORT_ORDER.md
 ```
 
-## 6. 导入后的人工接线
+## 6. 导入后的绑定复核
 
-由于不同 n8n 实例导入后会生成不同 workflow ID，当前模板不会硬编码跨 workflow ID。  
-导入后需要在 UI 中手动完成：
+当前仓库里的正式 JSON 已保留你在 n8n UI 中联调通过的跨 workflow 绑定。  
+这对**同一实例重新导入**很方便；但如果你把项目迁移到**另一台 n8n 实例**，因为 workflow ID 会变化，需要在 UI 中重新选择绑定：
 
-1. 在 Master 中把 executor 调度占位接成真正的 `Execute Sub-workflow` 调用
-2. 目标选择 `Agent Task Executor Workflow`
-3. 在 Master 中把 checker 调度占位接成真正的 `Execute Sub-workflow` 调用
-4. 目标选择 `Criteria Checker Workflow`
-5. 在 Master workflow 设置中，把 `Goal-Driven Error Handler Workflow` 设为 error workflow
+1. 在 Master 中重新确认 `Execute Sub-workflow` 指向 `[GoalDriven] 02 Agent Task Executor`
+2. 在 Master 中重新确认 `Execute Sub-workflow` 指向 `[GoalDriven] 03 Criteria Checker`
+3. 在 Master workflow 设置中，把 error workflow 重新选择为 `[GoalDriven] 04 Error Handler`
 
 完成后，先不要急着激活，先做手动执行。
 
@@ -170,7 +168,7 @@ examples/manual-test-payloads/
 
 在 n8n UI 中：
 
-1. 打开 `Goal-Driven Master Workflow`
+1. 打开 `[GoalDriven] 01 Master`
 2. 选择手动执行
 3. 用 sample payload 触发 Webhook / 测试入口
 4. 查看输出中的：
