@@ -1,0 +1,16 @@
+{
+  "goal": "Generate a dry-run plan for the GoalDriven workflow",
+  "criteria": [
+    "Output must include dry_run_plan",
+    "Output must not execute real actions",
+    "Output must require human approval before real run"
+  ],
+  "agent_mode": "dry-run",
+  "provider_mode": "dry-run",
+  "max_iterations": 1,
+  "timeout_minutes": 5,
+  "risk_level": "low",
+  "require_human_approval": false,
+  "manual_approval_required": false,
+  "human_approved": true
+}

@@ -27,7 +27,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\n\nconst context =\n  input.context && typeof input.context === 'object'\n    ? input.context\n    : {};\n\nconst agentMode =\n  typeof input.agent_mode === 'string' && input.agent_mode.trim()\n    ? input.agent_mode.trim()\n    : typeof context.agent_mode === 'string' && context.agent_mode.trim()\n      ? context.agent_mode.trim()\n      : 'mock';\n\nreturn [\n  {\n    json: {\n      ...input,\n      context: {\n        ...context,\n        agent_mode: agentMode,\n      },\n      prompt_reference: 'src/prompts/subagent_prompt.md',\n      prompt_contract: {\n        output: 'result.schema.json',\n        format: 'json_only',\n      },\n      agent_mode: agentMode,\n    },\n  },\n];"
+        "jsCode": "const input = $json;\n\nconst context =\n  input.context && typeof input.context === 'object'\n    ? input.context\n    : {};\n\nconst requestedProviderMode =\n  typeof input.provider_mode === 'string' && input.provider_mode.trim()\n    ? input.provider_mode.trim()\n    : typeof input.agent_mode === 'string' && input.agent_mode.trim()\n      ? input.agent_mode.trim()\n      : typeof context.agent_mode === 'string' && context.agent_mode.trim()\n        ? context.agent_mode.trim()\n        : 'mock';\n\nconst supportedModes = ['mock', 'dry-run'];\nconst providerMode = supportedModes.includes(requestedProviderMode)\n  ? requestedProviderMode\n  : 'mock';\nconst modeWarnings = supportedModes.includes(requestedProviderMode)\n  ? []\n  : ['unknown provider mode fallback to mock'];\n\nreturn [\n  {\n    json: {\n      ...input,\n      context: {\n        ...context,\n        agent_mode: providerMode,\n      },\n      prompt_reference: 'src/prompts/subagent_prompt.md',\n      prompt_contract: {\n        output: 'result.schema.json',\n        format: 'json_only',\n      },\n      requested_provider_mode: requestedProviderMode,\n      provider_mode: providerMode,\n      agent_mode: providerMode,\n      mode_warnings: modeWarnings,\n    },\n  },\n];"
       },
       "id": "41dd8d68-de84-4264-8f9e-4d911a3d52bf",
       "name": "Prompt Builder",
@@ -40,12 +40,42 @@
     },
     {
       "parameters": {
-        "jsCode": "if (($json.validation_errors || []).length > 0) {\n  return [{\n    json: {\n      run_id: $json.run_id || 'unknown',\n      task_id: $json.task_id || 'unknown',\n      status: 'failed',\n      summary: 'Task validation failed before execution.',\n      artifacts: [],\n      known_issues: $json.validation_errors,\n      evidence: ($json.criteria || ['task payload']).map((criterion) => ({\n        criterion,\n        status: 'fail',\n        detail: 'Executor could not run because the task payload was invalid.'\n      })),\n      next_action_suggestion: 'Fix the task payload and retry.',\n      error: {\n        code: 'TASK_VALIDATION_FAILED',\n        message: $json.validation_errors.join('; ')\n      }\n    }\n  }];\n}\n\nconst evidence = ($json.criteria || []).map((criterion, index) => ({\n  criterion,\n  status: index < 2 ? 'pass' : 'fail',\n  detail: index < 2\n    ? `Mock executor produced evidence for criterion ${index + 1}.`\n    : `Mock executor intentionally leaves criterion ${index + 1} unresolved.`\n}));\n\nreturn [{\n  json: {\n    run_id: $json.run_id,\n    task_id: $json.task_id,\n    status: evidence.every((item) => item.status === 'pass') ? 'completed' : 'partial',\n    summary: 'Mock executor completed one bounded task iteration.',\n    artifacts: ['docs/WORKFLOW_DESIGN.md'],\n    known_issues: evidence.filter((item) => item.status !== 'pass').map((item) => item.detail),\n    evidence,\n    next_action_suggestion: 'Run Criteria Checker to assess whether another iteration is required.',\n    error: null\n  }\n}];"
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.provider_mode }}",
+                    "operation": "equal",
+                    "value2": "mock"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "mock"
+            },
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.provider_mode }}",
+                    "operation": "equal",
+                    "value2": "dry-run"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "dry-run"
+            }
+          ]
+        },
+        "options": {}
       },
-      "id": "fefafe83-20d7-4989-a772-b52e66914291",
-      "name": "Mock Agent Adapter",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "3ef1f419-4e19-4485-9020-d60e5ccb8268",
+      "name": "Mode Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
       "position": [
         512,
         -192
@@ -53,14 +83,40 @@
     },
     {
       "parameters": {
-        "jsCode": "const agentOutput = $json || {};\n\nlet taskInput = {};\ntry {\n  taskInput = $('Task Validator').item.json || {};\n} catch (error) {\n  taskInput = {};\n}\n\nconst context =\n  taskInput.context && typeof taskInput.context === 'object'\n    ? taskInput.context\n    : agentOutput.context && typeof agentOutput.context === 'object'\n      ? agentOutput.context\n      : {};\n\nconst runId =\n  taskInput.run_id ||\n  agentOutput.run_id ||\n  `gd_${Date.now()}`;\n\nconst taskId =\n  taskInput.task_id ||\n  agentOutput.task_id ||\n  `task_${Date.now()}`;\n\nconst goal =\n  typeof taskInput.goal === 'string'\n    ? taskInput.goal\n    : typeof agentOutput.goal === 'string'\n      ? agentOutput.goal\n      : '';\n\nconst criteria = Array.isArray(taskInput.criteria)\n  ? taskInput.criteria\n  : Array.isArray(agentOutput.criteria)\n    ? agentOutput.criteria\n    : [];\n\nconst iteration =\n  Number.isInteger(taskInput.iteration)\n    ? taskInput.iteration\n    : Number.isInteger(agentOutput.iteration)\n      ? agentOutput.iteration\n      : 1;\n\nconst artifacts = Array.isArray(agentOutput.artifacts)\n  ? agentOutput.artifacts\n  : [];\n\nconst knownIssues = Array.isArray(agentOutput.known_issues)\n  ? agentOutput.known_issues\n  : [];\n\nconst evidence = Array.isArray(agentOutput.evidence)\n  ? agentOutput.evidence\n  : [];\n\nreturn [\n  {\n    json: {\n      ...taskInput,\n      ...agentOutput,\n\n      run_id: runId,\n      task_id: taskId,\n      goal,\n      criteria,\n      context,\n      iteration,\n\n      agent_result: {\n        run_id: runId,\n        task_id: taskId,\n        status: agentOutput.status || 'mock_completed',\n        summary: agentOutput.summary || 'Mock agent execution completed.',\n        artifacts,\n        known_issues: knownIssues,\n        evidence,\n      },\n\n      execution_log: {\n        logged_at: new Date().toISOString(),\n        summary: agentOutput.summary || 'Mock agent execution completed.',\n        artifact_count: artifacts.length,\n        issue_count: knownIssues.length,\n        criteria_count: criteria.length,\n      },\n    },\n  },\n];"
+        "jsCode": "if (($json.validation_errors || []).length > 0) {\n  return [{\n    json: {\n      run_id: $json.run_id || 'unknown',\n      task_id: $json.task_id || 'unknown',\n      status: 'failed',\n      summary: 'Task validation failed before execution.',\n      artifacts: [],\n      known_issues: $json.validation_errors,\n      evidence: ($json.criteria || ['task payload']).map((criterion) => ({\n        criterion,\n        status: 'fail',\n        detail: 'Executor could not run because the task payload was invalid.'\n      })),\n      next_action_suggestion: 'Fix the task payload and retry.',\n      error: {\n        code: 'TASK_VALIDATION_FAILED',\n        message: $json.validation_errors.join('; ')\n      }\n    }\n  }];\n}\n\nconst evidence = ($json.criteria || []).map((criterion, index) => ({\n  criterion,\n  status: index < 2 ? 'pass' : 'fail',\n  detail: index < 2\n    ? `Mock executor produced evidence for criterion ${index + 1}.`\n    : `Mock executor intentionally leaves criterion ${index + 1} unresolved.`\n}));\n\nreturn [{\n  json: {\n    run_id: $json.run_id,\n    task_id: $json.task_id,\n    status: evidence.every((item) => item.status === 'pass') ? 'completed' : 'partial',\n    summary: 'Mock executor completed one bounded task iteration.',\n    artifacts: ['docs/WORKFLOW_DESIGN.md'],\n    known_issues: evidence.filter((item) => item.status !== 'pass').map((item) => item.detail),\n    evidence,\n    next_action_suggestion: 'Run Criteria Checker to assess whether another iteration is required.',\n    error: null\n  }\n}];"
+      },
+      "id": "fefafe83-20d7-4989-a772-b52e66914291",
+      "name": "Mock Agent Adapter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const criteria = Array.isArray($json.criteria) ? $json.criteria : [];\nconst riskLevel = ['low', 'medium', 'high'].includes($json.risk_level)\n  ? $json.risk_level\n  : 'low';\nconst validationErrors = Array.isArray($json.validation_errors)\n  ? $json.validation_errors\n  : [];\n\nconst intendedActions = [\n  'Review the goal and success criteria.',\n  'Prepare a bounded implementation plan.',\n  'Identify validation evidence required before any real execution.'\n];\n\nconst dryRunPlan = {\n  goal: $json.goal || '',\n  intended_actions: validationErrors.length > 0 ? [] : intendedActions,\n  risk_summary: validationErrors.length > 0\n    ? 'Dry-run could not generate a safe plan because the task payload failed validation.'\n    : 'Dry-run only. Proposed work remains unexecuted. Risk level: ' + riskLevel + '.',\n  requires_human_approval_before_real_run: true\n};\n\nif (validationErrors.length > 0) {\n  return [{\n    json: {\n      run_id: $json.run_id || 'unknown',\n      task_id: $json.task_id || 'unknown',\n      status: 'failed',\n      summary: 'Task validation failed before dry-run planning.',\n      artifacts: [],\n      known_issues: validationErrors,\n      evidence: (criteria.length > 0 ? criteria : ['task payload']).map((criterion) => ({\n        criterion,\n        status: 'fail',\n        detail: 'Dry-run could not proceed because the task payload was invalid.'\n      })),\n      dry_run_plan: dryRunPlan,\n      provider: {\n        mode: 'dry-run',\n        name: 'dry-run-provider',\n        model: null,\n        request_id: null,\n        latency_ms: 0\n      },\n      safety: {\n        risk_level: riskLevel,\n        requires_human_approval: true,\n        approved: false,\n        blocked_reason: 'dry-run mode does not execute real actions'\n      },\n      next_action_suggestion: 'Fix the task payload and retry the dry-run.',\n      error: {\n        code: 'TASK_VALIDATION_FAILED',\n        message: validationErrors.join('; ')\n      }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    run_id: $json.run_id,\n    task_id: $json.task_id,\n    status: 'needs_review',\n    summary: 'Dry-run plan generated. No real action was executed.',\n    artifacts: [],\n    known_issues: [],\n    evidence: criteria.map((criterion) => ({\n      criterion,\n      status: 'unknown',\n      detail: 'Dry-run generated a plan but did not execute real work.'\n    })),\n    dry_run_plan: dryRunPlan,\n    provider: {\n      mode: 'dry-run',\n      name: 'dry-run-provider',\n      model: null,\n      request_id: null,\n      latency_ms: 0\n    },\n    safety: {\n      risk_level: riskLevel,\n      requires_human_approval: true,\n      approved: false,\n      blocked_reason: 'dry-run mode does not execute real actions'\n    },\n    next_action_suggestion: 'Review the dry-run plan before any real execution.',\n    error: null\n  }\n}];"
+      },
+      "id": "74ab8f6c-a78b-40d8-8283-322fb5e0fcfa",
+      "name": "Dry-run Provider Adapter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const agentOutput = $json || {};\n\nlet taskInput = {};\ntry {\n  taskInput = $('Task Validator').item.json || {};\n} catch (error) {\n  taskInput = {};\n}\n\nlet promptInput = {};\ntry {\n  promptInput = $('Prompt Builder').item.json || {};\n} catch (error) {\n  promptInput = {};\n}\n\nconst context =\n  taskInput.context && typeof taskInput.context === 'object'\n    ? taskInput.context\n    : agentOutput.context && typeof agentOutput.context === 'object'\n      ? agentOutput.context\n      : {};\n\nconst runId =\n  taskInput.run_id ||\n  agentOutput.run_id ||\n  'gd_' + Date.now();\n\nconst taskId =\n  taskInput.task_id ||\n  agentOutput.task_id ||\n  'task_' + Date.now();\n\nconst goal =\n  typeof taskInput.goal === 'string'\n    ? taskInput.goal\n    : typeof agentOutput.goal === 'string'\n      ? agentOutput.goal\n      : '';\n\nconst criteria = Array.isArray(taskInput.criteria)\n  ? taskInput.criteria\n  : Array.isArray(agentOutput.criteria)\n    ? agentOutput.criteria\n    : [];\n\nconst iteration =\n  Number.isInteger(taskInput.iteration)\n    ? taskInput.iteration\n    : Number.isInteger(agentOutput.iteration)\n      ? agentOutput.iteration\n      : 1;\n\nconst artifacts = Array.isArray(agentOutput.artifacts)\n  ? agentOutput.artifacts\n  : [];\n\nconst knownIssues = Array.isArray(agentOutput.known_issues)\n  ? agentOutput.known_issues\n  : [];\n\nconst evidence = Array.isArray(agentOutput.evidence)\n  ? agentOutput.evidence\n  : [];\n\nconst provider =\n  agentOutput.provider && typeof agentOutput.provider === 'object'\n    ? agentOutput.provider\n    : null;\n\nconst safety =\n  agentOutput.safety && typeof agentOutput.safety === 'object'\n    ? agentOutput.safety\n    : null;\n\nconst dryRunPlan =\n  agentOutput.dry_run_plan && typeof agentOutput.dry_run_plan === 'object'\n    ? agentOutput.dry_run_plan\n    : null;\n\nconst modeWarnings = Array.isArray(promptInput.mode_warnings)\n  ? promptInput.mode_warnings\n  : [];\n\nreturn [\n  {\n    json: {\n      ...taskInput,\n      ...agentOutput,\n\n      run_id: runId,\n      task_id: taskId,\n      goal,\n      criteria,\n      context,\n      iteration,\n      requested_provider_mode: promptInput.requested_provider_mode || taskInput.provider_mode || 'mock',\n      provider_mode: promptInput.provider_mode || taskInput.provider_mode || 'mock',\n      agent_mode: promptInput.agent_mode || taskInput.agent_mode || 'mock',\n      mode_warnings: modeWarnings,\n\n      agent_result: {\n        run_id: runId,\n        task_id: taskId,\n        status: agentOutput.status || 'mock_completed',\n        summary: agentOutput.summary || 'Mock agent execution completed.',\n        artifacts,\n        known_issues: knownIssues,\n        evidence,\n        ...(provider ? { provider } : {}),\n        ...(safety ? { safety } : {}),\n        ...(dryRunPlan ? { dry_run_plan: dryRunPlan } : {}),\n      },\n\n      execution_log: {\n        logged_at: new Date().toISOString(),\n        summary: agentOutput.summary || 'Mock agent execution completed.',\n        artifact_count: artifacts.length,\n        issue_count: knownIssues.length,\n        criteria_count: criteria.length,\n        provider_mode: promptInput.provider_mode || taskInput.provider_mode || 'mock',\n        mode_warnings: modeWarnings,\n      },\n    },\n  },\n];"
       },
       "id": "b516888e-8a4f-43d7-afcc-f09d576b486e",
       "name": "Execution Logger",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        752,
+        1008,
         -192
       ]
     }
@@ -93,7 +149,7 @@
       "main": [
         [
           {
-            "node": "Mock Agent Adapter",
+            "node": "Mode Router",
             "type": "main",
             "index": 0
           }
@@ -101,6 +157,35 @@
       ]
     },
     "Mock Agent Adapter": {
+      "main": [
+        [
+          {
+            "node": "Execution Logger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mode Router": {
+      "main": [
+        [
+          {
+            "node": "Mock Agent Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Dry-run Provider Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dry-run Provider Adapter": {
       "main": [
         [
           {
