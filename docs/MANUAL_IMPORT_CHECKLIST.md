@@ -84,6 +84,10 @@
   - [ ] 缺少 goal
   - [ ] 缺少 criteria
   - [ ] high risk 需要人工审核
+- [ ] Error Handler 已通过自动失败触发验证
+- [ ] 已确认验证 Error Handler 时使用的是 Production Webhook，而不是手动 `Execute Workflow`
+- [ ] Production Webhook 正常 payload 已验证
+- [ ] high risk 且 `human_approved=false` 的人工审核拦截已验证
 
 ## F. 激活前最后确认
 
@@ -94,6 +98,7 @@
 - [ ] 已确认仍保留人工审核入口
 - [ ] 已确认 `max_iterations <= 5`
 - [ ] 已确认 `timeout_minutes <= 30`
+- [ ] `npm run workflow:validate:all` 当前为 `0 warning / 0 error`
 
 ## G. 如果导入后表现和预期不一致
 

@@ -202,9 +202,90 @@ examples/manual-test-payloads/
    - 错误信息
 5. 修复后先手动重跑，再决定是否恢复自动运行
 
-## 9. 常见失败与排查
+## 9. Error Handler 验证结果
 
-### 9.1 缺少 goal / criteria
+### 9.1 验证方式
+
+当前 MVP 已完成一次真实的 Error Handler 自动触发验证：
+
+1. 在 `[GoalDriven] 01 Master` 中临时增加测试分支：
+
+   ```text
+   Payload Validator
+   → [TEST] Error Handler Probe
+      ├─ true → [TEST] Trigger Error Handler
+      └─ false → Approval or Invalid Router
+   ```
+
+2. `[TEST] Error Handler Probe` 只识别：
+
+   ```text
+   context.force_error_handler_test = true
+   ```
+
+3. `[TEST] Trigger Error Handler` 使用 `Stop And Error`，错误信息为：
+
+   ```text
+   Intentional error-handler verification test
+   ```
+
+4. 使用 **Production Webhook** 触发带测试标记的 payload，而不是使用手动测试入口。
+
+重要限制：
+
+- `Error Trigger` 不能通过手动 `Execute Workflow` 测试触发
+- 必须由自动 workflow execution 失败后触发
+- 因此验证 Error Handler 时必须使用 Production Webhook 自动执行路径
+
+### 9.2 成功标准与本次结果
+
+本次验证已通过，证据如下：
+
+- `[GoalDriven] 01 Master` 出现 `failed execution`
+- 失败节点为 `[TEST] Trigger Error Handler`
+- 错误信息包含 `Intentional error-handler verification test`
+- `[GoalDriven] 04 Error Handler` 出现新的 `succeeded execution`
+- `Error Trigger → Error Normalizer → Recovery Advisor` 全部执行成功
+
+### 9.3 测试后恢复
+
+验证完成后，已执行以下恢复步骤：
+
+1. 删除 `[TEST] Error Handler Probe`
+2. 删除 `[TEST] Trigger Error Handler`
+3. 恢复：
+
+   ```text
+   Payload Validator → Approval or Invalid Router
+   ```
+
+4. 重新发布 Master
+5. 用 Production Webhook 正常 payload 回归：
+   - 返回 `run_id`
+   - 返回 `task_id`
+   - 返回 `criteria_result`
+   - 返回 `next_action`
+6. 用 high-risk 且 `human_approved=false` 的 payload 回归：
+   - 返回 `needs_human_approval`
+7. 本地重新运行：
+
+   ```bash
+   npm test
+   npm run workflow:validate:all
+   npm run workflow:dry-run
+   npm run import:check
+   ```
+
+当前结果：
+
+- `npm test` 通过，`16/16`
+- `workflow:validate:all` 通过，`0 warning / 0 error`
+- `workflow:dry-run` 通过
+- `import:check` 通过
+
+## 10. 常见失败与排查
+
+### 10.1 缺少 goal / criteria
 
 现象：
 
@@ -216,7 +297,7 @@ examples/manual-test-payloads/
 - 对照 `src/schema/goal.schema.json`
 - 使用 `examples/sample_goal_request.json` 作为基准
 
-### 9.2 子 workflow 没有真正被调用
+### 10.2 子 workflow 没有真正被调用
 
 现象：
 
@@ -228,7 +309,7 @@ examples/manual-test-payloads/
 - 检查 Master 中是否已经手工接好 `Execute Sub-workflow`
 - 检查目标 workflow 是否选对
 
-### 9.3 Error Handler 没触发
+### 10.3 Error Handler 没触发
 
 现象：
 
@@ -239,7 +320,7 @@ examples/manual-test-payloads/
 - 检查 Master workflow 设置中是否已配置 error workflow
 - 确认错误流程以 `Error Trigger` 开头
 
-### 9.4 Workflow 导入失败
+### 10.4 Workflow 导入失败
 
 处理顺序：
 
@@ -248,7 +329,7 @@ examples/manual-test-payloads/
 3. 检查 n8n 版本差异
 4. 必要时先在 UI 中新建一个空 workflow，对照节点类型手工修复
 
-## 10. 如何回滚
+## 11. 如何回滚
 
 ### 本地代码回滚
 
@@ -269,7 +350,7 @@ examples/manual-test-payloads/
 3. 重新导入或恢复旧配置
 4. 先手动执行验证，再决定是否恢复自动运行
 
-## 11. 什么时候可以考虑激活
+## 12. 什么时候可以考虑激活
 
 只有同时满足以下条件时，才建议激活生产触发器：
 
@@ -277,10 +358,12 @@ examples/manual-test-payloads/
 - workflow JSON 校验通过
 - 已完成 n8n UI 手动接线
 - 已手动跑通 sample payload
-- 已确认 error workflow 生效
+- 已确认 Error Handler 可被自动失败触发
+- 已确认 Production Webhook 正常 payload 可运行
+- 已确认 high-risk 人工审核拦截仍生效
 - 已人工检查 workflow diff 和 credential 配置
 
-## 12. 成本与安全提醒
+## 13. 成本与安全提醒
 
 - Agent 自动化可能消耗大量 token 和时间
 - `max_iterations` 与 `timeout_minutes` 不是装饰项，而是停止边界

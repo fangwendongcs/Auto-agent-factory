@@ -24,6 +24,10 @@
 - 4 个正式 workflow JSON 模板
 - 本地 mock 校验工具与 `npm test`
 - 运行手册、测试用例和最终报告样例
+- mock-first MVP 已完成真实 n8n 联调验证
+- Production Webhook smoke test 已通过
+- Error Workflow 已通过自动失败触发验证
+- Human Approval Gate 已通过 high-risk payload 验证
 - 旧版 `Codex Planner Reviewer Workflow` 原型仍保留在 `n8n/` 中，作为可复用的过渡资产
 
 后续可继续扩展：
@@ -310,15 +314,27 @@ workflows/
 - [x] `error_handler.workflow.json` 已存在
 - [x] 支持 mock mode
 - [x] README / Runbook / Test Cases / Final Report 已存在
-- [ ] 已在你的 n8n 实例中完成 UI 导入与手动接线
-- [ ] 已在你的 n8n 实例中手动跑通 sample payload
+- [x] mock-first MVP validated
+- [x] production webhook smoke test passed
+- [x] error workflow verified
+- [x] human approval gate verified
+- [x] 已在你的 n8n 实例中完成 UI 导入与手动接线
+- [x] 已在你的 n8n 实例中手动跑通 sample payload
 
 ## 下一步
 
 MVP 基础版已经成立。  
-下一步不再是“继续补骨架”，而是进入你自己的 n8n 实例做一次**真实手动联调**：
+当前可以把阶段标记为：
 
-1. 导入 4 个正式 workflow
-2. 手动接好子 workflow 与 error workflow
-3. 用 sample payload 跑通一轮
-4. 再决定是否进入真实 provider 接入
+```text
+mock-first MVP validated
+production webhook smoke test passed
+error workflow verified
+human approval gate verified
+```
+
+下一步更适合进入：
+
+1. 真实 provider adapter 设计
+2. 发布前 credential / webhook / 回滚清单
+3. 更完整的日志、评估和观测方案
