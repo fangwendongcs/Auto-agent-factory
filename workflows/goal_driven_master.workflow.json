@@ -93,19 +93,6 @@
     },
     {
       "parameters": {
-        "jsCode": "const result = {\n  run_id: $json.run_id,\n  task_id: $json.task_id,\n  status: 'partial',\n  summary: 'Mock executor generated an initial artifact draft for checker review.',\n  artifacts: ['docs/WORKFLOW_DESIGN.md'],\n  known_issues: ['Mock mode intentionally leaves some criteria unresolved.'],\n  evidence: ($json.criteria || []).map((criterion, index) => ({\n    criterion,\n    status: index < 2 ? 'pass' : 'fail',\n    detail: index < 2\n      ? `Mock evidence collected for criterion ${index + 1}.`\n      : `Mock mode requires another iteration for criterion ${index + 1}.`\n  })),\n  next_action_suggestion: 'Run criteria checker and generate the next iteration instruction.',\n  error: null\n};\n\nreturn [{ json: { ...$json, agent_result: result, status: 'checking' } }];"
-      },
-      "id": "36886708-6ec6-483a-b61b-55dee719dea9",
-      "name": "Mock Executor Result",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        448,
-        592
-      ]
-    },
-    {
-      "parameters": {
         "jsCode": "const checks = ($json.criteria || []).map((criterion) => {\n  const evidence = ($json.agent_result?.evidence || []).find((item) => item.criterion === criterion);\n  return {\n    criterion,\n    status: evidence?.status || 'unknown',\n    evidence: evidence?.detail || 'No evidence provided.'\n  };\n});\nconst scoreMap = { pass: 1, unknown: 0.5, fail: 0 };\nconst score = checks.length === 0\n  ? 0\n  : checks.reduce((sum, item) => sum + scoreMap[item.status], 0) / checks.length;\nconst criteriaMet = checks.length > 0 && checks.every((item) => item.status === 'pass');\nconst canRetry = !criteriaMet && $json.iteration < $json.max_iterations;\nconst nextInstruction = criteriaMet\n  ? null\n  : checks\n      .filter((item) => item.status !== 'pass')\n      .map((item) => `Improve criterion: ${item.criterion}`)\n      .join('; ');\n\nreturn [{\n  json: {\n    ...$json,\n    checker_dispatch: {\n      target_workflow: 'criteria_checker.workflow.json',\n      workflow_id_placeholder: '{{ $env.N8N_CRITERIA_CHECKER_WORKFLOW_ID }}',\n      transport: 'execute_subworkflow',\n      note: 'After import, bind this checker call to the imported Criteria Checker workflow in n8n.'\n    },\n    criteria_result: {\n      criteria_met: criteriaMet,\n      score: Number(score.toFixed(2)),\n      checks,\n      next_iteration_instruction: nextInstruction,\n      should_stop: !criteriaMet && !canRetry,\n      stop_reason: !criteriaMet && !canRetry ? 'max_iterations_reached' : null\n    },\n    status: criteriaMet\n      ? 'completed'\n      : canRetry\n        ? 'needs_iteration'\n        : 'max_iterations_reached'\n  }\n}];"
       },
       "id": "22d9f387-1c9e-4de2-bf40-baf9768b8fac",
@@ -316,11 +303,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Mock Executor Result": {
-      "main": [
-        []
       ]
     },
     "Criteria Router": {
