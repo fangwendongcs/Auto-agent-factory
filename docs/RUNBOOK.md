@@ -188,6 +188,27 @@ examples/manual-test-payloads/
 - 未全部通过时，生成下一轮指令
 - 若达到限制，给出停止原因
 
+### 7.4 Executor 模式手动测试
+
+当前 `[GoalDriven] 02 Agent Task Executor` 已支持三种安全模式：
+
+1. `mock`
+2. `dry-run`
+3. `real-readonly`
+
+对应的手动 payload：
+
+```text
+examples/manual-test-payloads/05-dry-run-mode.json
+examples/manual-test-payloads/06-real-readonly-mode.json
+```
+
+其中：
+
+- `dry-run` 只生成计划，不执行真实动作
+- `real-readonly` 当前仍是 stub，只生成只读分析结果，不调用真实 provider，也不产生真实副作用
+- 两种模式都必须继续返回标准 `agent_result`，供 Criteria Checker 无感验收
+
 ## 8. 如何查看 execution
 
 在 n8n 中排查问题时，优先查看 execution 记录：

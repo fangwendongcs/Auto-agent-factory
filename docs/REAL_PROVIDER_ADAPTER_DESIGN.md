@@ -11,19 +11,21 @@
 
 1. `mock`
 2. `dry-run`
-3. `real`
+3. `real-readonly`
+
+后续如果进入真正会产生副作用的执行阶段，再单独新增受控的 `real` 模式。当前 V0.3a 只验证“真实 provider 只读分析”的结构，不提前开放真实执行能力。
 
 优先级固定为：
 
 1. `mock mode` 永远可用
 2. `dry-run mode` 必须先于 `real mode`
-3. `real mode` 必须受限执行
+3. `real-readonly mode` 必须只读、受限、可审查
 
 这意味着：
 
 - `mock` 是 contract 与回归测试基线
 - `dry-run` 是真实 provider 接入前的安全缓冲层
-- `real` 不是默认路径，而是需要审批、受限、可审查的执行路径
+- `real-readonly` 不是默认路径，而是需要审批、只读、可审查的分析路径
 
 ## 2. 当前 Executor 现状
 
@@ -107,27 +109,32 @@ When Executed by Another Workflow
 - 第一版 `dry-run` 优先不依赖外部 API
 - 即使未来接 provider，也应先把输出限制在计划层，而不是执行层
 
-### 3.3 real
+### 3.3 real-readonly
 
 用途：
 
-- 在充分验证后，允许真实 provider 处理一小类受控任务
+- 在真正接入真实 provider 之前，先验证“只读分析”这条路径的 contract 与编排结构
 
 规则：
 
-- 允许调用真实 provider
-- 第一版只允许低风险动作
+- 当前 V0.3a 只实现 stub，不调用真实 provider
+- 未来即使接入真实 provider，也只能生成只读分析结果
+- 只允许输出：
+  - `summary`
+  - `intended_actions`
+  - `evidence`
+  - `risk_summary`
 - 必须经过人工审批门
-- 必须保留：
-  - `timeout`
-  - `max_iterations`
-  - `rollback` 提醒
+- 不能写文件
+- 不能执行终端命令
+- 不能修改 Git
+- 不能调用外部写接口
 - 必须返回标准 `agent_result`
 - 默认应关闭，不能成为隐式默认分支
 
 ## 4. Agent Result Contract
 
-无论 provider 是 mock、dry-run 还是 real，最终都必须标准化成同一份结构：
+无论 provider 是 mock、dry-run 还是 real-readonly，最终都必须标准化成同一份结构：
 
 ```json
 {
@@ -145,7 +152,7 @@ When Executed by Another Workflow
     }
   ],
   "provider": {
-    "mode": "mock | dry-run | real",
+    "mode": "mock | dry-run | real-readonly",
     "name": "...",
     "model": "...",
     "request_id": "...",
@@ -217,7 +224,7 @@ When Executed by Another Workflow
 → Mode Router
    ├─ Mock Agent Adapter
    ├─ Dry-run Provider Adapter
-   └─ Real Provider Adapter
+   └─ Real-readonly Provider Adapter
 → Result Normalizer
 → Execution Logger
 ```
@@ -230,10 +237,10 @@ When Executed by Another Workflow
 | `When Executed by Another Workflow` | 上游任务 payload | 原始输入 | 子 workflow 入口 |
 | `Task Validator` | `run_id / task_id / goal / criteria / iteration / status` | 校验后的 task input + `validation_errors` | 拦截不完整任务 |
 | `Prompt Builder` | task input + context | prompt reference + provider intent | 继续保留 provider 无关 prompt 结构 |
-| `Mode Router` | `agent_mode` / `provider_mode` | 三种模式分支 | 明确决定 mock / dry-run / real |
+| `Mode Router` | `agent_mode` / `provider_mode` | 三种模式分支 | 明确决定 mock / dry-run / real-readonly |
 | `Mock Agent Adapter` | 标准 task input | mock raw result | 继续保留当前基线 |
 | `Dry-run Provider Adapter` | 标准 task input | plan / intended actions / risk summary | 不产生真实副作用 |
-| `Real Provider Adapter` | 标准 task input + approval | provider raw result | 第一版默认关闭，只允许低风险受控执行 |
+| `Real-readonly Provider Adapter` | 标准 task input + approval | read-only analysis result | 当前阶段只做 stub，不执行真实动作 |
 | `Result Normalizer` | adapter raw result | 标准 `agent_result` | 所有 provider 必须经过这里 |
 | `Execution Logger` | 标准结果 | 带日志的最终输出 | 记录摘要，不记录密钥 |
 
@@ -242,15 +249,17 @@ When Executed by Another Workflow
 优先级建议：
 
 ```text
-input.agent_mode
+context.provider_mode
 → context.agent_mode
+→ input.provider_mode
+→ input.agent_mode
 → default "mock"
 ```
 
 并且：
 
-- 未识别模式要 fail closed，而不是自动落到 `real`
-- `real` 若没有人工审批，应被阻断或转为 `needs_review`
+- 未识别模式要 fallback 到 `mock`，并保留 `mode_warnings`
+- `real-readonly` 若没有人工审批，也只能返回 `needs_review`
 
 ## 7. Credential / Secret 设计
 
@@ -337,16 +346,17 @@ response_normalizer
   - 不执行真实动作
   - 仍输出标准 `agent_result`
 
-### 阶段 3：加 `real adapter`，但默认关闭
+### 阶段 3：加 `real-readonly adapter`，但默认关闭
 
 - 目标：
-  - 建立真实 provider 接入口
+  - 建立只读 provider 接入口
 - 要求：
-  - 默认不走 real
-  - 没有审批时不执行
+  - 默认不走 real-readonly
+  - 即使接入真实 provider，也只能做只读分析
+  - 没有审批时不进入任何真实执行
   - 失败必须结构化返回
 
-### 阶段 4：人工审批后允许 real 处理低风险任务
+### 阶段 4：再单独评估是否需要受控 `real` 执行模式
 
 - 目标：
   - 在受控边界内验证真实执行
@@ -362,8 +372,8 @@ Real Provider Adapter Design 完成后，下一轮实施必须满足：
 
 - [ ] mock 模式仍然通过现有测试
 - [ ] dry-run 模式不产生真实副作用
-- [ ] real 模式默认关闭
-- [ ] real 模式必须经过人工审批
+- [ ] real-readonly 模式默认关闭
+- [ ] real-readonly 模式必须经过人工审批
 - [ ] `agent_result` contract 不变
 - [ ] Criteria Checker 不需要修改
 - [ ] Error Handler 仍然可触发
@@ -377,19 +387,20 @@ Real Provider Adapter Design 完成后，下一轮实施必须满足：
 | 无限循环 | agent 一直“继续尝试” | 停止条件、最大迭代、人工终止 |
 | provider 返回格式不稳定 | 下游 contract 被破坏 | `Result Normalizer` 统一标准化 |
 | API key 泄露 | secret 进入 JSON / docs / logs | n8n Credentials、环境变量、脱敏日志 |
-| 执行真实副作用 | real mode 修改真实系统 | 默认关闭、低风险白名单、人工审批 |
+| 执行真实副作用 | real-readonly 被误用成执行模式 | 默认关闭、只读约束、人工审批 |
 | 人工审核绕过 | 高风险任务直接执行 | fail closed、审批字段显式校验 |
 | Error Handler 不覆盖 provider 错误 | 外部失败无法追踪 | 结构化错误、统一错误出口 |
 | 跨 n8n 实例 credential 丢失 | workflow 导入后凭据失效 | 导入后重新绑定 credential 与子 workflow |
 
 ## 12. 下一轮实施建议
 
-下一轮 Codex 最适合只做：
+当前 V0.3a 最适合只做：
 
 1. 在 executor workflow 里加 `Mode Router`
 2. 保留 `mock` 路径
 3. 新增 `dry-run adapter`
-4. 不接 `real provider`
+4. 新增 `real-readonly stub`
+5. 不接真实 provider
 
 下一轮仍应坚持：
 
@@ -398,3 +409,21 @@ Real Provider Adapter Design 完成后，下一轮实施必须满足：
 - 不改 Criteria Checker contract
 - 不引入真实 API key
 - 不让真实执行能力抢跑到设计前面
+
+## 13. V0.3a 实施状态
+
+当前 V0.3a 的目标是：
+
+```text
+mock
+dry-run
+real-readonly stub
+```
+
+三种模式共存，且全部汇入同一个 `Result Normalizer`。
+
+当前阶段仍然明确禁止：
+
+- 真实 provider 调用
+- API key / credential 接入
+- 任何文件写入、终端命令、Git 修改或外部写接口

@@ -1,0 +1,22 @@
+{
+  "goal": "Generate a read-only implementation plan for the GoalDriven workflow",
+  "criteria": [
+    "Output must include summary",
+    "Output must include intended_actions",
+    "Output must include evidence",
+    "Output must include risk_summary",
+    "Output must not execute real actions"
+  ],
+  "agent_mode": "real-readonly",
+  "provider_mode": "real-readonly",
+  "max_iterations": 1,
+  "timeout_minutes": 5,
+  "risk_level": "low",
+  "require_human_approval": false,
+  "manual_approval_required": false,
+  "human_approved": true,
+  "context": {
+    "agent_mode": "real-readonly",
+    "provider_mode": "real-readonly"
+  }
+}
