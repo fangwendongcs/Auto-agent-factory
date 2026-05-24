@@ -1,5 +1,7 @@
 # Goal-Driven Agent Workflow with n8n
 
+**Language:** English | [简体中文](README.zh-CN.md)
+
 ![n8n workflow](https://img.shields.io/badge/n8n-workflow-FF6D5A)
 ![Node.js](https://img.shields.io/badge/Node.js-test%20scripts-339933)
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
@@ -245,6 +247,7 @@ These are roadmap items, not current repository capabilities.
 ```text
 .
 ├── README.md
+├── README.zh-CN.md
 ├── docs/
 │   ├── PROJECT_BRIEF.md
 │   ├── PORTFOLIO_CASE_STUDY.md
