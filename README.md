@@ -221,14 +221,14 @@ Safety boundaries include:
 - no production activation before manual verification
 - `.env.example` contains variable names only, not real values
 
-Before adding real provider access, review:
+Before any real provider work, I keep the implementation behind the same readiness and adapter boundaries:
 
 - [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md)
 - [`docs/REAL_PROVIDER_ADAPTER_DESIGN.md`](docs/REAL_PROVIDER_ADAPTER_DESIGN.md)
 
 ## Roadmap
 
-Planned next steps:
+The next direction is to keep the current workflow contract stable while gradually replacing stubs with controlled provider adapters:
 
 - Real LLM provider integration behind the existing adapter contract
 - Codex / coding-agent executor adapter
@@ -240,7 +240,7 @@ Planned next steps:
 - RAG / knowledge base integration
 - Better execution metrics and observability
 
-These are roadmap items, not current repository capabilities.
+I keep these as next steps, not as current capabilities.
 
 ## Repository Structure
 
@@ -280,9 +280,9 @@ These are roadmap items, not current repository capabilities.
 
 The `n8n/` directory contains an earlier Codex planner/reviewer workflow prototype kept as reference material. The current GoalDriven MVP lives primarily in `workflows/`, `docs/`, `examples/`, `src/`, and `tests/`.
 
-## Why this project is valuable
+## Why I built this
 
-This repository demonstrates a productized approach to Agent workflow design:
+I built this project to make Agent workflow design more concrete. The interesting part is not only calling a model; it is defining the control system around the model:
 
 - goal decomposition before execution
 - criteria-based validation instead of vague completion claims
@@ -291,10 +291,11 @@ This repository demonstrates a productized approach to Agent workflow design:
 - human-in-the-loop safety
 - mock-first engineering before real provider integration
 - import-ready n8n workflow JSON managed as code
-- clear documentation for validation, migration, rollback, and future provider adapters
+- documentation for validation, migration, rollback, and future provider adapters
 
-It is useful as a portfolio project because it shows the practical work around Agent systems: contracts, safety boundaries, operational readiness, and reproducible workflows.
+For me, this project is a practical way to show how Agent products can be designed with contracts, safety boundaries, and operational discipline from the start.
 
-## License / Maintainer
+## Project status
 
-No license file is currently included in this repository. Add a `LICENSE` file before presenting this as an open-source project intended for external reuse.
+- MVP status: mock-first workflow validated
+- Real provider: not connected yet

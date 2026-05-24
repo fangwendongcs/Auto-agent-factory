@@ -221,14 +221,14 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - 人工验证前不建议启用生产触发
 - `.env.example` 只包含变量名，不包含真实值
 
-接入真实 provider 前请先阅读：
+真实 provider 的接入会继续放在同一套 readiness 和 adapter 边界之后：
 
 - [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md)
 - [`docs/REAL_PROVIDER_ADAPTER_DESIGN.md`](docs/REAL_PROVIDER_ADAPTER_DESIGN.md)
 
 ## Roadmap
 
-规划中的下一步：
+下一步会围绕一个原则推进：保持当前 workflow contract 稳定，再逐步把 stub 替换成受控的 provider adapter。
 
 - 在现有 adapter contract 后接入真实 LLM provider
 - Codex / coding-agent executor adapter
@@ -240,7 +240,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - RAG / knowledge base integration
 - 更完整的 execution metrics 和 observability
 
-以上是 Roadmap，不是当前仓库已完成能力。
+这些内容是下一步方向，不是当前能力。
 
 ## Repository Structure
 
@@ -280,9 +280,9 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 
 `n8n/` 目录保留了较早的 Codex planner/reviewer workflow 原型，作为参考资产。当前 GoalDriven MVP 主要位于 `workflows/`、`docs/`、`examples/`、`src/` 和 `tests/`。
 
-## Why this project is valuable
+## Why I built this
 
-这个仓库体现的是一种产品化的 Agent workflow 设计方式：
+我做这个项目，是想把 Agent workflow 这件事从“调用一个模型”推进到“设计一个可控的执行系统”。真正有价值的不只是模型输出，而是模型周围的控制层：
 
 - 执行前先做 goal decomposition
 - 用 criteria-based validation 代替模糊的“完成了”
@@ -293,8 +293,9 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - n8n workflow JSON 作为代码管理，便于导入、审查和回滚
 - 文档覆盖验证、迁移、回滚和未来 provider adapter
 
-作为作品集项目，它展示的是 Agent 系统落地中真正重要的部分：contract、安全边界、运行准备和可复现 workflow。
+对我来说，这个项目展示的是 Agent 产品落地时更底层也更重要的部分：contract、安全边界、运行准备和可复现 workflow。
 
-## License / Maintainer
+## Project status
 
-当前仓库尚未包含 license 文件。如果计划将其作为面向外部复用的开源项目展示，建议后续补充 `LICENSE`。
+- MVP status：mock-first workflow validated
+- Real provider：尚未接入
