@@ -20,6 +20,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`IMPORT_ORDER.md`](IMPORT_ORDER.md) — short import order guide.
 - [`MANUAL_IMPORT_CHECKLIST.md`](MANUAL_IMPORT_CHECKLIST.md) — step-by-step manual import and validation checklist.
 - [`RUNBOOK.md`](RUNBOOK.md) — local validation, n8n import, execution troubleshooting, and rollback guide.
+- [`VALIDATION_LOG.md`](VALIDATION_LOG.md) — recorded validation milestones for V0.3a / V0.3b routing and safety checks.
 - [`V0_3A_REAL_READONLY_UI_VERIFICATION.md`](V0_3A_REAL_READONLY_UI_VERIFICATION.md) — n8n UI verification checklist for the real-readonly stub path.
 
 ## Production and provider planning

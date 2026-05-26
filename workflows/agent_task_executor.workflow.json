@@ -66,50 +66,86 @@
     },
     {
       "parameters": {
+        "mode": "rules",
         "rules": {
           "values": [
             {
               "conditions": {
-                "string": [
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
                   {
-                    "value1": "={{ $json.provider_mode }}",
-                    "operation": "equal",
-                    "value2": "real-readonly"
+                    "id": "mode-real-readonly",
+                    "leftValue": "={{ $json.provider_mode }}",
+                    "rightValue": "real-readonly",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
                   }
-                ]
+                ],
+                "combinator": "and"
               },
               "renameOutput": true,
               "outputKey": "real_readonly"
             },
             {
               "conditions": {
-                "string": [
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
                   {
-                    "value1": "={{ $json.provider_mode }}",
-                    "operation": "equal",
-                    "value2": "dry-run"
+                    "id": "mode-dry-run",
+                    "leftValue": "={{ $json.provider_mode }}",
+                    "rightValue": "dry-run",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
                   }
-                ]
+                ],
+                "combinator": "and"
               },
               "renameOutput": true,
               "outputKey": "dry_run"
             },
             {
               "conditions": {
-                "string": [
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
                   {
-                    "value1": "={{ $json.provider_mode }}",
-                    "operation": "equal",
-                    "value2": "mock"
+                    "id": "mode-mock",
+                    "leftValue": "={{ $json.provider_mode }}",
+                    "rightValue": "mock",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
                   }
-                ]
+                ],
+                "combinator": "and"
               },
               "renameOutput": true,
               "outputKey": "mock"
             }
           ]
         },
-        "options": {}
+        "options": {
+          "fallbackOutput": 2
+        }
       },
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,

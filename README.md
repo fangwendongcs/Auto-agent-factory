@@ -13,7 +13,9 @@ A **goal-driven AI Agent workflow MVP** built with n8n.
 
 This project turns an Agent task from “let the model try something” into a bounded workflow with a goal, criteria, execution loop, result checking, error handling, and human approval gates. It separates orchestration into four importable n8n workflows and validates the system with mock-first contracts before connecting any real provider.
 
-Current status: **mock-first MVP validated**, with dry-run and real-readonly stub modes available in the executor. The next runtime checkpoint is validating the real-readonly path inside n8n UI. No real LLM, Codex, or external provider is connected in this repository.
+Current status: **V0.3b regression verified**. The executor now supports three validated paths: `mock`, `dry-run`, and `real-readonly` stub. High-risk approval blocking and invalid payload validation have also been verified through the local n8n Production Webhook flow.
+
+This is still a safety-first MVP. It does **not** include production autonomous execution, real LLM execution, real Codex execution, file writes, shell execution, Git modification, or external write actions.
 
 ## Overview
 
@@ -107,6 +109,11 @@ Documented validation status:
 - Production Webhook smoke test passed in the local n8n validation flow
 - Error Workflow verified through automatic failure triggering
 - Human Approval Gate verified with high-risk payload behavior
+- V0.3b mode routing regression verified:
+  - `mock` → Mock Agent Adapter
+  - `dry-run` → Dry-run Provider Adapter
+  - `real-readonly` → Real-readonly Provider Adapter
+  - invalid payloads and high-risk requests are blocked before executor dispatch
 - `workflow:validate:all` currently expected to report `0 warning / 0 error`
 
 ## Quick Start
@@ -173,6 +180,7 @@ Detailed guides:
 - [`docs/IMPORT_ORDER.md`](docs/IMPORT_ORDER.md)
 - [`docs/MANUAL_IMPORT_CHECKLIST.md`](docs/MANUAL_IMPORT_CHECKLIST.md)
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
+- [`docs/VALIDATION_LOG.md`](docs/VALIDATION_LOG.md)
 - [`docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`](docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md)
 
 ## Manual Testing
@@ -299,5 +307,7 @@ For me, this project is a practical way to show how Agent products can be design
 ## Project status
 
 - MVP status: mock-first workflow validated
-- V0.3a status: repository workflow is ready for n8n UI real-readonly verification
+- V0.3b status: mock / dry-run / real-readonly routing verified in n8n regression testing
+- Safety gates: high-risk approval and invalid payload blocking verified
 - Real provider: not connected yet
+- Real execution: not enabled
