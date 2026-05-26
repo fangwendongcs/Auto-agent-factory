@@ -1,4 +1,8 @@
-# Goal-Driven Agent Workflow with n8n
+# Auto Agent Factory
+
+**A mock-first, goal-driven n8n workflow skeleton for bounded, testable, and human-reviewable AI Agent automation.**
+
+Technical positioning: **Goal-Driven Agent Workflow with n8n**.
 
 **Language:** English | [简体中文](README.zh-CN.md)
 
@@ -7,52 +11,86 @@
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-MVP-yellow)
+![status](https://img.shields.io/badge/status-v0.3.0%20validation-yellow)
+![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
-A **goal-driven AI Agent workflow MVP** built with n8n.
+Auto Agent Factory is a **mock-first AI Agent workflow skeleton** built with n8n. It turns an agent request into a bounded workflow contract: define a goal, define success criteria, run a controlled executor step, check the result, and decide whether to finish, revise, stop, or require human review.
 
-This project turns an Agent task from “let the model try something” into a bounded workflow with a goal, criteria, execution loop, result checking, error handling, and human approval gates. It separates orchestration into four importable n8n workflows and validates the system with mock-first contracts before connecting any real provider.
+Current stage: **v0.3.0 / Mock-First MVP Validation**. The project has validated `mock`, `dry-run`, and `real-readonly` stub routing, plus invalid payload blocking and high-risk manual review blocking. It is designed to prove orchestration, contracts, validation, and safety boundaries before connecting real providers.
 
-Current status: **V0.3b regression verified**. The executor now supports three validated paths: `mock`, `dry-run`, and `real-readonly` stub. High-risk approval blocking and invalid payload validation have also been verified through the local n8n Production Webhook flow.
+This is **not** a production autonomous agent. It does **not** yet execute real LLM calls, real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-This is still a safety-first MVP. It does **not** include production autonomous execution, real LLM execution, real Codex execution, file writes, shell execution, Git modification, or external write actions.
+## Current Stage
 
-## Overview
+| Area | v0.3.0 status |
+|---|---|
+| Project phase | Mock-First MVP Validation |
+| Master workflow | Importable n8n workflow JSON implemented |
+| Executor workflow | `mock`, `dry-run`, and `real-readonly` stub routing validated |
+| Criteria checker | Provider-agnostic criteria evaluation workflow implemented |
+| Error handler | n8n Error Trigger workflow implemented |
+| Payload safety | Invalid payload validation and high-risk blocking verified |
+| Local verification | Tests, workflow validation, dry-run, and import checks available |
+| Real LLM provider | Not connected |
+| Real Codex provider | Not connected |
+| Production autonomous execution | Not implemented |
+| Real user data / SaaS operations | Not included |
 
-`Goal-Driven Agent Workflow with n8n` is a workflow-as-code prototype for building safer Agent automation.
+## Verified Paths
 
-Instead of treating an Agent as a single prompt or a black-box automation, the project models an execution system around:
+- `mock`: returns a controlled mock executor result for contract validation.
+- `dry-run`: exercises routing and response shape without real provider calls.
+- `real-readonly`: currently a stub route used to validate future adapter shape.
+- invalid payload: blocked before executor dispatch.
+- high-risk request: routed to manual review / blocking behavior.
+- workflow validation: all exported workflow JSON files can be checked locally.
+- import readiness: workflow import order and binding reminders are documented and checked.
 
-- a user-defined `goal`
-- explicit `criteria`
-- a bounded executor workflow
-- a criteria checker
-- an error workflow
-- manual approval and stop conditions
-- import, validation, and rollback documentation
+## Safety Status
 
-The repository is designed to be reproducible: workflow JSON lives in Git, sample payloads live in `examples/`, validation scripts live in `scripts/`, and operational guidance lives in `docs/`.
+- Workflows are exported inactive by default.
+- No real API keys or webhook secrets are stored in workflow JSON.
+- `.env.example` contains placeholder variable names only.
+- Execution is bounded by documented `max_iterations` and `timeout_minutes`.
+- High-risk requests are blocked or require human review.
+- The current executor does not perform shell execution, file writes, Git operations, or external write actions.
+- Real provider integration is intentionally deferred behind future adapter and credential boundaries.
 
-## The Problem
+## Why This Project Exists
 
-Many Agent automation demos fail for the same reasons:
+Many AI agent demos jump directly from a prompt to an automation. In real products, the harder problem is the control plane around the agent:
 
-- the goal is ambiguous
-- success criteria are not measurable
-- outputs are not checked against acceptance criteria
-- failures do not have a recovery path
-- costs and execution time can grow without a stop condition
-- high-risk actions may continue without human review
+- What exact goal is the system trying to satisfy?
+- What criteria define success?
+- How does the workflow stop?
+- What happens when output is invalid or incomplete?
+- Where does human review happen for high-risk actions?
+- How can the workflow be tested, imported, reviewed, and versioned as code?
 
-This project treats those issues as product and systems-design problems, not just prompt-engineering problems.
+Auto Agent Factory treats these as workflow architecture problems. The goal is to create a reusable skeleton for safer agent orchestration before adding expensive or risky provider integrations.
 
-## Product Concept
+## What It Does
 
-The core product assumption is simple:
+- Accepts a structured goal request with `goal`, `criteria`, and execution limits.
+- Validates payloads before dispatching work.
+- Routes high-risk requests through a manual review boundary.
+- Initializes run and task identifiers.
+- Dispatches one bounded executor iteration.
+- Normalizes executor output into an `agent_result` contract.
+- Checks evidence against acceptance criteria.
+- Returns a final report, next iteration instruction, stop response, blocked response, or error context.
+- Keeps workflow JSON, examples, tests, validation scripts, and operations docs in Git.
 
-> A user submits a `goal` and a list of `criteria`. The Master Workflow initializes a run, dispatches an executor, checks the result against the criteria, and either finishes, asks for another iteration, blocks for human approval, or routes failures to an Error Handler.
+## Why Star This Project?
 
-The MVP is intentionally mock-first. It proves the workflow contract, import path, validation scripts, safety boundaries, and manual testing process before connecting a real provider.
+Star this repository if you want to follow or reuse:
+
+- a goal-driven n8n workflow pattern for AI Agent automation
+- mock-first validation before real provider cost and risk
+- explicit success criteria instead of vague “agent finished” claims
+- human-reviewable safety boundaries for high-risk actions
+- workflow JSON managed and tested as code
+- a practical roadmap toward real LLM adapters, Codex/coding-agent adapters, run history, and observability
 
 ## Architecture
 
@@ -79,42 +117,12 @@ flowchart TD
 
 ## Workflow Modules
 
-| Module | File | Responsibility | Current Status | Notes |
-|---|---|---|---|---|
-| Goal-Driven Master Workflow | `workflows/goal_driven_master.workflow.json` | Receives goal payloads, validates input, initializes run/task IDs, dispatches executor/checker, routes final response. | Implemented as importable workflow JSON. | Includes human approval and safety gate behavior. |
-| Agent Task Executor Workflow | `workflows/agent_task_executor.workflow.json` | Executes one bounded task iteration and returns a normalized `agent_result`. | Implemented with `mock`, `dry-run`, and `real-readonly` stub modes. | No real provider is connected. |
-| Criteria Checker Workflow | `workflows/criteria_checker.workflow.json` | Evaluates executor evidence against each criterion and returns pass/fail/unknown checks. | Implemented as sub-workflow. | Designed to be provider-agnostic. |
-| Goal-Driven Error Handler Workflow | `workflows/error_handler.workflow.json` | Handles failed workflow executions and produces recovery context. | Implemented as Error Trigger workflow. | Error Handler verification is documented in the Runbook. |
-
-## What is already implemented
-
-Verified against the current repository:
-
-- Four official n8n workflow JSON files in `workflows/`
-- Workflow contract validation scripts
-- Import readiness check script
-- Dry-run deployment script that does not call the n8n API unless explicitly configured
-- Node test suite covering schemas, criteria scoring, and workflow contracts
-- `goal`, `task`, and `result` JSON schemas
-- Prompt templates for master, subagent, and criteria checker roles
-- Sample goal, success result, failed result, and final report examples
-- Manual test payloads for valid input, missing fields, high-risk approval, dry-run mode, and real-readonly stub mode
-- Runbook, import order, manual import checklist, production readiness checklist, and real provider adapter design
-- Mock-first execution path
-- Safety defaults and documentation around `max_iterations`, `timeout_minutes`, manual approval, and inactive workflow exports
-
-Documented validation status:
-
-- mock-first MVP validated
-- Production Webhook smoke test passed in the local n8n validation flow
-- Error Workflow verified through automatic failure triggering
-- Human Approval Gate verified with high-risk payload behavior
-- V0.3b mode routing regression verified:
-  - `mock` → Mock Agent Adapter
-  - `dry-run` → Dry-run Provider Adapter
-  - `real-readonly` → Real-readonly Provider Adapter
-  - invalid payloads and high-risk requests are blocked before executor dispatch
-- `workflow:validate:all` currently expected to report `0 warning / 0 error`
+| Module | File | Responsibility | Current status |
+|---|---|---|---|
+| Goal-Driven Master Workflow | `workflows/goal_driven_master.workflow.json` | Receives goal payloads, validates input, initializes run/task IDs, dispatches executor/checker, routes final response. | Implemented |
+| Agent Task Executor Workflow | `workflows/agent_task_executor.workflow.json` | Executes one bounded task iteration and returns a normalized `agent_result`. | Implemented with `mock`, `dry-run`, and `real-readonly` stub modes |
+| Criteria Checker Workflow | `workflows/criteria_checker.workflow.json` | Evaluates executor evidence against criteria and returns pass/fail/unknown checks. | Implemented |
+| Goal-Driven Error Handler Workflow | `workflows/error_handler.workflow.json` | Handles failed workflow executions and produces recovery context. | Implemented |
 
 ## Quick Start
 
@@ -124,31 +132,31 @@ Install dependencies:
 npm install
 ```
 
-Run the local test suite:
+Run tests:
 
 ```bash
 npm test
 ```
 
-Validate all workflow JSON files:
+Validate workflow JSON:
 
 ```bash
 npm run workflow:validate:all
 ```
 
-Run the deployment script in dry-run mode:
+Run dry-run deployment check:
 
 ```bash
 npm run workflow:dry-run
 ```
 
-Check import readiness:
+Check n8n import readiness:
 
 ```bash
 npm run import:check
 ```
 
-Optional: generate a smoke-test request from the sample goal payload:
+Optional smoke-test payload generation:
 
 ```bash
 npm run smoke:goal-driven
@@ -183,61 +191,62 @@ Detailed guides:
 - [`docs/VALIDATION_LOG.md`](docs/VALIDATION_LOG.md)
 - [`docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`](docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md)
 
-## Manual Testing
-
-Start with:
-
-```text
-examples/sample_goal_request.json
-```
-
-Additional manual payloads:
-
-```text
-examples/manual-test-payloads/01-valid-goal.json
-examples/manual-test-payloads/02-missing-goal.json
-examples/manual-test-payloads/03-missing-criteria.json
-examples/manual-test-payloads/04-high-risk-needs-approval.json
-examples/manual-test-payloads/05-dry-run-mode.json
-examples/manual-test-payloads/06-real-readonly-mode.json
-```
-
-Expected checks during manual execution:
-
-- `run_id` is generated
-- `task_id` is generated
-- `criteria_result` is returned
-- `next_action` is returned
-- missing `goal` returns a clear validation error
-- missing `criteria` returns a clear validation error
-- high-risk payloads can be blocked by the manual approval gate
-- Error Handler behavior is verified through automatic execution failure, not only manual test execution
-
 ## Safety & Cost Boundaries
 
-This project is intentionally not an unbounded autonomous Agent implementation.
+This project is intentionally not an unbounded autonomous agent.
 
-Safety boundaries include:
+Current boundaries:
 
 - mock-first implementation
 - dry-run execution path
-- real-readonly stub before real provider integration
-- manual approval gate for high-risk payloads
+- `real-readonly` is a stub, not a real provider call
+- manual review gate for high-risk payloads
 - `max_iterations` limit
 - `timeout_minutes` limit
 - workflow JSON exported as inactive by default
-- no real secrets in workflow JSON
-- no production activation before manual verification
-- `.env.example` contains variable names only, not real values
+- no real API keys or secrets in workflow JSON
+- `.env.example` contains placeholder names only
+- no external write actions, shell execution, file writes, or Git modifications
 
-Before any real provider work, I keep the implementation behind the same readiness and adapter boundaries:
+Before connecting real providers, keep provider calls behind a backend, n8n credential, or adapter boundary. Do not expose OpenAI, ElevenLabs, n8n webhook secrets, or other credentials in frontend code or public workflow exports.
+
+Related docs:
 
 - [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md)
 - [`docs/REAL_PROVIDER_ADAPTER_DESIGN.md`](docs/REAL_PROVIDER_ADAPTER_DESIGN.md)
+- [`docs/n8n-security-checklist.md`](docs/n8n-security-checklist.md)
+
+## Project Status
+
+Current release target: **v0.3.0 Mock-First MVP Validation**.
+
+Implemented and validated:
+
+- Four official n8n workflow JSON files in `workflows/`
+- Workflow contract validation scripts
+- Import readiness check script
+- Dry-run deployment script
+- Node test suite for schemas, scoring, and workflow contracts
+- `goal`, `task`, and `result` JSON schemas
+- Prompt templates for master, subagent, and criteria checker roles
+- Sample goal, success result, failed result, and final report examples
+- Manual test payloads for valid input, missing fields, high-risk approval, dry-run mode, and real-readonly stub mode
+- Runbook, import order, manual import checklist, production readiness checklist, and real provider adapter design
+- Mode Router regression fix and validation trail
+- Safety documentation around `max_iterations`, `timeout_minutes`, manual review, and inactive workflow exports
+
+Not implemented yet:
+
+- real LLM execution
+- real Codex/coding-agent automation
+- real provider API calls
+- persistent run history
+- hosted dashboard
+- multi-user permissions
+- production autonomous execution
+- real user data processing
 
 ## Roadmap
-
-The next direction is to keep the current workflow contract stable while gradually replacing stubs with controlled provider adapters:
 
 - Real LLM provider integration behind the existing adapter contract
 - Codex / coding-agent executor adapter
@@ -249,7 +258,20 @@ The next direction is to keep the current workflow contract stable while gradual
 - RAG / knowledge base integration
 - Better execution metrics and observability
 
-I keep these as next steps, not as current capabilities.
+These are planned milestones, not current capabilities.
+
+## GitHub Display Assets
+
+No real screenshots are included yet, and this README intentionally does not use fake screenshots.
+
+Planned assets are tracked in [`docs/ASSETS_TODO.md`](docs/ASSETS_TODO.md), including:
+
+- n8n master workflow screenshot
+- executor workflow screenshot
+- criteria checker workflow screenshot
+- error handler screenshot
+- sample execution output
+- architecture diagram image
 
 ## Repository Structure
 
@@ -257,6 +279,8 @@ I keep these as next steps, not as current capabilities.
 .
 ├── README.md
 ├── README.zh-CN.md
+├── CHANGELOG.md
+├── LICENSE
 ├── docs/
 │   ├── PROJECT_BRIEF.md
 │   ├── PORTFOLIO_CASE_STUDY.md
@@ -264,7 +288,9 @@ I keep these as next steps, not as current capabilities.
 │   ├── IMPORT_ORDER.md
 │   ├── MANUAL_IMPORT_CHECKLIST.md
 │   ├── PRODUCTION_READINESS.md
-│   └── REAL_PROVIDER_ADAPTER_DESIGN.md
+│   ├── REAL_PROVIDER_ADAPTER_DESIGN.md
+│   ├── RELEASE_NOTES_V0_3_0.md
+│   └── ASSETS_TODO.md
 ├── workflows/
 │   ├── goal_driven_master.workflow.json
 │   ├── agent_task_executor.workflow.json
@@ -283,31 +309,13 @@ I keep these as next steps, not as current capabilities.
 ├── tests/
 ├── scripts/
 ├── n8n/
+├── .github/
 ├── .env.example
 └── package.json
 ```
 
-The `n8n/` directory contains an earlier Codex planner/reviewer workflow prototype kept as reference material. The current GoalDriven MVP lives primarily in `workflows/`, `docs/`, `examples/`, `src/`, and `tests/`.
+The `n8n/` directory contains an earlier Codex planner/reviewer workflow prototype kept as reference material. The current Auto Agent Factory v0.3.0 validation work lives primarily in `workflows/`, `docs/`, `examples/`, `src/`, and `tests/`.
 
-## Why I built this
+## License
 
-I built this project to make Agent workflow design more concrete. The interesting part is not only calling a model; it is defining the control system around the model:
-
-- goal decomposition before execution
-- criteria-based validation instead of vague completion claims
-- workflow orchestration across dedicated modules
-- fail-safe error handling
-- human-in-the-loop safety
-- mock-first engineering before real provider integration
-- import-ready n8n workflow JSON managed as code
-- documentation for validation, migration, rollback, and future provider adapters
-
-For me, this project is a practical way to show how Agent products can be designed with contracts, safety boundaries, and operational discipline from the start.
-
-## Project status
-
-- MVP status: mock-first workflow validated
-- V0.3b status: mock / dry-run / real-readonly routing verified in n8n regression testing
-- Safety gates: high-risk approval and invalid payload blocking verified
-- Real provider: not connected yet
-- Real execution: not enabled
+MIT. See [`LICENSE`](LICENSE).
