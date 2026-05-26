@@ -20,6 +20,8 @@ Current stage: **v0.3.0 / Mock-First MVP Validation**. The project has validated
 
 This is **not** a production autonomous agent. It does **not** yet execute real LLM calls, real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
+Next phase: **V0.4 real provider adapter design**, read-only first. The next provider step is to design a controlled real-readonly adapter contract before enabling any real provider calls.
+
 ## Current Stage
 
 | Area | v0.3.0 status |

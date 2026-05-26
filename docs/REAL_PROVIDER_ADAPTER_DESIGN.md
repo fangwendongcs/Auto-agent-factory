@@ -392,27 +392,9 @@ Real Provider Adapter Design 完成后，下一轮实施必须满足：
 | Error Handler 不覆盖 provider 错误 | 外部失败无法追踪 | 结构化错误、统一错误出口 |
 | 跨 n8n 实例 credential 丢失 | workflow 导入后凭据失效 | 导入后重新绑定 credential 与子 workflow |
 
-## 12. 下一轮实施建议
+## 12. V0.3a / V0.3b implementation status
 
-当前 V0.3a 最适合只做：
-
-1. 在 executor workflow 里加 `Mode Router`
-2. 保留 `mock` 路径
-3. 新增 `dry-run adapter`
-4. 新增 `real-readonly stub`
-5. 不接真实 provider
-
-下一轮仍应坚持：
-
-- 小步修改
-- 只做 executor 局部演进
-- 不改 Criteria Checker contract
-- 不引入真实 API key
-- 不让真实执行能力抢跑到设计前面
-
-## 13. V0.3a 实施状态
-
-当前 V0.3a 的目标是：
+V0.3a 的目标是：
 
 ```text
 mock
@@ -420,10 +402,219 @@ dry-run
 real-readonly stub
 ```
 
-三种模式共存，且全部汇入同一个 `Result Normalizer`。
+当前已完成：
+
+- `mock` path verified
+- `dry-run` path verified
+- `real-readonly stub` path verified
+- all three paths converge into `Result Normalizer`
+- `agent_result` contract remains compatible with Criteria Checker
+- high-risk approval gate remains active
+- invalid payload validation remains active
+
+V0.3b 修复并验证了 Mode Router regression：
+
+- n8n Switch V3 must use filter-style conditions
+- `mock` falls back to Mock Agent Adapter
+- `dry-run` routes to Dry-run Provider Adapter
+- `real-readonly` routes to Real-readonly Provider Adapter
+- no real provider, credential, file write, shell execution, Git modification, or external write action is enabled
 
 当前阶段仍然明确禁止：
 
 - 真实 provider 调用
 - API key / credential 接入
 - 任何文件写入、终端命令、Git 修改或外部写接口
+
+## 13. V0.4 real provider adapter design
+
+V0.4 的目标不是打开真实执行能力，而是设计第一条真实 provider 的 **read-only adapter**。
+
+它只允许真实 provider 生成结构化分析，不允许执行动作。
+
+### 13.1 Scope
+
+V0.4 可以设计：
+
+- provider selection
+- credential binding strategy
+- request payload contract
+- provider response normalizer
+- failure fallback
+- usage / latency metadata
+- read-only safety checks
+
+V0.4 不应该实现：
+
+- file write
+- shell execution
+- Git modification
+- external write API calls
+- autonomous production execution
+- bypassing human approval
+
+### 13.2 First provider strategy
+
+第一版真实 provider 建议只接一个，避免同时引入多厂商差异。
+
+推荐优先级：
+
+1. OpenRouter-compatible HTTP provider
+2. OpenAI-compatible HTTP provider
+3. local HTTP agent
+4. Codex manual-task adapter
+
+选择标准：
+
+- credential can live in n8n Credentials or local environment only
+- response can be normalized into the existing `agent_result`
+- provider timeout can be bounded
+- token / cost usage can be recorded or estimated
+- provider failure can fall back to structured `needs_review`
+
+### 13.3 Node design for V0.4
+
+推荐仍只修改 `[GoalDriven] 02 Agent Task Executor`：
+
+```text
+When Executed by Another Workflow
+→ Task Validator
+→ Prompt Builder
+→ Mode Router
+   ├─ Mock Agent Adapter
+   ├─ Dry-run Provider Adapter
+   └─ Real-readonly Provider Adapter
+        ├─ Real-readonly Safety Check
+        ├─ Real Provider HTTP Call
+        └─ Provider Response Normalizer
+→ Result Normalizer
+→ Execution Logger
+```
+
+其中：
+
+- `Real-readonly Safety Check` blocks missing approval, high-risk inputs, or unsupported write intents
+- `Real Provider HTTP Call` is read-only and must not call write endpoints
+- `Provider Response Normalizer` converts provider output into the existing contract
+- `Result Normalizer` remains the final contract boundary before logging
+
+### 13.4 Provider request contract
+
+The provider prompt/request must be limited to analysis:
+
+```json
+{
+  "mode": "real-readonly",
+  "goal": "...",
+  "criteria": ["..."],
+  "constraints": [
+    "Do not execute commands",
+    "Do not write files",
+    "Do not modify Git",
+    "Do not call external write APIs",
+    "Return structured JSON only"
+  ],
+  "expected_output": {
+    "summary": "...",
+    "intended_actions": [],
+    "evidence": [],
+    "risk_summary": "..."
+  }
+}
+```
+
+### 13.5 Provider response contract
+
+The provider output must be normalized into:
+
+```json
+{
+  "status": "needs_review",
+  "summary": "...",
+  "artifacts": [],
+  "known_issues": [],
+  "evidence": [
+    {
+      "criterion": "...",
+      "status": "pass | fail | unknown",
+      "detail": "..."
+    }
+  ],
+  "intended_actions": [],
+  "risk_summary": "...",
+  "provider": {
+    "mode": "real-readonly",
+    "name": "...",
+    "model": "...",
+    "request_id": "...",
+    "latency_ms": 0
+  },
+  "safety": {
+    "risk_level": "low | medium | high",
+    "requires_human_approval": true,
+    "approved": false,
+    "blocked_reason": null
+  }
+}
+```
+
+The response must remain `needs_review`; V0.4 does not auto-promote provider output into execution.
+
+### 13.6 Failure fallback
+
+Provider errors must not crash the workflow without context.
+
+On timeout, invalid JSON, provider 4xx/5xx, or schema mismatch, the adapter should return a structured `agent_result`:
+
+```json
+{
+  "status": "failed",
+  "summary": "Real-readonly provider call failed before execution.",
+  "known_issues": ["..."],
+  "evidence": [],
+  "provider": {
+    "mode": "real-readonly",
+    "name": "...",
+    "model": "...",
+    "request_id": null,
+    "latency_ms": 0
+  },
+  "safety": {
+    "risk_level": "medium",
+    "requires_human_approval": true,
+    "approved": false,
+    "blocked_reason": "provider_error"
+  }
+}
+```
+
+If the n8n node itself fails unexpectedly, `[GoalDriven] 04 Error Handler` should still capture the failed execution.
+
+### 13.7 V0.4 acceptance criteria
+
+- [ ] mock path still passes
+- [ ] dry-run path still passes
+- [ ] real-readonly stub path still passes or remains available as fallback
+- [ ] real provider read-only path returns `needs_review`
+- [ ] real provider output includes `summary`, `intended_actions`, `evidence`, and `risk_summary`
+- [ ] no file write
+- [ ] no shell execution
+- [ ] no Git modification
+- [ ] no external write action
+- [ ] no API key in workflow JSON, docs, logs, or Git
+- [ ] Criteria Checker does not need to change
+- [ ] Error Handler can still capture provider node failures
+- [ ] `workflow:validate:all` remains `0 warning / 0 error`
+
+### 13.8 Recommended next implementation step
+
+The next implementation should be smaller than “connect a real provider and hope it works.”
+
+Recommended first implementation:
+
+1. Add a provider configuration placeholder to documentation only.
+2. Define the n8n credential name convention.
+3. Add a real-readonly provider request/response normalizer in design.
+4. Only then modify Executor with a disabled or manually gated HTTP provider branch.
+
+Do not remove `mock`, `dry-run`, or `real-readonly stub`. They are regression and safety baselines.
