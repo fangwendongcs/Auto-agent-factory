@@ -13,7 +13,7 @@
 
 这个项目不是“让模型随便执行一个任务”，而是把 Agent 任务拆成一个有边界的工作流：目标定义、成功标准、执行循环、结果检查、错误处理和人工审核。项目将编排拆成 4 个可导入的 n8n workflow，并在接入真实 provider 之前，先用 mock-first contract 验证结构、安全边界和可复现性。
 
-当前状态：**mock-first MVP 已验证**。Executor 已支持 dry-run 和 real-readonly stub 模式。本仓库尚未接入真实 LLM、Codex 或外部 provider。
+当前状态：**mock-first MVP 已验证**。Executor 已支持 dry-run 和 real-readonly stub 模式。下一步运行态检查是在 n8n UI 中验证 real-readonly 路径。本仓库尚未接入真实 LLM、Codex 或外部 provider。
 
 ## Overview
 
@@ -173,6 +173,7 @@ npm run smoke:goal-driven
 - [`docs/IMPORT_ORDER.md`](docs/IMPORT_ORDER.md)
 - [`docs/MANUAL_IMPORT_CHECKLIST.md`](docs/MANUAL_IMPORT_CHECKLIST.md)
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
+- [`docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`](docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md)
 
 ## Manual Testing
 
@@ -298,4 +299,5 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 ## Project status
 
 - MVP status：mock-first workflow validated
+- V0.3a status：仓库 workflow 已准备好进行 n8n UI real-readonly 验证
 - Real provider：尚未接入

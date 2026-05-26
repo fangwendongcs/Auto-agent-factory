@@ -13,7 +13,7 @@ A **goal-driven AI Agent workflow MVP** built with n8n.
 
 This project turns an Agent task from “let the model try something” into a bounded workflow with a goal, criteria, execution loop, result checking, error handling, and human approval gates. It separates orchestration into four importable n8n workflows and validates the system with mock-first contracts before connecting any real provider.
 
-Current status: **mock-first MVP validated**, with dry-run and real-readonly stub modes available in the executor. No real LLM, Codex, or external provider is connected in this repository.
+Current status: **mock-first MVP validated**, with dry-run and real-readonly stub modes available in the executor. The next runtime checkpoint is validating the real-readonly path inside n8n UI. No real LLM, Codex, or external provider is connected in this repository.
 
 ## Overview
 
@@ -173,6 +173,7 @@ Detailed guides:
 - [`docs/IMPORT_ORDER.md`](docs/IMPORT_ORDER.md)
 - [`docs/MANUAL_IMPORT_CHECKLIST.md`](docs/MANUAL_IMPORT_CHECKLIST.md)
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
+- [`docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`](docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md)
 
 ## Manual Testing
 
@@ -298,4 +299,5 @@ For me, this project is a practical way to show how Agent products can be design
 ## Project status
 
 - MVP status: mock-first workflow validated
+- V0.3a status: repository workflow is ready for n8n UI real-readonly verification
 - Real provider: not connected yet

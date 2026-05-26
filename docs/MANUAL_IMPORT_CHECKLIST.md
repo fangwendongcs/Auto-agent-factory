@@ -25,6 +25,8 @@
   - [ ] `examples/manual-test-payloads/02-missing-goal.json`
   - [ ] `examples/manual-test-payloads/03-missing-criteria.json`
   - [ ] `examples/manual-test-payloads/04-high-risk-needs-approval.json`
+  - [ ] `examples/manual-test-payloads/05-dry-run-mode.json`
+  - [ ] `examples/manual-test-payloads/06-real-readonly-mode.json`
 
 ## B. 导入顺序
 
@@ -88,6 +90,11 @@
 - [ ] 已确认验证 Error Handler 时使用的是 Production Webhook，而不是手动 `Execute Workflow`
 - [ ] Production Webhook 正常 payload 已验证
 - [ ] high risk 且 `human_approved=false` 的人工审核拦截已验证
+- [ ] 已打开 `docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`
+- [ ] `[GoalDriven] 02 Agent Task Executor` 已包含 `Real-readonly Provider Adapter`
+- [ ] `[GoalDriven] 02 Agent Task Executor` 已包含 `Result Normalizer`
+- [ ] real-readonly Production Webhook payload 已验证
+- [ ] real-readonly execution 路径经过 `Mode Router → Real-readonly Provider Adapter → Result Normalizer → Execution Logger`
 
 ## F. 激活前最后确认
 

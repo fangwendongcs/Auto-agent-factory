@@ -304,9 +304,29 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - `workflow:dry-run` 通过
 - `import:check` 通过
 
-## 10. 常见失败与排查
 
-### 10.1 缺少 goal / criteria
+## 10. V0.3a real-readonly UI 验证
+
+当前仓库中的 `[GoalDriven] 02 Agent Task Executor` 已包含：
+
+- `Mode Router`
+- `Real-readonly Provider Adapter`
+- `Result Normalizer`
+- `Execution Logger`
+
+下一步需要在 n8n UI 中确认运行态 workflow 已同步到这个结构，并通过 Production Webhook 验证 real-readonly payload。
+
+完整操作清单见：
+
+```text
+docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md
+```
+
+在验证完成前，不要把 real-readonly 写成真实 provider 能力。当前它仍然是 stub，只用于验证 contract、路由和安全边界。
+
+## 11. 常见失败与排查
+
+### 11.1 缺少 goal / criteria
 
 现象：
 
@@ -318,7 +338,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - 对照 `src/schema/goal.schema.json`
 - 使用 `examples/sample_goal_request.json` 作为基准
 
-### 10.2 子 workflow 没有真正被调用
+### 11.2 子 workflow 没有真正被调用
 
 现象：
 
@@ -330,7 +350,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - 检查 Master 中是否已经手工接好 `Execute Sub-workflow`
 - 检查目标 workflow 是否选对
 
-### 10.3 Error Handler 没触发
+### 11.3 Error Handler 没触发
 
 现象：
 
@@ -341,7 +361,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - 检查 Master workflow 设置中是否已配置 error workflow
 - 确认错误流程以 `Error Trigger` 开头
 
-### 10.4 Workflow 导入失败
+### 11.4 Workflow 导入失败
 
 处理顺序：
 
@@ -350,7 +370,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 3. 检查 n8n 版本差异
 4. 必要时先在 UI 中新建一个空 workflow，对照节点类型手工修复
 
-## 11. 如何回滚
+## 12. 如何回滚
 
 ### 本地代码回滚
 
@@ -371,7 +391,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 3. 重新导入或恢复旧配置
 4. 先手动执行验证，再决定是否恢复自动运行
 
-## 12. 什么时候可以考虑激活
+## 13. 什么时候可以考虑激活
 
 只有同时满足以下条件时，才建议激活生产触发器：
 
@@ -384,7 +404,7 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 - 已确认 high-risk 人工审核拦截仍生效
 - 已人工检查 workflow diff 和 credential 配置
 
-## 13. 进入真实 provider 前
+## 14. 进入真实 provider 前
 
 在把 mock-first MVP 继续推进到真实 provider / LLM / HTTP adapter 之前，必须先完成：
 
@@ -403,7 +423,7 @@ docs/PRODUCTION_READINESS.md
 
 如果 `PRODUCTION_READINESS` 仍有关键项未完成，不建议直接接入真实 provider。
 
-## 14. 成本与安全提醒
+## 15. 成本与安全提醒
 
 - Agent 自动化可能消耗大量 token 和时间
 - `max_iterations` 与 `timeout_minutes` 不是装饰项，而是停止边界
