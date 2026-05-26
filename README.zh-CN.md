@@ -1,4 +1,8 @@
-# Goal-Driven Agent Workflow with n8n
+# Auto Agent Factory
+
+**一个 mock-first、目标驱动的 n8n workflow skeleton，用于构建有边界、可测试、可人工审核的 AI Agent 自动化。**
+
+技术定位：**Goal-Driven Agent Workflow with n8n**。
 
 **语言：** [English](README.md) | 简体中文
 
@@ -7,50 +11,86 @@
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-MVP-yellow)
+![status](https://img.shields.io/badge/status-v0.3.0%20validation-yellow)
+![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
-一个基于 **n8n** 构建的 **目标驱动型 AI Agent 工作流 MVP**。
+Auto Agent Factory 是一个基于 **n8n** 的 **mock-first AI Agent workflow skeleton**。它把一次 Agent 请求变成一个有边界的 workflow contract：定义目标、定义成功标准、执行一轮受控任务、检查结果，然后决定完成、修订、停止，或进入人工审核。
 
-这个项目不是“让模型随便执行一个任务”，而是把 Agent 任务拆成一个有边界的工作流：目标定义、成功标准、执行循环、结果检查、错误处理和人工审核。项目将编排拆成 4 个可导入的 n8n workflow，并在接入真实 provider 之前，先用 mock-first contract 验证结构、安全边界和可复现性。
+当前阶段：**v0.3.0 / Mock-First MVP Validation**。项目已验证 `mock`、`dry-run`、`real-readonly` stub 三条路由，同时验证了 invalid payload 阻断和 high-risk 人工审核阻断。当前重点是先证明编排结构、contract、验证流程和安全边界，再接入真实 provider。
 
-当前状态：**mock-first MVP 已验证**。Executor 已支持 dry-run 和 real-readonly stub 模式。下一步运行态检查是在 n8n UI 中验证 real-readonly 路径。本仓库尚未接入真实 LLM、Codex 或外部 provider。
+这不是生产自主执行 Agent。它目前**不会**执行真实 LLM 调用、真实 Codex/coding-agent 任务、shell 命令、文件写入、Git 修改、外部写操作或真实 SaaS 用户流程。
 
-## Overview
+## Current Stage
 
-`Goal-Driven Agent Workflow with n8n` 是一个 workflow-as-code 原型，用来探索更安全、可验证的 Agent 自动化系统。
+| Area | v0.3.0 status |
+|---|---|
+| 项目阶段 | Mock-First MVP Validation |
+| Master workflow | 已实现为可导入 n8n workflow JSON |
+| Executor workflow | 已验证 `mock`、`dry-run`、`real-readonly` stub 路由 |
+| Criteria checker | 已实现 provider-agnostic 的 criteria evaluation workflow |
+| Error handler | 已实现 n8n Error Trigger workflow |
+| Payload safety | 已验证 invalid payload 校验和 high-risk 阻断 |
+| 本地验证 | 已提供 tests、workflow validation、dry-run、import check |
+| 真实 LLM provider | 未接入 |
+| 真实 Codex provider | 未接入 |
+| 生产自主执行 | 未实现 |
+| 真实用户数据 / SaaS 运行 | 未包含 |
 
-它没有把 Agent 看成一个 prompt 或黑盒脚本，而是围绕以下对象建立执行系统：
+## Verified Paths
 
-- 用户定义的 `goal`
-- 明确的 `criteria`
-- 有边界的 Executor workflow
-- Criteria Checker
-- Error Handler
-- 人工审核和停止条件
-- 导入、验证、回滚文档
+- `mock`：返回受控 mock executor result，用于验证 contract。
+- `dry-run`：验证路由和响应结构，不调用真实 provider。
+- `real-readonly`：当前是 stub route，用于验证未来 adapter 形态。
+- invalid payload：在派发 Executor 前阻断。
+- high-risk request：进入人工审核 / 阻断行为。
+- workflow validation：可在本地检查所有导出的 workflow JSON。
+- import readiness：已文档化并可检查 workflow 导入顺序和绑定提醒。
 
-这个仓库强调可复现：workflow JSON 进入 Git，sample payload 放在 `examples/`，验证脚本放在 `scripts/`，运行和导入说明放在 `docs/`。
+## Safety Status
 
-## The Problem
+- workflow 导出默认 inactive。
+- workflow JSON 中没有真实 API key 或 webhook secret。
+- `.env.example` 只包含 placeholder 变量名。
+- 执行边界由 `max_iterations` 和 `timeout_minutes` 约束。
+- high-risk 请求会被阻断或要求人工审核。
+- 当前 Executor 不执行 shell、文件写入、Git 操作或外部写操作。
+- 真实 provider 接入会放在未来 adapter 和 credential 边界之后。
 
-很多 Agent 自动化 Demo 会遇到类似问题：
+## Why This Project Exists
 
-- 目标不清晰
-- 成功标准不可衡量
-- 输出没有按验收标准检查
-- 失败后缺少恢复路径
-- 成本和执行时间没有停止边界
-- 高风险动作可能绕过人工审核继续执行
+很多 AI Agent demo 会直接从 prompt 跳到自动化执行。但在真实产品里，更难的是 Agent 外围的控制平面：
 
-这个项目把这些问题当成产品设计和系统设计问题，而不只是 prompt engineering 问题。
+- 系统到底要完成什么目标？
+- 什么标准算成功？
+- workflow 如何停止？
+- 输出无效或不完整时怎么办？
+- 高风险动作在哪里进入人工审核？
+- workflow 如何被测试、导入、review，并以代码方式版本管理？
 
-## Product Concept
+Auto Agent Factory 把这些问题当成 workflow architecture 问题。这个项目的目标是先做出一个更安全、可复用的 Agent orchestration skeleton，再逐步加入高成本或高风险的 provider integration。
 
-核心产品假设很简单：
+## What It Does
 
-> 用户提交一个 `goal` 和一组 `criteria`。Master Workflow 初始化运行，派发 Executor，Checker 根据 criteria 检查结果，然后决定完成、进入下一轮、等待人工审核，或将失败交给 Error Handler。
+- 接收包含 `goal`、`criteria` 和执行限制的结构化 goal request。
+- 在派发任务前校验 payload。
+- 将 high-risk 请求路由到人工审核边界。
+- 初始化 run 和 task 标识。
+- 派发一轮有边界的 executor iteration。
+- 将 executor 输出标准化为 `agent_result` contract。
+- 根据 acceptance criteria 检查 evidence。
+- 返回 final report、next iteration instruction、stop response、blocked response 或 error context。
+- 将 workflow JSON、examples、tests、validation scripts 和运行文档保存在 Git 中。
 
-MVP 故意采用 mock-first 方式。它先证明 workflow contract、导入路径、验证脚本、安全边界和手动测试流程，再考虑接入真实 provider。
+## Why Star This Project?
+
+如果你关注以下方向，可以 Star 这个仓库：
+
+- 基于 n8n 的 goal-driven AI Agent workflow pattern
+- 在真实 provider 成本和风险之前先做 mock-first validation
+- 用明确 criteria 取代模糊的“Agent 已完成”说法
+- 面向 high-risk action 的 human-reviewable safety boundary
+- 将 workflow JSON 当作代码管理和测试
+- 后续真实 LLM adapter、Codex/coding-agent adapter、run history 和 observability 的实践路线
 
 ## Architecture
 
@@ -77,37 +117,12 @@ flowchart TD
 
 ## Workflow Modules
 
-| Module | File | Responsibility | Current Status | Notes |
-|---|---|---|---|---|
-| Goal-Driven Master Workflow | `workflows/goal_driven_master.workflow.json` | 接收 goal payload、校验输入、初始化 run/task ID、调度 Executor 和 Checker、返回最终响应。 | 已实现为可导入 workflow JSON。 | 包含人工审核和安全边界逻辑。 |
-| Agent Task Executor Workflow | `workflows/agent_task_executor.workflow.json` | 执行一轮有边界的任务，并返回标准化 `agent_result`。 | 已支持 `mock`、`dry-run`、`real-readonly` stub。 | 尚未接入真实 provider。 |
-| Criteria Checker Workflow | `workflows/criteria_checker.workflow.json` | 根据 criteria 逐项评估 evidence，返回 pass/fail/unknown。 | 已实现为子 workflow。 | 与 provider 类型解耦。 |
-| Goal-Driven Error Handler Workflow | `workflows/error_handler.workflow.json` | 处理 workflow 失败执行并输出恢复上下文。 | 已实现为 Error Trigger workflow。 | Error Handler 验证记录见 Runbook。 |
-
-## What is already implemented
-
-基于当前仓库真实内容，已经实现：
-
-- `workflows/` 中的 4 个正式 n8n workflow JSON
-- workflow contract 校验脚本
-- import readiness check 脚本
-- dry-run 部署脚本，默认不调用 n8n API
-- Node 测试套件，覆盖 schema、criteria scoring 和 workflow contract
-- `goal`、`task`、`result` JSON schema
-- master、subagent、criteria checker prompt 模板
-- sample goal、成功结果、失败结果和最终报告示例
-- valid input、缺字段、高风险审批、dry-run、real-readonly stub 的手动测试 payload
-- Runbook、导入顺序、手动导入检查清单、Production Readiness、Real Provider Adapter 设计文档
-- mock-first 执行路径
-- 围绕 `max_iterations`、`timeout_minutes`、manual approval、inactive workflow export 的安全默认值和说明
-
-已记录的验证状态：
-
-- mock-first MVP validated
-- 本地 n8n 验证流程中已通过 Production Webhook smoke test
-- Error Workflow 已通过自动失败触发验证
-- Human Approval Gate 已通过 high-risk payload 行为验证
-- `workflow:validate:all` 当前预期为 `0 warning / 0 error`
+| Module | File | Responsibility | Current status |
+|---|---|---|---|
+| Goal-Driven Master Workflow | `workflows/goal_driven_master.workflow.json` | 接收 goal payload、校验输入、初始化 run/task ID、调度 Executor 和 Checker、返回最终响应。 | 已实现 |
+| Agent Task Executor Workflow | `workflows/agent_task_executor.workflow.json` | 执行一轮有边界的任务，并返回标准化 `agent_result`。 | 已实现 `mock`、`dry-run`、`real-readonly` stub modes |
+| Criteria Checker Workflow | `workflows/criteria_checker.workflow.json` | 根据 criteria 评估 executor evidence，返回 pass/fail/unknown checks。 | 已实现 |
+| Goal-Driven Error Handler Workflow | `workflows/error_handler.workflow.json` | 处理失败的 workflow execution 并输出恢复上下文。 | 已实现 |
 
 ## Quick Start
 
@@ -117,31 +132,31 @@ flowchart TD
 npm install
 ```
 
-运行本地测试：
+运行测试：
 
 ```bash
 npm test
 ```
 
-校验所有 workflow JSON：
+校验 workflow JSON：
 
 ```bash
 npm run workflow:validate:all
 ```
 
-以 dry-run 方式检查部署脚本：
+运行 dry-run 部署检查：
 
 ```bash
 npm run workflow:dry-run
 ```
 
-检查导入前 readiness：
+检查 n8n import readiness：
 
 ```bash
 npm run import:check
 ```
 
-可选：根据 sample goal payload 生成 smoke-test 请求：
+可选：生成 smoke-test payload：
 
 ```bash
 npm run smoke:goal-driven
@@ -162,10 +177,10 @@ npm run smoke:goal-driven
 
 导入后请确认：
 
-- workflow 默认保持 inactive
+- workflows 默认保持 inactive
 - Executor 和 Checker 以 `When Executed by Another Workflow` 开头
 - Error Handler 以 `Error Trigger` 开头
-- Master 的子 workflow 绑定指向正确的 Executor 和 Checker
+- Master 的 sub-workflow bindings 指向正确的 Executor 和 Checker
 - Master 的 error workflow 指向 Error Handler
 
 详细说明：
@@ -173,75 +188,90 @@ npm run smoke:goal-driven
 - [`docs/IMPORT_ORDER.md`](docs/IMPORT_ORDER.md)
 - [`docs/MANUAL_IMPORT_CHECKLIST.md`](docs/MANUAL_IMPORT_CHECKLIST.md)
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
+- [`docs/VALIDATION_LOG.md`](docs/VALIDATION_LOG.md)
 - [`docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`](docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md)
-
-## Manual Testing
-
-建议从这个 payload 开始：
-
-```text
-examples/sample_goal_request.json
-```
-
-其他手动测试 payload：
-
-```text
-examples/manual-test-payloads/01-valid-goal.json
-examples/manual-test-payloads/02-missing-goal.json
-examples/manual-test-payloads/03-missing-criteria.json
-examples/manual-test-payloads/04-high-risk-needs-approval.json
-examples/manual-test-payloads/05-dry-run-mode.json
-examples/manual-test-payloads/06-real-readonly-mode.json
-```
-
-手动执行时建议检查：
-
-- 是否生成 `run_id`
-- 是否生成 `task_id`
-- 是否返回 `criteria_result`
-- 是否返回 `next_action`
-- 缺少 `goal` 时是否返回明确校验错误
-- 缺少 `criteria` 时是否返回明确校验错误
-- high-risk payload 是否会被人工审核门拦截
-- Error Handler 是否通过自动执行失败触发验证，而不只是手动测试执行
 
 ## Safety & Cost Boundaries
 
 这个项目有意不做无边界自治 Agent。
 
-当前安全边界包括：
+当前边界：
 
 - mock-first 实现
 - dry-run 执行路径
-- 在真实 provider 前先提供 real-readonly stub
+- `real-readonly` 是 stub，不是真实 provider call
 - high-risk payload 的人工审核门
 - `max_iterations` 限制
 - `timeout_minutes` 限制
-- 仓库中的 workflow JSON 默认 inactive
-- workflow JSON 不写入真实密钥
-- 人工验证前不建议启用生产触发
-- `.env.example` 只包含变量名，不包含真实值
+- workflow JSON 导出默认 inactive
+- workflow JSON 中没有真实 API keys 或 secrets
+- `.env.example` 只包含 placeholder 变量名
+- 不执行外部写操作、shell、文件写入或 Git 修改
 
-真实 provider 的接入会继续放在同一套 readiness 和 adapter 边界之后：
+接入真实 provider 前，应将 provider call 放在 backend、n8n credential 或 adapter 边界之后。不要在 frontend code 或公开 workflow export 中暴露 OpenAI、ElevenLabs、n8n webhook secrets 或其他 credentials。
+
+相关文档：
 
 - [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md)
 - [`docs/REAL_PROVIDER_ADAPTER_DESIGN.md`](docs/REAL_PROVIDER_ADAPTER_DESIGN.md)
+- [`docs/n8n-security-checklist.md`](docs/n8n-security-checklist.md)
+
+## Project Status
+
+当前发布目标：**v0.3.0 Mock-First MVP Validation**。
+
+已实现并验证：
+
+- `workflows/` 中的 4 个正式 n8n workflow JSON
+- workflow contract validation scripts
+- import readiness check script
+- dry-run deployment script
+- Node test suite，覆盖 schemas、scoring、workflow contracts
+- `goal`、`task`、`result` JSON schemas
+- master、subagent、criteria checker prompt templates
+- sample goal、success result、failed result 和 final report examples
+- valid input、missing fields、high-risk approval、dry-run mode、real-readonly stub mode 的 manual test payloads
+- Runbook、import order、manual import checklist、production readiness checklist、real provider adapter design
+- Mode Router regression fix 和 validation trail
+- 围绕 `max_iterations`、`timeout_minutes`、manual review、inactive workflow exports 的 safety documentation
+
+尚未实现：
+
+- 真实 LLM execution
+- 真实 Codex/coding-agent automation
+- 真实 provider API calls
+- persistent run history
+- hosted dashboard
+- multi-user permissions
+- 生产自主执行
+- 真实用户数据处理
 
 ## Roadmap
 
-下一步会围绕一个原则推进：保持当前 workflow contract 稳定，再逐步把 stub 替换成受控的 provider adapter。
-
 - 在现有 adapter contract 后接入真实 LLM provider
 - Codex / coding-agent executor adapter
-- 持久化 run history
-- execution 监控 Web dashboard
+- Persistent run history
+- Web dashboard for monitoring executions
 - Human approval UI
 - Evaluation reports
 - Multi-agent task routing
 - RAG / knowledge base integration
 - 更完整的 execution metrics 和 observability
 
-这些内容是下一步方向，不是当前能力。
+这些是计划中的里程碑，不是当前能力。
+
+## GitHub Display Assets
+
+当前还没有真实截图，本 README 不使用伪造截图。
+
+计划补充的素材记录在 [`docs/ASSETS_TODO.md`](docs/ASSETS_TODO.md)，包括：
+
+- n8n master workflow screenshot
+- executor workflow screenshot
+- criteria checker workflow screenshot
+- error handler screenshot
+- sample execution output
+- architecture diagram image
 
 ## Repository Structure
 
@@ -249,6 +279,8 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 .
 ├── README.md
 ├── README.zh-CN.md
+├── CHANGELOG.md
+├── LICENSE
 ├── docs/
 │   ├── PROJECT_BRIEF.md
 │   ├── PORTFOLIO_CASE_STUDY.md
@@ -256,7 +288,9 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 │   ├── IMPORT_ORDER.md
 │   ├── MANUAL_IMPORT_CHECKLIST.md
 │   ├── PRODUCTION_READINESS.md
-│   └── REAL_PROVIDER_ADAPTER_DESIGN.md
+│   ├── REAL_PROVIDER_ADAPTER_DESIGN.md
+│   ├── RELEASE_NOTES_V0_3_0.md
+│   └── ASSETS_TODO.md
 ├── workflows/
 │   ├── goal_driven_master.workflow.json
 │   ├── agent_task_executor.workflow.json
@@ -275,29 +309,13 @@ examples/manual-test-payloads/06-real-readonly-mode.json
 ├── tests/
 ├── scripts/
 ├── n8n/
+├── .github/
 ├── .env.example
 └── package.json
 ```
 
-`n8n/` 目录保留了较早的 Codex planner/reviewer workflow 原型，作为参考资产。当前 GoalDriven MVP 主要位于 `workflows/`、`docs/`、`examples/`、`src/` 和 `tests/`。
+`n8n/` 目录保留了早期 Codex planner/reviewer workflow prototype，作为参考材料。当前 Auto Agent Factory v0.3.0 validation 工作主要位于 `workflows/`、`docs/`、`examples/`、`src/` 和 `tests/`。
 
-## Why I built this
+## License
 
-我做这个项目，是想把 Agent workflow 这件事从“调用一个模型”推进到“设计一个可控的执行系统”。真正有价值的不只是模型输出，而是模型周围的控制层：
-
-- 执行前先做 goal decomposition
-- 用 criteria-based validation 代替模糊的“完成了”
-- 用独立模块编排 workflow
-- fail-safe error handling
-- human-in-the-loop safety
-- 在真实 provider 前先做 mock-first engineering
-- n8n workflow JSON 作为代码管理，便于导入、审查和回滚
-- 文档覆盖验证、迁移、回滚和未来 provider adapter
-
-对我来说，这个项目展示的是 Agent 产品落地时更底层也更重要的部分：contract、安全边界、运行准备和可复现 workflow。
-
-## Project status
-
-- MVP status：mock-first workflow validated
-- V0.3a status：仓库 workflow 已准备好进行 n8n UI real-readonly 验证
-- Real provider：尚未接入
+MIT. See [`LICENSE`](LICENSE).
