@@ -27,6 +27,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 
 - [`PRODUCTION_READINESS.md`](PRODUCTION_READINESS.md) — Go / No-Go checklist before moving beyond mock-first validation.
 - [`REAL_PROVIDER_ADAPTER_DESIGN.md`](REAL_PROVIDER_ADAPTER_DESIGN.md) — adapter design for mock, dry-run, and real-readonly provider modes.
+- [`V0_4_PROVIDER_INTEGRATION_PREP.md`](V0_4_PROVIDER_INTEGRATION_PREP.md) — read-only provider integration preparation checklist for the next implementation phase.
 
 ## Earlier n8n / Codex notes
 

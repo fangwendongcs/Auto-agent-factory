@@ -22,6 +22,8 @@ This is **not** a production autonomous agent. It does **not** yet execute real 
 
 Next phase: **V0.4 real provider adapter design**, read-only first. The next provider step is to design a controlled real-readonly adapter contract before enabling any real provider calls.
 
+The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
+
 ## Current Stage
 
 | Area | v0.3.0 status |
