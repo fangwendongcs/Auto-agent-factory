@@ -25,9 +25,11 @@ This directory contains the product, workflow, testing, import, safety, and port
 
 ## Production and provider planning
 
+- [`ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md) — decision record for the first real-readonly provider adapter interface.
 - [`PRODUCTION_READINESS.md`](PRODUCTION_READINESS.md) — Go / No-Go checklist before moving beyond mock-first validation.
 - [`REAL_PROVIDER_ADAPTER_DESIGN.md`](REAL_PROVIDER_ADAPTER_DESIGN.md) — adapter design for mock, dry-run, and real-readonly provider modes.
 - [`V0_4_PROVIDER_INTEGRATION_PREP.md`](V0_4_PROVIDER_INTEGRATION_PREP.md) — read-only provider integration preparation checklist for the next implementation phase.
+- [`V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md) — minimal implementation plan for the OpenAI-compatible real-readonly provider path.
 
 ## Earlier n8n / Codex notes
 

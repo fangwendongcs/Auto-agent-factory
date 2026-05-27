@@ -23,6 +23,8 @@ This is **not** a production autonomous agent. It does **not** yet execute real 
 Next phase: **V0.4 real provider adapter design**, read-only first. The next provider step is to design a controlled real-readonly adapter contract before enabling any real provider calls.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
+The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
+The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md).
 
 ## Current Stage
 

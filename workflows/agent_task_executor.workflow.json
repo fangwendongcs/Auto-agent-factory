@@ -60,7 +60,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1200,
+        1680,
         -192
       ]
     },
@@ -178,8 +178,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        720,
-        -592
+        960,
+        -704
       ]
     },
     {
@@ -191,9 +191,116 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        960,
+        1440,
         -192
       ]
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "real-readonly-provider-execution",
+                    "leftValue": "={{ $json.context && $json.context.provider_execution ? $json.context.provider_execution : $json.provider_execution || 'stub' }}",
+                    "rightValue": "provider",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "provider"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "real-readonly-stub-execution",
+                    "leftValue": "={{ $json.context && $json.context.provider_execution ? $json.context.provider_execution : $json.provider_execution || 'stub' }}",
+                    "rightValue": "stub",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "stub"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 1
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        720,
+        -592
+      ],
+      "id": "v04d-real-readonly-provider-selector",
+      "name": "Real-readonly Provider Selector"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\nconst context =\n  input.context && typeof input.context === 'object'\n    ? input.context\n    : {};\n\nconst criteria = Array.isArray(input.criteria) ? input.criteria : [];\nconst riskLevel = input.risk_level || context.risk_level || 'low';\nconst humanApproved = Boolean(input.human_approved || context.human_approved);\nconst goalText = typeof input.goal === 'string' ? input.goal : '';\nconst criteriaText = criteria.join('\\n');\nconst combinedText = (goalText + '\\n' + criteriaText).toLowerCase();\n\nconst writeIntentPatterns = [\n  /write\\s+file/,\n  /create\\s+file/,\n  /modify\\s+file/,\n  /delete\\s+file/,\n  /run\\s+(a\\s+)?shell/,\n  /execute\\s+(a\\s+)?command/,\n  /terminal\\s+command/,\n  /git\\s+(commit|push|merge|reset|checkout)/,\n  /modify\\s+git/,\n  /deploy\\s+production/,\n  /external\\s+write/,\n];\n\nconst blockedReasons = [];\nif (String(riskLevel).toLowerCase() === 'high' && !humanApproved) {\n  blockedReasons.push('high_risk_requires_human_approval');\n}\nif (writeIntentPatterns.some((pattern) => pattern.test(combinedText))) {\n  blockedReasons.push('write_or_execution_intent_detected');\n}\n\nconst endpoint =\n  context.openai_compatible_base_url ||\n  context.provider_endpoint ||\n  input.openai_compatible_base_url ||\n  input.provider_endpoint ||\n  '';\n\nconst model =\n  context.openai_compatible_model ||\n  context.provider_model ||\n  input.openai_compatible_model ||\n  input.provider_model ||\n  '{{ $env.OPENAI_COMPATIBLE_MODEL }}';\n\nconst credentialName =\n  context.provider_credential_name ||\n  input.provider_credential_name ||\n  'goald-openai-compatible-readonly';\n\nconst credentialReady =\n  context.provider_credential_ready === true ||\n  input.provider_credential_ready === true;\n\nconst providerConfig = {\n  interface: 'openai-compatible',\n  mode: 'real-readonly',\n  endpoint_env: 'OPENAI_COMPATIBLE_BASE_URL',\n  model_env: 'OPENAI_COMPATIBLE_MODEL',\n  endpoint_placeholder: endpoint || '{{ $env.OPENAI_COMPATIBLE_BASE_URL }}',\n  endpoint_configured: Boolean(endpoint),\n  credential_name: credentialName,\n  credential_reference_only: true,\n  credential_ready: credentialReady,\n  model,\n  timeout_ms: Number(context.provider_timeout_ms || input.provider_timeout_ms || 30000),\n};\n\nreturn [\n  {\n    json: {\n      ...input,\n      provider_execution: 'provider',\n      provider_config: providerConfig,\n      provider_safety_check: {\n        read_only: true,\n        blocked: blockedReasons.length > 0,\n        blocked_reasons: blockedReasons,\n      },\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -480
+      ],
+      "id": "v04d-real-readonly-safety-check",
+      "name": "Real-readonly Safety Check"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\nconst context =\n  input.context && typeof input.context === 'object'\n    ? input.context\n    : {};\n\nconst criteria = Array.isArray(input.criteria) ? input.criteria : [];\nconst providerConfig =\n  input.provider_config && typeof input.provider_config === 'object'\n    ? input.provider_config\n    : {};\nconst safetyCheck =\n  input.provider_safety_check && typeof input.provider_safety_check === 'object'\n    ? input.provider_safety_check\n    : { blocked: true, blocked_reasons: ['provider_safety_check_missing'] };\n\nconst baseProvider = {\n  mode: 'real-readonly',\n  name: 'openai-compatible-readonly',\n  model: providerConfig.model || null,\n  request_id: null,\n  latency_ms: 0,\n};\n\nconst baseSafety = {\n  risk_level: input.risk_level || context.risk_level || 'low',\n  requires_human_approval: true,\n  approved: false,\n  blocked_reason: null,\n};\n\nfunction fallback(reason, summary, status = 'needs_review') {\n  return [{\n    json: {\n      ...input,\n      status,\n      summary,\n      artifacts: [],\n      known_issues: [reason],\n      evidence: criteria.map((criterion) => ({\n        criterion,\n        status: 'unknown',\n        detail: 'OpenAI-compatible real-readonly provider path did not execute because ' + reason + '.',\n      })),\n      intended_actions: [],\n      risk_summary: 'Provider path stopped safely before any real action. No file write, shell execution, Git modification, or external write action occurred.',\n      provider: baseProvider,\n      safety: {\n        ...baseSafety,\n        blocked_reason: reason,\n      },\n      provider_error: {\n        code: reason,\n        message: summary,\n      },\n    }\n  }];\n}\n\nif (safetyCheck.blocked) {\n  return fallback(\n    'safety_check_failed',\n    'Real-readonly provider call blocked by safety check: ' + (safetyCheck.blocked_reasons || []).join(', '),\n    'needs_review'\n  );\n}\n\nif (!providerConfig.endpoint_configured) {\n  return fallback(\n    'provider_endpoint_missing',\n    'Real-readonly provider endpoint is not configured.',\n    'needs_review'\n  );\n}\n\nif (!providerConfig.credential_ready) {\n  return fallback(\n    'provider_credential_missing',\n    'Real-readonly provider credential is missing or has not been confirmed in n8n.',\n    'needs_review'\n  );\n}\n\nconst providerRequest = {\n  model: providerConfig.model,\n  messages: [\n    {\n      role: 'system',\n      content: 'You are a read-only planning and evidence generation adapter. Do not execute commands, write files, modify Git, call external write APIs, or claim that work was executed. Return JSON only.',\n    },\n    {\n      role: 'user',\n      content: {\n        mode: 'real-readonly',\n        goal: input.goal || '',\n        criteria,\n        iteration: input.iteration || 1,\n        constraints: [\n          'Do not execute commands.',\n          'Do not write files.',\n          'Do not modify Git.',\n          'Do not call external write APIs.',\n          'Return structured JSON only.',\n        ],\n        expected_output: {\n          summary: 'string',\n          intended_actions: ['string'],\n          evidence: [\n            {\n              criterion: 'string',\n              status: 'pass | fail | unknown',\n              detail: 'string',\n            },\n          ],\n          risk_summary: 'string',\n        },\n      },\n    },\n  ],\n  temperature: 0.2,\n  response_format: {\n    type: 'json_object',\n  },\n};\n\nreturn [{\n  json: {\n    ...input,\n    provider_request: providerRequest,\n    provider_call_status: 'prepared_not_sent',\n    provider_response_raw: null,\n    provider_error: {\n      code: 'provider_call_disabled_in_repo_template',\n      message: 'The OpenAI-compatible request was prepared but not sent by the repository workflow template.',\n    },\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -480
+      ],
+      "id": "v04d-openai-compatible-provider-request-builder",
+      "name": "OpenAI-compatible Provider Request Builder"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\nconst context =\n  input.context && typeof input.context === 'object'\n    ? input.context\n    : {};\nconst criteria = Array.isArray(input.criteria) ? input.criteria : [];\nconst providerConfig =\n  input.provider_config && typeof input.provider_config === 'object'\n    ? input.provider_config\n    : {};\n\nconst provider =\n  input.provider && typeof input.provider === 'object'\n    ? input.provider\n    : {\n        mode: 'real-readonly',\n        name: 'openai-compatible-readonly',\n        model: providerConfig.model || null,\n        request_id: null,\n        latency_ms: 0,\n      };\n\nconst baseSafety = {\n  risk_level: input.risk_level || context.risk_level || 'low',\n  requires_human_approval: true,\n  approved: false,\n  blocked_reason: null,\n};\n\nfunction normalizeEvidence(rawEvidence) {\n  if (!Array.isArray(rawEvidence)) {\n    return criteria.map((criterion) => ({\n      criterion,\n      status: 'unknown',\n      detail: 'Provider did not return evidence for this criterion.',\n    }));\n  }\n\n  const allowed = new Set(['pass', 'fail', 'unknown']);\n  return rawEvidence.map((item, index) => {\n    const status = allowed.has(item && item.status) ? item.status : 'unknown';\n    return {\n      criterion: item && item.criterion ? item.criterion : criteria[index] || 'criterion_' + (index + 1),\n      status,\n      detail: item && item.detail ? item.detail : 'Provider evidence detail was missing.',\n    };\n  });\n}\n\nfunction safeResult(reason, summary, status = 'needs_review') {\n  return [{\n    json: {\n      ...input,\n      status,\n      summary,\n      artifacts: [],\n      known_issues: [reason],\n      evidence: normalizeEvidence(input.evidence),\n      intended_actions: Array.isArray(input.intended_actions) ? input.intended_actions : [],\n      risk_summary: input.risk_summary || 'Provider path stopped safely before execution.',\n      provider,\n      safety: {\n        ...baseSafety,\n        ...(input.safety && typeof input.safety === 'object' ? input.safety : {}),\n        blocked_reason: reason,\n      },\n    }\n  }];\n}\n\nif (input.provider_error && input.provider_error.code) {\n  const code = input.provider_error.code;\n  return safeResult(code, input.summary || input.provider_error.message || 'Provider path returned a safe fallback.', input.status || 'needs_review');\n}\n\nlet content = input.provider_response_content || input.provider_response_raw || null;\nif (typeof content === 'string') {\n  try {\n    content = JSON.parse(content);\n  } catch (error) {\n    return safeResult('provider_invalid_json', 'Provider returned invalid JSON.', 'failed');\n  }\n}\n\nif (!content || typeof content !== 'object') {\n  return safeResult('provider_response_missing', 'Provider response was missing.', 'failed');\n}\n\nconst summary =\n  typeof content.summary === 'string' && content.summary.trim()\n    ? content.summary\n    : 'Provider returned no summary.';\nconst intendedActions = Array.isArray(content.intended_actions)\n  ? content.intended_actions\n  : [];\nconst evidence = normalizeEvidence(content.evidence);\nconst riskSummary =\n  typeof content.risk_summary === 'string' && content.risk_summary.trim()\n    ? content.risk_summary\n    : 'Risk summary was not provided by the provider.';\n\nreturn [{\n  json: {\n    ...input,\n    status: 'needs_review',\n    summary,\n    artifacts: [],\n    known_issues: [],\n    evidence,\n    intended_actions: intendedActions,\n    risk_summary: riskSummary,\n    provider,\n    safety: {\n      ...baseSafety,\n      ...(input.safety && typeof input.safety === 'object' ? input.safety : {}),\n      requires_human_approval: true,\n      approved: false,\n      blocked_reason: null,\n    },\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        -480
+      ],
+      "id": "v04d-provider-response-normalizer",
+      "name": "Provider Response Normalizer"
     }
   ],
   "pinData": {},
@@ -235,7 +342,7 @@
       "main": [
         [
           {
-            "node": "Real-readonly Provider Adapter",
+            "node": "Real-readonly Provider Selector",
             "type": "main",
             "index": 0
           }
@@ -294,6 +401,57 @@
         [
           {
             "node": "Execution Logger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Real-readonly Provider Selector": {
+      "main": [
+        [
+          {
+            "node": "Real-readonly Safety Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Real-readonly Provider Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Real-readonly Safety Check": {
+      "main": [
+        [
+          {
+            "node": "OpenAI-compatible Provider Request Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI-compatible Provider Request Builder": {
+      "main": [
+        [
+          {
+            "node": "Provider Response Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Provider Response Normalizer": {
+      "main": [
+        [
+          {
+            "node": "Result Normalizer",
             "type": "main",
             "index": 0
           }
