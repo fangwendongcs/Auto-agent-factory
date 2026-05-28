@@ -156,3 +156,85 @@ Not enabled:
 - Git modification
 - external write action
 - autonomous production execution
+
+## V0.4e Runtime Regression Verification
+
+Result: **PASS**
+
+This verification was completed against the local n8n Production Webhook runtime after syncing the V0.4d Executor workflow patch.
+
+Important boundary:
+
+V0.4e verifies routing, fallback behavior, and safety boundaries for the OpenAI-compatible real-readonly provider skeleton. It does not enable a real provider, create credentials, call a real API, or make the project production autonomous.
+
+### Regression results
+
+- mock regression: PASS
+  - `agent_result.provider.mode = mock`
+  - `agent_result.provider.name = mock-agent-adapter`
+  - execution path confirmed: Mock Agent Adapter
+
+- dry-run regression: PASS
+  - `agent_result.provider.mode = dry-run`
+  - `agent_result.provider.name = dry-run-provider`
+  - `agent_result.dry_run_plan` exists
+
+- real-readonly stub regression: PASS
+  - `agent_result.provider.mode = real-readonly`
+  - `agent_result.provider.name = real-readonly-stub`
+  - `agent_result.status = needs_review`
+
+- provider missing endpoint fallback: PASS
+  - `provider_execution = provider`
+  - `provider_error.code = provider_endpoint_missing`
+  - `status = needs_review`
+  - `safety.requires_human_approval = true`
+
+- provider missing credential fallback: not separately verified
+  - missing endpoint is checked first and safely blocks the provider path
+
+- high-risk approval gate: PASS
+  - `status = needs_human_approval`
+  - blocked before executor dispatch
+
+- missing goal validation: PASS
+  - `status = invalid_request`
+  - `validation_errors = ["goal is required"]`
+  - rejected before task initialization
+
+- missing criteria validation: PASS
+  - `status = invalid_request`
+  - `validation_errors = ["criteria must contain at least one item"]`
+  - rejected before task initialization
+
+### Provider skeleton execution path
+
+The provider missing endpoint fallback path was confirmed in n8n execution history:
+
+```text
+Real-readonly Provider Selector
+→ Real-readonly Safety Check
+→ OpenAI-compatible Provider Request Builder
+→ Provider Response Normalizer
+→ Result Normalizer
+→ Execution Logger
+```
+
+### Side-effect check
+
+- no real API call
+- no file write
+- no shell execution
+- no Git modification
+- no external write action
+
+### Current boundary after V0.4e
+
+Current project status:
+
+```text
+V0.4e runtime regression verified.
+The project still uses mock / dry-run / real-readonly stub plus a read-only provider skeleton.
+No real provider credential is configured in the repository.
+No production autonomous execution is enabled.
+```
