@@ -93,3 +93,38 @@ test('error handler starts with an Error Trigger', () => {
   assert.equal(errorWorkflow.nodes[0].type, 'n8n-nodes-base.errorTrigger');
 });
 
+
+
+test('executor provider request asks for criterion-indexed evidence', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const requestBuilder = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible Provider Request Builder'
+  );
+
+  assert.ok(requestBuilder, 'missing OpenAI-compatible Provider Request Builder');
+
+  const jsCode = requestBuilder.parameters.jsCode;
+
+  assert.match(jsCode, /criteriaItems/);
+  assert.match(jsCode, /criterion_id/);
+  assert.match(jsCode, /v0\.6b-criterion-indexed-evidence/);
+  assert.match(jsCode, /Return exactly one evidence item for each criteria_items entry/);
+  assert.match(jsCode, /Do not mark a criterion as pass unless/);
+});
+
+test('provider response normalizer preserves evaluator-quality evidence fields', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const normalizer = executor.nodes.find(
+    (node) => node.name === 'Provider Response Normalizer'
+  );
+
+  assert.ok(normalizer, 'missing Provider Response Normalizer');
+
+  const jsCode = normalizer.parameters.jsCode;
+
+  assert.match(jsCode, /normalizeConfidence/);
+  assert.match(jsCode, /supports_fields/);
+  assert.match(jsCode, /limitations/);
+  assert.match(jsCode, /criterion_id/);
+  assert.match(jsCode, /provider_evidence_missing/);
+});

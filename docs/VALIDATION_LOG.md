@@ -383,3 +383,109 @@ V0.6 evaluator quality / reliability / safety hardening
 ```
 
 The next phase should improve criteria/evidence quality without enabling file writes, shell execution, Git modification, external write actions, automatic approval, or production autonomous execution.
+
+## V0.6b Provider Prompt Refinement
+
+Result: **REPO-SIDE PATCH PREPARED**
+
+This update refines the OpenAI-compatible read-only provider request contract so provider evidence can be aligned with input criteria more reliably.
+
+### Patch summary
+
+`[GoalDriven] 02 Agent Task Executor` now asks the provider to return criterion-indexed evidence using:
+
+- `criteria_items[]`
+- `criterion_id`
+- `criterion`
+- `status = pass | fail | unknown`
+- `detail`
+- `confidence`
+- `supports_fields`
+- `limitations`
+
+`Provider Response Normalizer` now preserves these evaluator-quality fields in normalized evidence where available, while keeping backward compatibility with the existing `agent_result.evidence[]` contract.
+
+### Boundary
+
+This patch does not enable:
+
+- file write
+- shell execution
+- Git modification
+- external write action
+- automatic approval
+- production autonomous execution
+
+Provider success still returns `needs_review`, and provider output remains review material rather than executable authority.
+
+### Runtime note
+
+This is a repository-side workflow patch. After importing or syncing `[GoalDriven] 02 Agent Task Executor` into n8n, the next runtime verification should confirm that a real provider sandbox response includes criterion-indexed evidence and that Criteria Checker can distinguish stronger matches from fallback matches.
+
+
+## V0.6c Runtime Verification
+
+Result: **PASS**
+
+This verification was completed manually by the user against the local n8n Production Webhook runtime after syncing the V0.6b Executor workflow patch.
+
+Important boundary:
+
+V0.6c verifies read-only provider evidence quality and Criteria Checker alignment. It does not enable production autonomous execution, file writes, shell execution, Git modification, external write actions, Codex execution, or automatic approval.
+
+### Real provider sandbox result
+
+- real provider call: PASS
+- `provider_call_status = response_received`
+- `provider_runtime_model = deepseek-v4-flash`
+- `agent_result.status = needs_review`
+- `agent_result.provider.mode = real-readonly`
+- `agent_result.provider.name = openai-compatible-readonly`
+- `agent_result.safety.requires_human_approval = true`
+
+No real API key was shared with Codex or written to the repository.
+
+### V0.6b evidence contract observed at runtime
+
+- `provider_request.criteria_items[]` exists
+- `evaluator_contract_version = v0.6b-criterion-indexed-evidence`
+- `agent_result.evidence[].criterion_id` exists
+- `agent_result.evidence[].confidence` exists
+- `agent_result.evidence[].supports_fields` exists
+- `agent_result.evidence[].limitations` exists
+
+### Criteria Checker alignment result
+
+- `criteria_result.criteria_met = true`
+- `criteria_result.score = 1`
+- `criteria_result.checks[].match_type = exact`
+- `criteria_result.checks[].provider_evidence_criterion` matches the original criteria
+- `checker_log.failed_criteria = 0`
+- `checker_log.provider_context_available = true`
+- `next_action = stop`
+
+### Safety status
+
+- provider success still returns `needs_review`
+- human approval remains retained for risky operations
+- provider output cannot trigger writes
+- no file write
+- no shell execution
+- no Git modification
+- no external write action
+- no production autonomous execution
+
+### Current boundary after V0.6c
+
+Current project status:
+
+```text
+V0.6c Real Provider Read-only Sandbox + Evaluator Alignment Verified.
+The project remains read-only first and is not production autonomous execution.
+```
+
+Recommended next phase:
+
+```text
+V0.7 Human-in-the-loop Controlled Execution Design / Safety Hardening
+```

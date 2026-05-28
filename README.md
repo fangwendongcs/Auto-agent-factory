@@ -11,33 +11,34 @@ Technical positioning: **Goal-Driven Agent Workflow with n8n**.
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-v0.5c%20sandbox%20verified-yellow)
+![status](https://img.shields.io/badge/status-v0.6c%20evaluator%20verified-yellow)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 Auto Agent Factory is a **mock-first AI Agent workflow skeleton** built with n8n. It turns an agent request into a bounded workflow contract: define a goal, define success criteria, run a controlled executor step, check the result, and decide whether to finish, revise, stop, or require human review.
 
-Current stage: **v0.5c / Real Provider Read-only Sandbox + Checker Alignment Verified**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, and Criteria Checker alignment for provider-normalized evidence.
+Current stage: **v0.6c / Real Provider Read-only Sandbox + Evaluator Alignment Verified**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, and criterion-indexed evidence alignment in Criteria Checker.
 
-This is **not** a production autonomous agent. It does **not** yet execute real LLM calls, real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
+This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Next phase: **V0.6 evaluator quality / reliability / safety hardening**, still read-only first.
+Next phase: **V0.7 Human-in-the-loop Controlled Execution Design / Safety Hardening**, still read-only first until explicitly reviewed.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
 The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md).
+The evaluator-quality phase is documented in [`docs/V0.6_EVALUATOR_QUALITY_PLAN.md`](docs/V0.6_EVALUATOR_QUALITY_PLAN.md).
 
 ## Current Stage
 
-| Area | v0.5c status |
+| Area | v0.6c status |
 |---|---|
-| Project phase | Real Provider Read-only Sandbox + Checker Alignment Verified |
+| Project phase | Real Provider Read-only Sandbox + Evaluator Alignment Verified |
 | Master workflow | Importable n8n workflow JSON implemented |
 | Executor workflow | `mock`, `dry-run`, `real-readonly` stub, and OpenAI-compatible read-only sandbox path validated |
-| Criteria checker | Provider-normalized evidence alignment verified |
+| Criteria checker | Criterion-indexed provider evidence alignment verified; exact-match runtime path observed |
 | Error handler | n8n Error Trigger workflow implemented |
 | Payload safety | Invalid payload validation and high-risk blocking verified |
 | Local verification | Tests, workflow validation, dry-run, and import checks available |
-| Real LLM provider | One read-only sandbox call verified through an OpenAI-compatible interface |
+| Real provider sandbox | One read-only OpenAI-compatible provider call verified; output remains `needs_review` |
 | Real Codex provider | Not connected |
 | Production autonomous execution | Not implemented |
 | Real user data / SaaS operations | Not included |
@@ -46,7 +47,7 @@ The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEME
 
 - `mock`: returns a controlled mock executor result for contract validation.
 - `dry-run`: exercises routing and response shape without real provider calls.
-- `real-readonly`: currently a stub route used to validate future adapter shape.
+- `real-readonly`: a stub route used to validate adapter shape without provider cost.
 - `real provider sandbox`: one OpenAI-compatible read-only call verified; provider output remains `needs_review`.
 - invalid payload: blocked before executor dispatch.
 - high-risk request: routed to manual review / blocking behavior.
@@ -61,7 +62,7 @@ The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEME
 - Execution is bounded by documented `max_iterations` and `timeout_minutes`.
 - High-risk requests are blocked or require human review.
 - The current executor does not perform shell execution, file writes, Git operations, or external write actions.
-- Real provider integration is intentionally deferred behind future adapter and credential boundaries.
+- Real provider write/execution capabilities are intentionally not enabled; provider access remains behind n8n credential and read-only adapter boundaries.
 
 ## Why This Project Exists
 
@@ -206,7 +207,8 @@ Current boundaries:
 
 - mock-first implementation
 - dry-run execution path
-- `real-readonly` is a stub, not a real provider call
+- `real-readonly` stub remains available for no-provider validation
+- one OpenAI-compatible read-only sandbox provider call has been verified, but it does not enable execution
 - manual review gate for high-risk payloads
 - `max_iterations` limit
 - `timeout_minutes` limit
@@ -225,7 +227,7 @@ Related docs:
 
 ## Project Status
 
-Current release target: **v0.3.0 Mock-First MVP Validation**.
+Current release target: **v0.6c Real Provider Read-only Sandbox + Evaluator Alignment Verified**.
 
 Implemented and validated:
 
@@ -244,9 +246,9 @@ Implemented and validated:
 
 Not implemented yet:
 
-- real LLM execution
+- production LLM execution
 - real Codex/coding-agent automation
-- real provider API calls
+- provider-driven write execution
 - persistent run history
 - hosted dashboard
 - multi-user permissions
@@ -255,7 +257,9 @@ Not implemented yet:
 
 ## Roadmap
 
-- Real LLM provider integration behind the existing adapter contract
+- Human-in-the-loop controlled execution design
+- Further evaluator quality improvements for ambiguous provider evidence
+- Real provider integration hardening behind the existing adapter contract
 - Codex / coding-agent executor adapter
 - Persistent run history
 - Web dashboard for monitoring executions

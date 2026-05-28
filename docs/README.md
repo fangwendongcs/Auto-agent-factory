@@ -32,6 +32,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md) — minimal implementation plan for the OpenAI-compatible real-readonly provider path.
 - [`V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md`](V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md) — sandbox test plan for the first real provider validation.
 - [`V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md`](V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md) — manual n8n setup checklist before a real provider sandbox call.
+- [`V0.6_EVALUATOR_QUALITY_PLAN.md`](V0.6_EVALUATOR_QUALITY_PLAN.md) — evaluator quality, criteria/evidence alignment, and safety hardening plan after V0.5c.
 
 ## Earlier n8n / Codex notes
 
