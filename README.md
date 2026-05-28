@@ -11,16 +11,16 @@ Technical positioning: **Goal-Driven Agent Workflow with n8n**.
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-v0.3.0%20validation-yellow)
+![status](https://img.shields.io/badge/status-v0.5c%20sandbox%20verified-yellow)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 Auto Agent Factory is a **mock-first AI Agent workflow skeleton** built with n8n. It turns an agent request into a bounded workflow contract: define a goal, define success criteria, run a controlled executor step, check the result, and decide whether to finish, revise, stop, or require human review.
 
-Current stage: **v0.3.0 / Mock-First MVP Validation**. The project has validated `mock`, `dry-run`, and `real-readonly` stub routing, plus invalid payload blocking and high-risk manual review blocking. It is designed to prove orchestration, contracts, validation, and safety boundaries before connecting real providers.
+Current stage: **v0.5c / Real Provider Read-only Sandbox + Checker Alignment Verified**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, and Criteria Checker alignment for provider-normalized evidence.
 
 This is **not** a production autonomous agent. It does **not** yet execute real LLM calls, real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Next phase: **V0.4 real provider adapter design**, read-only first. The next provider step is to design a controlled real-readonly adapter contract before enabling any real provider calls.
+Next phase: **V0.6 evaluator quality / reliability / safety hardening**, still read-only first.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
@@ -28,16 +28,16 @@ The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEME
 
 ## Current Stage
 
-| Area | v0.3.0 status |
+| Area | v0.5c status |
 |---|---|
-| Project phase | Mock-First MVP Validation |
+| Project phase | Real Provider Read-only Sandbox + Checker Alignment Verified |
 | Master workflow | Importable n8n workflow JSON implemented |
-| Executor workflow | `mock`, `dry-run`, and `real-readonly` stub routing validated |
-| Criteria checker | Provider-agnostic criteria evaluation workflow implemented |
+| Executor workflow | `mock`, `dry-run`, `real-readonly` stub, and OpenAI-compatible read-only sandbox path validated |
+| Criteria checker | Provider-normalized evidence alignment verified |
 | Error handler | n8n Error Trigger workflow implemented |
 | Payload safety | Invalid payload validation and high-risk blocking verified |
 | Local verification | Tests, workflow validation, dry-run, and import checks available |
-| Real LLM provider | Not connected |
+| Real LLM provider | One read-only sandbox call verified through an OpenAI-compatible interface |
 | Real Codex provider | Not connected |
 | Production autonomous execution | Not implemented |
 | Real user data / SaaS operations | Not included |
@@ -47,6 +47,7 @@ The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEME
 - `mock`: returns a controlled mock executor result for contract validation.
 - `dry-run`: exercises routing and response shape without real provider calls.
 - `real-readonly`: currently a stub route used to validate future adapter shape.
+- `real provider sandbox`: one OpenAI-compatible read-only call verified; provider output remains `needs_review`.
 - invalid payload: blocked before executor dispatch.
 - high-risk request: routed to manual review / blocking behavior.
 - workflow validation: all exported workflow JSON files can be checked locally.

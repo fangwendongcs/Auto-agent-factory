@@ -312,11 +312,11 @@ It is not production autonomous execution.
 No file write, shell execution, Git modification, or external write action is enabled.
 ```
 
-## V0.5c Criteria Checker Alignment Patch
+## V0.5c Criteria Checker Runtime Alignment
 
-Status: **local patch prepared; n8n runtime verification pending**
+Result: **PASS**
 
-This patch addresses the known V0.5b issue where Criteria Checker could report:
+This runtime verification addresses the known V0.5b issue where Criteria Checker could report:
 
 ```text
 No evidence provided for criterion
@@ -334,7 +334,7 @@ entry.criterion === criterion
 
 Real provider evidence may use shorter labels such as `summary`, `intended_actions`, `evidence`, or `risk_summary`, while the input criteria may be phrased as full acceptance statements such as `Output must include summary`.
 
-### Local patch
+### Patch
 
 `[GoalDriven] 03 Criteria Checker` now supports:
 
@@ -364,6 +364,22 @@ This patch only changes evaluation alignment. It does not enable:
 - automatic approval
 - production autonomous execution
 
-### Next verification
+### Runtime verification result
 
-After syncing `[GoalDriven] 03 Criteria Checker` into n8n runtime, rerun the V0.5 provider sandbox response through the normal Production Webhook path and confirm that checks use provider evidence instead of reporting missing evidence.
+- `criteria_result.checks[].match_type` appears
+- `criteria_result.checks[].provider_evidence_criterion` appears
+- `checker_log.evidence_items_seen = 8`
+- `checker_log.provider_context_available = true`
+- the checker no longer returns the previous all-missing-evidence behavior
+
+### Known issue after V0.5c
+
+`criteria_met = false` may still occur because provider evidence and acceptance criteria can remain semantically misaligned. Current matching can rely on `index_fallback`, which is acceptable for V0.5c runtime alignment but should be improved in the next evaluator quality phase.
+
+Recommended next phase:
+
+```text
+V0.6 evaluator quality / reliability / safety hardening
+```
+
+The next phase should improve criteria/evidence quality without enabling file writes, shell execution, Git modification, external write actions, automatic approval, or production autonomous execution.
