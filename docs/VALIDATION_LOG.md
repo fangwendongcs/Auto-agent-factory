@@ -238,3 +238,76 @@ The project still uses mock / dry-run / real-readonly stub plus a read-only prov
 No real provider credential is configured in the repository.
 No production autonomous execution is enabled.
 ```
+
+## V0.5b Real Provider Sandbox Call
+
+Result: **PASS**
+
+This verification was completed by the user against the local n8n Production Webhook runtime after syncing the V0.5b Executor workflow update.
+
+Important boundary:
+
+V0.5b verifies one real provider sandbox call through the OpenAI-compatible real-readonly path. It does not enable production autonomous execution, file writes, shell execution, Git modification, external write actions, or automatic approval.
+
+### Provider configuration observed at runtime
+
+- `provider_runtime_endpoint = https://api.deepseek.com`
+- `provider_runtime_model = deepseek-v4-flash`
+- `provider_config.endpoint_configured = true`
+- `provider_config.model_configured = true`
+- `credential_ready = true`
+- `provider_call_status = response_received`
+
+No real API key was shared with Codex or written to the repository.
+
+### Normalized provider result
+
+- `agent_result.status = needs_review`
+- `agent_result.provider.mode = real-readonly`
+- `agent_result.provider.name = openai-compatible-readonly`
+- `agent_result.provider.model = deepseek-v4-flash`
+- `agent_result.summary` exists
+- `agent_result.intended_actions` exists
+- `agent_result.evidence` exists
+- `agent_result.risk_summary` exists
+- `agent_result.safety.requires_human_approval = true`
+
+### Safety status
+
+- provider success still returns `needs_review`
+- human approval remains required for risky operations
+- provider output cannot trigger execution
+- no file write
+- no shell execution
+- no Git modification
+- no external write action
+- no production autonomous execution
+
+### Known issue
+
+Criteria Checker still reports `criteria_met = false` for the provider sandbox result and may produce messages such as:
+
+```text
+No evidence provided for criterion
+```
+
+This is not treated as a V0.5b blocker because the provider path successfully returned a normalized `agent_result` with summary, intended actions, evidence, risk summary, provider metadata, and safety metadata.
+
+Likely next area:
+
+```text
+V0.5c regression + evaluator/checker alignment
+```
+
+The Criteria Checker should be reviewed to ensure it reads provider-normalized `agent_result.evidence`, `summary`, `intended_actions`, and `risk_summary` consistently. Do not expand this into execution or write capabilities.
+
+### Current boundary after V0.5b
+
+Current project status:
+
+```text
+V0.5b real provider sandbox success path verified.
+The project is still read-only first.
+It is not production autonomous execution.
+No file write, shell execution, Git modification, or external write action is enabled.
+```

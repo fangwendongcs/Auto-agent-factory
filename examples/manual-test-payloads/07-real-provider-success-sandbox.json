@@ -21,8 +21,6 @@
     "provider_execution": "provider",
     "provider_name": "openai-compatible-readonly",
     "provider_credential_name": "goald-openai-compatible-readonly",
-    "provider_credential_ready": true,
-    "openai_compatible_base_url": "CONFIGURE_IN_N8N_RUNTIME",
-    "openai_compatible_model": "CONFIGURE_IN_N8N_RUNTIME"
+    "provider_credential_ready": true
   }
 }
