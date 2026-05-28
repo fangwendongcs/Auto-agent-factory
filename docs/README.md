@@ -31,6 +31,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0_4_PROVIDER_INTEGRATION_PREP.md`](V0_4_PROVIDER_INTEGRATION_PREP.md) — read-only provider integration preparation checklist for the next implementation phase.
 - [`V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md) — minimal implementation plan for the OpenAI-compatible real-readonly provider path.
 - [`V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md`](V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md) — sandbox test plan for the first real provider validation.
+- [`V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md`](V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md) — manual n8n setup checklist before a real provider sandbox call.
 
 ## Earlier n8n / Codex notes
 

@@ -1,0 +1,24 @@
+{
+  "goal": "Verify the provider path stops safely when the endpoint is missing",
+  "criteria": [
+    "Output must include provider_error.code = provider_endpoint_missing",
+    "Output must require human approval",
+    "Output must not execute real actions"
+  ],
+  "agent_mode": "real-readonly",
+  "provider_mode": "real-readonly",
+  "max_iterations": 1,
+  "timeout_minutes": 5,
+  "risk_level": "low",
+  "require_human_approval": false,
+  "manual_approval_required": false,
+  "human_approved": true,
+  "context": {
+    "agent_mode": "real-readonly",
+    "provider_mode": "real-readonly",
+    "provider_execution": "provider",
+    "provider_name": "openai-compatible-readonly",
+    "provider_credential_name": "goald-openai-compatible-readonly",
+    "provider_credential_ready": true
+  }
+}
