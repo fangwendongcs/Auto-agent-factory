@@ -311,3 +311,59 @@ The project is still read-only first.
 It is not production autonomous execution.
 No file write, shell execution, Git modification, or external write action is enabled.
 ```
+
+## V0.5c Criteria Checker Alignment Patch
+
+Status: **local patch prepared; n8n runtime verification pending**
+
+This patch addresses the known V0.5b issue where Criteria Checker could report:
+
+```text
+No evidence provided for criterion
+```
+
+even when the real provider sandbox path returned normalized `agent_result.evidence`.
+
+### Root cause
+
+The Criteria Checker primarily matched evidence with strict criterion text equality:
+
+```text
+entry.criterion === criterion
+```
+
+Real provider evidence may use shorter labels such as `summary`, `intended_actions`, `evidence`, or `risk_summary`, while the input criteria may be phrased as full acceptance statements such as `Output must include summary`.
+
+### Local patch
+
+`[GoalDriven] 03 Criteria Checker` now supports:
+
+- exact criterion matching
+- normalized text matching
+- index-based fallback matching
+- provider context fallback from:
+  - `agent_result.summary`
+  - `agent_result.intended_actions`
+  - `agent_result.risk_summary`
+
+The checker also records:
+
+- `match_type`
+- `provider_evidence_criterion`
+- `checker_log.evidence_items_seen`
+- `checker_log.provider_context_available`
+
+### Boundary
+
+This patch only changes evaluation alignment. It does not enable:
+
+- file write
+- shell execution
+- Git modification
+- external write action
+- automatic approval
+- production autonomous execution
+
+### Next verification
+
+After syncing `[GoalDriven] 03 Criteria Checker` into n8n runtime, rerun the V0.5 provider sandbox response through the normal Production Webhook path and confirm that checks use provider evidence instead of reporting missing evidence.
