@@ -26,6 +26,7 @@ The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PR
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
 The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md).
 The evaluator-quality phase is documented in [`docs/V0.6_EVALUATOR_QUALITY_PLAN.md`](docs/V0.6_EVALUATOR_QUALITY_PLAN.md).
+The controlled-execution boundary design is tracked in [`docs/V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](docs/V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md).
 
 ## Current Stage
 
@@ -257,7 +258,7 @@ Not implemented yet:
 
 ## Roadmap
 
-- Human-in-the-loop controlled execution design
+- Human-in-the-loop controlled execution boundary design before any real write actions
 - Further evaluator quality improvements for ambiguous provider evidence
 - Real provider integration hardening behind the existing adapter contract
 - Codex / coding-agent executor adapter
