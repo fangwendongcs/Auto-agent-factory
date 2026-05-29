@@ -10,6 +10,7 @@
     "workflow:validate:all": "node scripts/validate-all-workflows.mjs workflows",
     "workflow:dry-run": "node scripts/deploy-n8n-workflow.mjs workflows/goal_driven_master.workflow.json",
     "smoke:goal-driven": "node scripts/smoke-test-goal-driven-workflow.mjs",
-    "import:check": "node scripts/check-import-readiness.mjs"
+    "import:check": "node scripts/check-import-readiness.mjs",
+    "audit:dev:write": "node scripts/write-dev-audit-record.mjs examples/sample_sanitized_run_record.json"
   }
 }
