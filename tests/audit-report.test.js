@@ -4,7 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
-import { generateAuditReviewReport, evaluateAuditRecordForReview } from '../src/utils/generateAuditReviewReport.js';
+import {
+  generateAuditReviewReport,
+  evaluateAuditRecordForReview,
+  writeAuditReviewReportArtifact
+} from '../src/utils/generateAuditReviewReport.js';
 
 const scriptPath = path.resolve('scripts/generate-audit-review-report.mjs');
 const sampleRecordPath = path.resolve('examples/sample_sanitized_run_record.json');
@@ -114,4 +118,73 @@ test('audit review CLI reads JSONL with multiple sanitized records', () => {
   assert.match(result.stdout, /High-risk records: 1/);
   assert.match(result.stdout, /Write-like action records: 1/);
   assert.match(result.stdout, /gd_v09_report_002/);
+});
+
+test('audit review CLI does not write report artifacts by default', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'audit-report-default-'));
+  const result = runCli([replayRecordPath], { cwd });
+  const defaultReportPath = path.join(cwd, '.local-audit', 'reports', 'latest-audit-report.md');
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.existsSync(defaultReportPath), false);
+  assert.match(result.stdout, /^# Audit Review Report/m);
+});
+
+test('audit review CLI writes a dev-only markdown artifact when explicitly enabled', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'audit-report-enabled-'));
+  const outputPath = '.local-audit/reports/v09b-test-report.md';
+  const result = runCli([replayRecordPath], {
+    cwd,
+    env: {
+      AUDIT_REPORT_WRITE_ENABLED: 'true',
+      AUDIT_REPORT_OUTPUT_PATH: outputPath
+    }
+  });
+  const absoluteOutputPath = path.join(cwd, outputPath);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.existsSync(absoluteOutputPath), true);
+  assert.match(fs.readFileSync(absoluteOutputPath, 'utf8'), /^# Audit Review Report/m);
+  assert.match(result.stderr, /"written": true/);
+});
+
+test('audit review CLI rejects report artifact paths outside .local-audit/reports', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'audit-report-outside-'));
+  const result = runCli([replayRecordPath], {
+    cwd,
+    env: {
+      AUDIT_REPORT_WRITE_ENABLED: 'true',
+      AUDIT_REPORT_OUTPUT_PATH: 'reports/unsafe-report.md'
+    }
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /must stay under \.local-audit\/reports\//);
+});
+
+test('audit review CLI rejects non-markdown report artifact paths', () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'audit-report-non-md-'));
+  const result = runCli([replayRecordPath], {
+    cwd,
+    env: {
+      AUDIT_REPORT_WRITE_ENABLED: 'true',
+      AUDIT_REPORT_OUTPUT_PATH: '.local-audit/reports/unsafe-report.txt'
+    }
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /must be a \.md file/);
+});
+
+test('audit report artifact writer rejects secret-like report content', () => {
+  assert.throws(
+    () => writeAuditReviewReportArtifact(`safe text\n${'Bearer'} not-a-real-secret-but-denied`, {
+      env: {
+        AUDIT_REPORT_WRITE_ENABLED: 'true',
+        AUDIT_REPORT_OUTPUT_PATH: '.local-audit/reports/unsafe-report.md'
+      },
+      cwd: fs.mkdtempSync(path.join(os.tmpdir(), 'audit-report-secret-'))
+    }),
+    /Audit report refused/
+  );
 });

@@ -20,7 +20,7 @@ Current stage: **v0.7 / Human-in-the-loop Controlled Execution Boundary Verified
 
 This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Current design target: **V0.9 audit review report generation**, still no production autonomous execution.
+Current design target: **V0.9b local audit report artifact option**, still no production autonomous execution.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
@@ -34,6 +34,7 @@ The dev-only JSONL audit storage prototype is tracked in [`docs/V0.8D_DEV_ONLY_J
 The dev-only audit CLI is tracked in [`docs/V0.8E_DEV_ONLY_AUDIT_CLI.md`](docs/V0.8E_DEV_ONLY_AUDIT_CLI.md).
 The staging replay closeout is tracked in [`docs/V0.8F_STAGING_REPLAY_CLOSEOUT.md`](docs/V0.8F_STAGING_REPLAY_CLOSEOUT.md).
 The audit review report generator is tracked in [`docs/V0.9_AUDIT_REVIEW_REPORT_GENERATION.md`](docs/V0.9_AUDIT_REVIEW_REPORT_GENERATION.md).
+The dev-only local report artifact option is tracked in [`docs/V0.9B_LOCAL_AUDIT_REPORT_ARTIFACT.md`](docs/V0.9B_LOCAL_AUDIT_REPORT_ARTIFACT.md).
 
 ## Current Stage
 

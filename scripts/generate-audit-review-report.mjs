@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateAuditReviewReport } from '../src/utils/generateAuditReviewReport.js';
+import {
+  generateAuditReviewReport,
+  writeAuditReviewReportArtifact
+} from '../src/utils/generateAuditReviewReport.js';
 import { validateAuditRecordForStorage } from '../src/utils/auditStorage.js';
 
 function printError(value) {
@@ -14,10 +17,11 @@ function usage() {
     output: 'Markdown report to stdout',
     safety: [
       'reads sanitized audit records only',
-      'does not read provider raw responses',
-      'does not read prompts or provider messages',
+      'does not read unredacted provider payloads',
+      'does not read prompt or provider chat payloads',
       'does not connect to n8n runtime',
-      'does not write report files by default'
+      'does not write report files by default',
+      'writes only to .local-audit/reports/*.md when AUDIT_REPORT_WRITE_ENABLED=true'
     ]
   };
 }
@@ -66,7 +70,22 @@ try {
     process.exit(1);
   }
 
-  process.stdout.write(`${generateAuditReviewReport(list)}\n`);
+  const report = generateAuditReviewReport(list);
+  const writeResult = writeAuditReviewReportArtifact(report, {
+    env: process.env,
+    cwd: process.cwd()
+  });
+
+  process.stdout.write(`${report}\n`);
+
+  if (writeResult.written) {
+    process.stderr.write(`${JSON.stringify({
+      ok: true,
+      written: true,
+      path: writeResult.path,
+      bytes: writeResult.bytes
+    }, null, 2)}\n`);
+  }
 } catch (error) {
   printError({
     ok: false,

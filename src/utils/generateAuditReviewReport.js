@@ -1,9 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const APPROVED_REPORT_DIR = path.join('.local-audit', 'reports');
+const DEFAULT_REPORT_PATH = path.join(APPROVED_REPORT_DIR, 'latest-audit-report.md');
+
 const SECRET_PATTERNS = [
   /Bearer\s+\S{8,}/i,
   /sk-[A-Za-z0-9_-]{12,}/,
   /ghp_[A-Za-z0-9_]{12,}/,
   /xoxb-[A-Za-z0-9-]{12,}/,
   /Authorization\s*:/i
+];
+
+const REPORT_DENY_PATTERNS = [
+  ...SECRET_PATTERNS,
+  new RegExp(['provider', 'response', 'raw'].join('_'), 'i'),
+  new RegExp(['provider', 'request'].join('_'), 'i'),
+  new RegExp(['full', 'prompt'].join('_'), 'i'),
+  new RegExp(['raw', 'prompt'].join('_'), 'i'),
+  new RegExp(`\\b${'message'}s\\b`, 'i')
 ];
 
 function yesNo(value) {
@@ -34,6 +49,78 @@ function recordHasRawFields(record) {
       Object.hasOwn(record, 'full_prompt')
     )
   );
+}
+
+export function validateAuditReportOutputPath(outputPath = DEFAULT_REPORT_PATH) {
+  const requested = outputPath || DEFAULT_REPORT_PATH;
+
+  if (path.isAbsolute(requested)) {
+    throw new Error('Audit report output path must be relative and dev-only.');
+  }
+
+  const normalized = path.normalize(requested);
+
+  if (normalized.startsWith('..') || normalized.includes(`..${path.sep}`)) {
+    throw new Error('Audit report output path cannot traverse outside the project.');
+  }
+
+  if (!normalized.startsWith(`${APPROVED_REPORT_DIR}${path.sep}`)) {
+    throw new Error('Audit report output path must stay under .local-audit/reports/.');
+  }
+
+  if (!normalized.endsWith('.md')) {
+    throw new Error('Audit report output path must be a .md file.');
+  }
+
+  return normalized;
+}
+
+export function validateAuditReportContent(reportMarkdown = '') {
+  const errors = [];
+
+  for (const pattern of REPORT_DENY_PATTERNS) {
+    if (pattern.test(reportMarkdown)) {
+      errors.push('audit report contains denied raw or secret-like content');
+      break;
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function writeAuditReviewReportArtifact(reportMarkdown, options = {}) {
+  const env = options.env || process.env;
+  const enabled = env.AUDIT_REPORT_WRITE_ENABLED === 'true';
+  const relativePath = validateAuditReportOutputPath(
+    env.AUDIT_REPORT_OUTPUT_PATH || DEFAULT_REPORT_PATH
+  );
+
+  if (!enabled) {
+    return {
+      written: false,
+      reason: 'audit_report_write_disabled',
+      path: relativePath
+    };
+  }
+
+  const contentValidation = validateAuditReportContent(reportMarkdown);
+  if (!contentValidation.valid) {
+    throw new Error(`Audit report refused: ${contentValidation.errors.join('; ')}`);
+  }
+
+  const absolutePath = path.resolve(options.cwd || process.cwd(), relativePath);
+  fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+  fs.writeFileSync(absolutePath, `${reportMarkdown.trimEnd()}\n`, 'utf8');
+
+  return {
+    written: true,
+    reason: null,
+    path: relativePath,
+    bytes: Buffer.byteLength(`${reportMarkdown.trimEnd()}\n`)
+  };
 }
 
 export function evaluateAuditRecordForReview(record = {}) {
@@ -139,8 +226,8 @@ export function generateAuditReviewReport(recordsInput, options = {}) {
     lines.push(`- Storage persisted: ${yesNo(item.storage_persisted)}`);
     lines.push(`- No-write default: ${yesNo(item.no_write_default)}`);
     lines.push(`- Side effects enabled: ${yesNo(item.side_effects_enabled)}`);
-    lines.push(`- Raw prompt stored: ${yesNo(item.raw_prompt_stored)}`);
-    lines.push(`- Raw provider response stored: ${yesNo(item.raw_provider_response_stored)}`);
+    lines.push(`- Prompt payload stored: ${yesNo(item.raw_prompt_stored)}`);
+    lines.push(`- Provider response payload stored: ${yesNo(item.raw_provider_response_stored)}`);
     lines.push(`- Secrets stored: ${yesNo(item.secrets_stored)}`);
     lines.push(`- Redaction applied: ${yesNo(item.redaction_applied)}`);
     lines.push(`- Forbidden action: ${yesNo(item.forbidden_action)}`);
@@ -153,7 +240,7 @@ export function generateAuditReviewReport(recordsInput, options = {}) {
   lines.push('## Safety Boundary');
   lines.push('');
   lines.push('- Report input must be sanitized audit records.');
-  lines.push('- The report does not require raw prompts, provider request messages, raw provider responses, credential headers, credentials, or tokens.');
+  lines.push('- The report does not require prompt payloads, provider message payloads, unredacted provider responses, credential headers, credentials, or tokens.');
   lines.push('- Generating this report does not modify n8n runtime and does not enable production execution.');
 
   return lines.join('\n');
