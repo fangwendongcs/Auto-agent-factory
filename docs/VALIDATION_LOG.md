@@ -688,3 +688,32 @@ The response did not expose a top-level `human_approved = false` field. This is 
 - no Git modification
 - no external write action
 - no production autonomous execution
+
+## v1.0.0-rc.1 GitHub Pre-release Publication
+
+Result: **PUBLISHED BY USER**
+
+The user confirmed that the GitHub pre-release for `v1.0.0-rc.1` has been created.
+
+### Release scope
+
+- release type: GitHub pre-release
+- project positioning: open-source local-first AI Agent governance toolkit
+- primary demo path: `npm run demo:local`
+- workflow runtime changes in this closeout: none
+- provider calls in this closeout: none
+- production autonomous execution: not enabled
+
+### Safety boundary
+
+The release remains bounded to the documented local-first and read-only-first scope:
+
+- no real API key is stored in the repository
+- no `.env` file is tracked
+- `.local-audit/` remains ignored by Git
+- no workflow file-write, shell execution, Git modification, or external write action is enabled
+- real provider sandbox usage requires the user's own n8n credential and remains review-oriented
+
+### Post-release note
+
+If a local Git tag is needed for future local release checks, fetch or create `v1.0.0-rc.1` intentionally after confirming it points to the same commit as the GitHub pre-release.

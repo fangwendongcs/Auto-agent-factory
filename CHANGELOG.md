@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [1.0.0-rc.1] - 2026-05-29
 
+### Published
+
+- GitHub pre-release publication confirmed by the user.
+
 ### Added
 
 - Open-source release-candidate positioning for Auto Agent Factory as a local-first AI Agent governance toolkit.
