@@ -36,6 +36,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md) — controlled execution boundary design and V0.7 runtime verification before enabling any real write actions.
 - [`V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md`](V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md) — staging pilot, audit logging, approval record, run history, failure recovery, rollback, and no-write default design.
 - [`V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md`](V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md) — repo-side sanitized audit record schema, mock sanitizer, and no-write audit prototype.
+- [`V0.8C_DEV_ONLY_AUDIT_STORAGE_PLAN.md`](V0.8C_DEV_ONLY_AUDIT_STORAGE_PLAN.md) — dev-only sanitized audit storage plan, storage option comparison, allowlist, denylist, and disabled-by-default strategy.
 
 ## Earlier n8n / Codex notes
 
