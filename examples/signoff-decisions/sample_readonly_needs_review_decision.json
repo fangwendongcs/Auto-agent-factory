@@ -1,0 +1,9 @@
+{
+  "reviewer": {
+    "id": "local-human-reviewer",
+    "type": "human"
+  },
+  "decision": "needs_review",
+  "reason_summary": "Read-only replay record is safe to inspect, but this local flow does not auto-approve next-stage action.",
+  "notes_summary": "Dev-only sample decision for V0.11 local review cycle."
+}

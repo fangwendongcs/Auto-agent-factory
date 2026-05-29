@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/signoff-decision.schema.json",
+  "title": "Human Sign-off Decision Record",
+  "description": "Sanitized local-only human sign-off decision record. It must not contain secrets, prompt payloads, provider chat payloads, or unredacted provider responses.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "signoff_decision_version",
+    "decision_id",
+    "record_type",
+    "created_at",
+    "run_id",
+    "task_id",
+    "reviewer",
+    "decision",
+    "reason_summary",
+    "source_audit_record",
+    "risk_snapshot",
+    "approval_snapshot",
+    "storage",
+    "safety",
+    "redaction"
+  ],
+  "properties": {
+    "signoff_decision_version": {
+      "type": "string",
+      "enum": ["v0.11-dev-signoff-decision"]
+    },
+    "decision_id": {
+      "type": "string",
+      "pattern": "^signoff_[A-Za-z0-9_-]+$"
+    },
+    "record_type": {
+      "type": "string",
+      "enum": ["human_signoff_decision"]
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^gd_[A-Za-z0-9_-]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^task_[A-Za-z0-9_-]+$"
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "enum": ["human"] }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["approved", "rejected", "needs_review"]
+    },
+    "reason_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes_summary": {
+      "type": "string"
+    },
+    "source_audit_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audit_record_version", "record_type"],
+      "properties": {
+        "audit_record_version": { "type": "string", "minLength": 1 },
+        "record_type": { "type": "string", "enum": ["sanitized_run_record"] }
+      }
+    },
+    "risk_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk_level", "action_class", "permission_level", "safe_for_review", "forbidden_action", "write_like_action", "high_risk"],
+      "properties": {
+        "risk_level": { "type": "string", "enum": ["low", "medium", "high", "unknown"] },
+        "action_class": { "type": "string", "minLength": 1 },
+        "permission_level": { "type": "string", "minLength": 1 },
+        "safe_for_review": { "type": "boolean" },
+        "forbidden_action": { "type": "boolean" },
+        "write_like_action": { "type": "boolean" },
+        "high_risk": { "type": "boolean" }
+      }
+    },
+    "approval_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["existing_decision", "existing_blocked", "existing_approved"],
+      "properties": {
+        "existing_decision": { "type": "string", "minLength": 1 },
+        "existing_blocked": { "type": "boolean" },
+        "existing_approved": { "type": "boolean" }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "persisted"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["mock_decision_contract", "dev_signoff_jsonl"] },
+        "persisted": { "type": "boolean" }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["no_auto_approval", "no_write_default", "side_effects_enabled", "secrets_stored", "prompt_payload_stored", "provider_response_payload_stored"],
+      "properties": {
+        "no_auto_approval": { "type": "boolean" },
+        "no_write_default": { "type": "boolean" },
+        "side_effects_enabled": { "type": "boolean" },
+        "secrets_stored": { "type": "boolean" },
+        "prompt_payload_stored": { "type": "boolean" },
+        "provider_response_payload_stored": { "type": "boolean" }
+      }
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applied", "excluded_fields"],
+      "properties": {
+        "applied": { "type": "boolean" },
+        "excluded_fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

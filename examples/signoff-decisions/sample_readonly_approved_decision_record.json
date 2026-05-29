@@ -1,0 +1,61 @@
+{
+  "signoff_decision_version": "v0.11-dev-signoff-decision",
+  "decision_id": "signoff_v011_sample_approved_001",
+  "record_type": "human_signoff_decision",
+  "created_at": "2026-05-29T00:00:00.000Z",
+  "run_id": "gd_v08f_replay_001",
+  "task_id": "task_v08f_replay_001",
+  "reviewer": {
+    "id": "local-human-reviewer",
+    "type": "human"
+  },
+  "decision": "approved",
+  "reason_summary": "Human reviewer explicitly approved this safe read-only sample after checking the local review package.",
+  "notes_summary": "Sample approved decision fixture. No runtime side effects are enabled.",
+  "source_audit_record": {
+    "audit_record_version": "v0.8b-sanitized-audit-record",
+    "record_type": "sanitized_run_record"
+  },
+  "risk_snapshot": {
+    "risk_level": "low",
+    "action_class": "read_only",
+    "permission_level": "read_only",
+    "safe_for_review": true,
+    "forbidden_action": false,
+    "write_like_action": false,
+    "high_risk": false
+  },
+  "approval_snapshot": {
+    "existing_decision": "allow",
+    "existing_blocked": false,
+    "existing_approved": false
+  },
+  "storage": {
+    "mode": "mock_decision_contract",
+    "persisted": false
+  },
+  "safety": {
+    "no_auto_approval": true,
+    "no_write_default": true,
+    "side_effects_enabled": false,
+    "secrets_stored": false,
+    "prompt_payload_stored": false,
+    "provider_response_payload_stored": false
+  },
+  "redaction": {
+    "applied": true,
+    "excluded_fields": [
+      "authorization",
+      "api_key",
+      "token",
+      "password",
+      "credential",
+      "provider_payload_fields",
+      "provider_input_payload_fields",
+      "provider_chat_payload_fields",
+      "prompt_payload_fields",
+      "header_payload_fields",
+      "body_payload_fields"
+    ]
+  }
+}

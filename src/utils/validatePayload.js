@@ -9,7 +9,8 @@ const schemaPaths = {
   goal: path.resolve(__dirname, '../schema/goal.schema.json'),
   task: path.resolve(__dirname, '../schema/task.schema.json'),
   result: path.resolve(__dirname, '../schema/result.schema.json'),
-  auditRecord: path.resolve(__dirname, '../schema/audit-record.schema.json')
+  auditRecord: path.resolve(__dirname, '../schema/audit-record.schema.json'),
+  signoffDecision: path.resolve(__dirname, '../schema/signoff-decision.schema.json')
 };
 
 function readSchema(kind) {
