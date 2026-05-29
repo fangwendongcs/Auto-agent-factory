@@ -489,3 +489,157 @@ Recommended next phase:
 ```text
 V0.7 Human-in-the-loop Controlled Execution Design / Safety Hardening
 ```
+
+## V0.7 Controlled Execution Boundary Contract
+
+Result: **REPO-SIDE PATCH PREPARED**
+
+This update turns the V0.7 controlled execution boundary design into a Master workflow approval-decision contract.
+
+### Patch summary
+
+`[GoalDriven] 01 Master` now classifies incoming requests before executor dispatch using:
+
+- `risk_level`
+- `action_class`
+- `permission_level`
+- `forbidden_action_detected`
+- `approval_decision`
+
+Supported action classes:
+
+- `read_only`
+- `local_draft`
+- `repo_write`
+- `shell_command`
+- `git_operation`
+- `external_write`
+- `deployment`
+
+Default policies:
+
+- `read_only`: may proceed after validation
+- `local_draft`: may proceed as reviewable draft work
+- `repo_write`: requires explicit human approval before dispatch
+- `shell_command`: forbidden before controlled execution adapter exists
+- `git_operation`: forbidden before controlled execution adapter exists
+- `external_write`: forbidden before controlled execution adapter exists
+- `deployment`: forbidden before controlled execution adapter exists
+
+### Approval decision contract
+
+Blocked and allowed paths now carry a structured `approval_decision` object with:
+
+- `decision`
+- `risk_level`
+- `action_class`
+- `permission_level`
+- `requires_human_approval`
+- `approved`
+- `blocked`
+- `reason`
+- `approval_required_reason`
+- `forbidden_reason`
+- `approval_package`
+
+### Boundary
+
+This patch does not enable:
+
+- file write
+- shell execution
+- Git modification
+- external write action
+- automatic approval
+- production autonomous execution
+
+Forbidden action classes are rejected before task initialization and before executor dispatch.
+
+### Repo-side validation
+
+Automated tests now cover:
+
+- allowed read-only approval decision
+- high-risk / repo-write request blocked without explicit approval
+- forbidden shell command rejected before executor dispatch
+- blocked response includes the approval decision contract
+
+### Runtime note
+
+This is a repository-side workflow patch. After syncing `[GoalDriven] 01 Master` into n8n, runtime verification should confirm:
+
+- read-only payload returns `approval_decision.decision = allow`
+- high-risk repo-write payload returns `status = needs_human_approval`
+- forbidden shell-command payload returns `status = forbidden_request`
+- blocked requests do not call `[GoalDriven] 02 Agent Task Executor`
+
+
+## V0.7 Runtime Verification
+
+Result: **PASS**
+
+This verification was completed manually by the user against the local n8n Production Webhook runtime after syncing the V0.7 Master workflow patch.
+
+Important boundary:
+
+V0.7 verifies approval-boundary decisions before executor dispatch. It does not enable file writes, shell execution, Git modification, external write actions, automatic approval, or production autonomous execution.
+
+### Read-only allow
+
+- result: PASS
+- `action_class = read_only`
+- `permission_level = read_only`
+- `approval_decision.decision = allow`
+- `approval_decision.blocked = false`
+- `forbidden_action_detected = false`
+- `status = completed`
+
+Note: `criteria_met = false` in this read-only mock regression is not an approval-gate failure. It reflects expected mock executor behavior for one criterion.
+
+### High-risk repo-write approval gate
+
+- result: PASS
+- `status = needs_human_approval`
+- `action_class = repo_write`
+- `permission_level = write_action`
+- `approval_decision.decision = needs_human_approval`
+- `approval_decision.blocked = true`
+- `forbidden_action_detected = false`
+- no `agent_result` returned
+- blocked before Executor dispatch
+
+### Forbidden shell-command rejection
+
+- result: PASS
+- `status = forbidden_request`
+- `action_class = shell_command`
+- `permission_level = forbidden`
+- `forbidden_action_detected = true`
+- `approval_decision.decision = forbidden`
+- `approval_decision.blocked = true`
+- `note = Forbidden action rejected before task initialization.`
+- rejected before Executor dispatch
+
+### Safety status
+
+- blocked and forbidden requests do not enter Executor
+- no file write enabled
+- no shell execution enabled
+- no Git modification enabled
+- no external write action enabled
+- no production autonomous execution enabled
+
+### Current boundary after V0.7
+
+Current project status:
+
+```text
+V0.7 Human-in-the-loop Controlled Execution Boundary Verified.
+The project remains read-only first and does not enable production autonomous execution.
+```
+
+Recommended next phase:
+
+```text
+V0.8 staging-style pilot / audit logging / rollback design
+```

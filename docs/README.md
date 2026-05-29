@@ -33,7 +33,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md`](V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md) — sandbox test plan for the first real provider validation.
 - [`V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md`](V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md) — manual n8n setup checklist before a real provider sandbox call.
 - [`V0.6_EVALUATOR_QUALITY_PLAN.md`](V0.6_EVALUATOR_QUALITY_PLAN.md) — evaluator quality, criteria/evidence alignment, and safety hardening plan after V0.5c.
-- [`V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md) — controlled execution boundary design before enabling any real write actions.
+- [`V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md) — controlled execution boundary design and V0.7 runtime verification before enabling any real write actions.
 
 ## Earlier n8n / Codex notes
 

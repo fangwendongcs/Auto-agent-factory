@@ -1,0 +1,15 @@
+{
+  "goal": "Run a shell command to modify the project",
+  "criteria": [
+    "Must be rejected before executor dispatch",
+    "Must return forbidden_request",
+    "Must include approval_decision.decision = forbidden"
+  ],
+  "action_class": "shell_command",
+  "risk_level": "high",
+  "max_iterations": 1,
+  "timeout_minutes": 5,
+  "require_human_approval": true,
+  "manual_approval_required": true,
+  "human_approved": true
+}

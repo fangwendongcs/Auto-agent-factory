@@ -128,3 +128,90 @@ test('provider response normalizer preserves evaluator-quality evidence fields',
   assert.match(jsCode, /criterion_id/);
   assert.match(jsCode, /provider_evidence_missing/);
 });
+
+test('master payload validator returns structured approval decision for allowed read-only work', () => {
+  const master = readWorkflow('workflows/goal_driven_master.workflow.json');
+  const validator = master.nodes.find((node) => node.name === 'Payload Validator');
+  const runValidator = new Function('$json', validator.parameters.jsCode);
+
+  const result = runValidator({
+    goal: 'Review a workflow plan',
+    criteria: ['Return a structured review'],
+    risk_level: 'low',
+    action_class: 'read_only'
+  })[0].json;
+
+  assert.equal(result.status, 'validated');
+  assert.equal(result.action_class, 'read_only');
+  assert.equal(result.approval_decision.decision, 'allow');
+  assert.equal(result.approval_decision.blocked, false);
+});
+
+test('master payload validator blocks high-risk work without explicit approval', () => {
+  const master = readWorkflow('workflows/goal_driven_master.workflow.json');
+  const validator = master.nodes.find((node) => node.name === 'Payload Validator');
+  const runValidator = new Function('$json', validator.parameters.jsCode);
+
+  const result = runValidator({
+    goal: 'Modify production automation workflow without review',
+    criteria: ['Must not proceed without human approval'],
+    risk_level: 'high',
+    action_class: 'repo_write',
+    human_approved: false
+  })[0].json;
+
+  assert.equal(result.status, 'needs_human_approval');
+  assert.equal(result.approval_decision.decision, 'needs_human_approval');
+  assert.equal(result.approval_decision.requires_human_approval, true);
+  assert.equal(result.approval_decision.approved, false);
+  assert.equal(result.approval_decision.blocked, true);
+});
+
+test('master payload validator rejects forbidden action classes before executor dispatch', () => {
+  const master = readWorkflow('workflows/goal_driven_master.workflow.json');
+  const validator = master.nodes.find((node) => node.name === 'Payload Validator');
+  const runValidator = new Function('$json', validator.parameters.jsCode);
+
+  const result = runValidator({
+    goal: 'Run a shell command to modify the project',
+    criteria: ['Must be rejected before execution'],
+    risk_level: 'high',
+    action_class: 'shell_command',
+    human_approved: true
+  })[0].json;
+
+  assert.equal(result.status, 'forbidden_request');
+  assert.equal(result.approval_decision.decision, 'forbidden');
+  assert.equal(result.forbidden_action_detected, true);
+  assert.equal(result.approval_decision.blocked, true);
+});
+
+test('master blocked response includes approval decision contract', () => {
+  const master = readWorkflow('workflows/goal_driven_master.workflow.json');
+  const blockedBuilder = master.nodes.find((node) => node.name === 'Blocked Response Builder');
+  const runBlockedBuilder = new Function('$json', blockedBuilder.parameters.jsCode);
+
+  const result = runBlockedBuilder({
+    status: 'forbidden_request',
+    validation_errors: [],
+    risk_level: 'high',
+    action_class: 'shell_command',
+    permission_level: 'forbidden',
+    forbidden_action_detected: true,
+    approval_decision: {
+      decision: 'forbidden',
+      risk_level: 'high',
+      action_class: 'shell_command',
+      permission_level: 'forbidden',
+      requires_human_approval: true,
+      approved: true,
+      blocked: true,
+      reason: 'Shell command execution is forbidden before a controlled execution adapter exists.'
+    }
+  })[0].json;
+
+  assert.equal(result.status, 'forbidden_request');
+  assert.equal(result.approval_decision.decision, 'forbidden');
+  assert.equal(result.approval_decision.blocked, true);
+  assert.equal(result.note, 'Forbidden action rejected before task initialization.');
+});

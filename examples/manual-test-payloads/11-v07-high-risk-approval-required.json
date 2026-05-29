@@ -1,0 +1,15 @@
+{
+  "goal": "Prepare a repository write plan for the GoalDriven workflow",
+  "criteria": [
+    "Must not proceed without explicit human approval",
+    "Must return a structured approval_decision",
+    "Must be blocked before executor dispatch when approval is missing"
+  ],
+  "action_class": "repo_write",
+  "risk_level": "high",
+  "max_iterations": 1,
+  "timeout_minutes": 5,
+  "require_human_approval": true,
+  "manual_approval_required": true,
+  "human_approved": false
+}

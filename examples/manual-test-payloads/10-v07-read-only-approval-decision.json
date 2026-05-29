@@ -1,0 +1,19 @@
+{
+  "goal": "Review the GoalDriven workflow safety boundaries and return a read-only summary",
+  "criteria": [
+    "Output must include an approval_decision",
+    "Output must remain read-only",
+    "Output must not require executor write actions"
+  ],
+  "action_class": "read_only",
+  "risk_level": "low",
+  "max_iterations": 1,
+  "timeout_minutes": 5,
+  "require_human_approval": false,
+  "manual_approval_required": false,
+  "human_approved": false,
+  "context": {
+    "agent_mode": "mock",
+    "provider_mode": "mock"
+  }
+}

@@ -11,16 +11,16 @@ Technical positioning: **Goal-Driven Agent Workflow with n8n**.
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-v0.6c%20evaluator%20verified-yellow)
+![status](https://img.shields.io/badge/status-v0.7%20approval%20boundary%20verified-yellow)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 Auto Agent Factory is a **mock-first AI Agent workflow skeleton** built with n8n. It turns an agent request into a bounded workflow contract: define a goal, define success criteria, run a controlled executor step, check the result, and decide whether to finish, revise, stop, or require human review.
 
-Current stage: **v0.6c / Real Provider Read-only Sandbox + Evaluator Alignment Verified**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, and criterion-indexed evidence alignment in Criteria Checker.
+Current stage: **v0.7 / Human-in-the-loop Controlled Execution Boundary Verified**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, criterion-indexed evidence alignment, and approval-boundary decisions for read-only, high-risk write-like, and forbidden action classes.
 
 This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Next phase: **V0.7 Human-in-the-loop Controlled Execution Design / Safety Hardening**, still read-only first until explicitly reviewed.
+Next phase: **V0.8 staging-style pilot / audit logging / rollback design**, still no production autonomous execution.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
@@ -30,14 +30,14 @@ The controlled-execution boundary design is tracked in [`docs/V0.7_CONTROLLED_EX
 
 ## Current Stage
 
-| Area | v0.6c status |
+| Area | v0.7 status |
 |---|---|
-| Project phase | Real Provider Read-only Sandbox + Evaluator Alignment Verified |
+| Project phase | Human-in-the-loop Controlled Execution Boundary Verified |
 | Master workflow | Importable n8n workflow JSON implemented |
 | Executor workflow | `mock`, `dry-run`, `real-readonly` stub, and OpenAI-compatible read-only sandbox path validated |
 | Criteria checker | Criterion-indexed provider evidence alignment verified; exact-match runtime path observed |
 | Error handler | n8n Error Trigger workflow implemented |
-| Payload safety | Invalid payload validation and high-risk blocking verified |
+| Payload safety | Invalid payload validation, high-risk approval gate, and forbidden action rejection verified |
 | Local verification | Tests, workflow validation, dry-run, and import checks available |
 | Real provider sandbox | One read-only OpenAI-compatible provider call verified; output remains `needs_review` |
 | Real Codex provider | Not connected |
@@ -228,7 +228,7 @@ Related docs:
 
 ## Project Status
 
-Current release target: **v0.6c Real Provider Read-only Sandbox + Evaluator Alignment Verified**.
+Current release target: **v0.7 Human-in-the-loop Controlled Execution Boundary Verified**.
 
 Implemented and validated:
 
@@ -244,6 +244,7 @@ Implemented and validated:
 - Runbook, import order, manual import checklist, production readiness checklist, and real provider adapter design
 - Mode Router regression fix and validation trail
 - Safety documentation around `max_iterations`, `timeout_minutes`, manual review, and inactive workflow exports
+- Structured `approval_decision` contract for read-only, approval-gated, and forbidden requests
 
 Not implemented yet:
 
@@ -258,7 +259,7 @@ Not implemented yet:
 
 ## Roadmap
 
-- Human-in-the-loop controlled execution boundary design before any real write actions
+- Staging-style pilot design with audit logging and rollback expectations
 - Further evaluator quality improvements for ambiguous provider evidence
 - Real provider integration hardening behind the existing adapter contract
 - Codex / coding-agent executor adapter
