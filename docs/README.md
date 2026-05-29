@@ -2,6 +2,14 @@
 
 This directory contains the product, workflow, testing, import, safety, and portfolio documentation for `Goal-Driven Agent Workflow with n8n`.
 
+## Start here
+
+- [`LOCAL_DEMO_RUNBOOK.md`](LOCAL_DEMO_RUNBOOK.md) — fastest safe path to run the repo-side local demo.
+- [`RUNBOOK.md`](RUNBOOK.md) — operational runbook for validation, import, troubleshooting, and rollback.
+- [`IMPORT_ORDER.md`](IMPORT_ORDER.md) — n8n workflow import order.
+- [`MANUAL_IMPORT_CHECKLIST.md`](MANUAL_IMPORT_CHECKLIST.md) — manual import and validation checklist.
+- [`VALIDATION_LOG.md`](VALIDATION_LOG.md) — recorded runtime and local validation milestones.
+
 ## Project presentation
 
 - [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) — one-page project brief for recruiters, interviewers, and portfolio readers.
@@ -20,7 +28,6 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`IMPORT_ORDER.md`](IMPORT_ORDER.md) — short import order guide.
 - [`MANUAL_IMPORT_CHECKLIST.md`](MANUAL_IMPORT_CHECKLIST.md) — step-by-step manual import and validation checklist.
 - [`RUNBOOK.md`](RUNBOOK.md) — local validation, n8n import, execution troubleshooting, and rollback guide.
-- [`VALIDATION_LOG.md`](VALIDATION_LOG.md) — recorded validation milestones for V0.3a / V0.3b routing and safety checks.
 - [`V0_3A_REAL_READONLY_UI_VERIFICATION.md`](V0_3A_REAL_READONLY_UI_VERIFICATION.md) — n8n UI verification checklist for the real-readonly stub path.
 
 ## Production and provider planning
@@ -45,6 +52,8 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md`](V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md) — local human sign-off review package generator for sanitized audit records.
 - [`V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md`](V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md) — dev-only human decision record, local JSONL ledger, and ledger summary report.
 - [`V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md) — one-command local replay from sanitized audit record to ledger summary.
+- [`LOCAL_DEMO_RUNBOOK.md`](LOCAL_DEMO_RUNBOOK.md) — practical local demo walkthrough for GitHub readers.
+- [`V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md`](V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md) — local demo / release-candidate packaging note.
 
 ## Earlier n8n / Codex notes
 

@@ -17,6 +17,7 @@
     "audit:signoff": "node scripts/generate-human-signoff-review.mjs examples/audit-replay/v08f-read-only-run-record.json",
     "audit:signoff:decision": "node scripts/write-human-signoff-decision.mjs examples/audit-replay/v08f-read-only-run-record.json examples/signoff-decisions/sample_readonly_needs_review_decision.json",
     "audit:signoff:ledger": "node scripts/generate-signoff-ledger-report.mjs examples/signoff-decisions/sample_signoff_decision_ledger.jsonl",
-    "audit:cycle:replay": "node scripts/replay-local-review-cycle.mjs"
+    "audit:cycle:replay": "node scripts/replay-local-review-cycle.mjs",
+    "demo:local": "node scripts/run-local-demo.mjs"
   }
 }

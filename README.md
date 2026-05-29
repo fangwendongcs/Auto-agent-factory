@@ -11,16 +11,16 @@ Technical positioning: **Goal-Driven Agent Workflow with n8n**.
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-v0.7%20approval%20boundary%20verified-yellow)
+![status](https://img.shields.io/badge/status-v0.13%20local%20demo%20RC-yellow)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 Auto Agent Factory is a **mock-first AI Agent workflow skeleton** built with n8n. It turns an agent request into a bounded workflow contract: define a goal, define success criteria, run a controlled executor step, check the result, and decide whether to finish, revise, stop, or require human review.
 
-Current stage: **v0.7 / Human-in-the-loop Controlled Execution Boundary Verified**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, criterion-indexed evidence alignment, and approval-boundary decisions for read-only, high-risk write-like, and forbidden action classes.
+Current stage: **V0.13 / Local Demo Release Candidate Packaging**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, criterion-indexed evidence alignment, approval-boundary decisions, sanitized audit records, local audit reports, human sign-off review packages, a dev-only decision ledger, and a one-command local replay.
 
 This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Current design target: **V0.12 local review cycle replay**, still no production autonomous execution.
+Current design target: **V0.13 local demo / release-candidate packaging**, still no production autonomous execution.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
@@ -38,21 +38,24 @@ The dev-only local report artifact option is tracked in [`docs/V0.9B_LOCAL_AUDIT
 The local human sign-off review workflow is tracked in [`docs/V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md`](docs/V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md).
 The dev-only sign-off decision ledger is tracked in [`docs/V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md`](docs/V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md).
 The local end-to-end review cycle replay is tracked in [`docs/V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](docs/V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md).
+The local demo runbook is tracked in [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md).
+The V0.13 packaging note is tracked in [`docs/V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md`](docs/V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md).
 
 ## Current Stage
 
-| Area | v0.7 status |
+| Area | V0.13 status |
 |---|---|
-| Project phase | Human-in-the-loop Controlled Execution Boundary Verified |
+| Project phase | Local Demo Release Candidate Packaging |
 | Master workflow | Importable n8n workflow JSON implemented |
 | Executor workflow | `mock`, `dry-run`, `real-readonly` stub, and OpenAI-compatible read-only sandbox path validated |
 | Criteria checker | Criterion-indexed provider evidence alignment verified; exact-match runtime path observed |
 | Error handler | n8n Error Trigger workflow implemented |
 | Payload safety | Invalid payload validation, high-risk approval gate, and forbidden action rejection verified |
-| Local verification | Tests, workflow validation, dry-run, and import checks available |
+| Local verification | Tests, workflow validation, dry-run, import checks, audit report, sign-off review, decision ledger, and local replay available |
 | Real provider sandbox | One read-only OpenAI-compatible provider call verified; output remains `needs_review` |
 | Real Codex provider | Not connected |
 | Production autonomous execution | Not implemented |
+| Local demo replay | Implemented with dev-only `.local-audit/` artifacts |
 | Real user data / SaaS operations | Not included |
 
 ## Verified Paths
@@ -152,27 +155,28 @@ Install dependencies:
 npm install
 ```
 
-Run tests:
+Run the core local verification path:
 
 ```bash
 npm test
+npm run workflow:validate:all
+npm run audit:report
+npm run audit:signoff
+npm run audit:cycle:replay
 ```
 
-Validate workflow JSON:
+Or run the packaged local demo:
 
 ```bash
-npm run workflow:validate:all
+npm run demo:local
 ```
 
-Run dry-run deployment check:
+The local demo is repo-side only. It does not connect to n8n runtime or call a real provider. It may create dev-only artifacts under `.local-audit/`, which is ignored by Git.
+
+Optional import readiness checks:
 
 ```bash
 npm run workflow:dry-run
-```
-
-Check n8n import readiness:
-
-```bash
 npm run import:check
 ```
 
@@ -181,6 +185,8 @@ Optional smoke-test payload generation:
 ```bash
 npm run smoke:goal-driven
 ```
+
+For the full walkthrough, see [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md).
 
 ## Import into n8n
 
