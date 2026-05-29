@@ -40,6 +40,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.8D_DEV_ONLY_JSONL_AUDIT_STORAGE_PROTOTYPE.md`](V0.8D_DEV_ONLY_JSONL_AUDIT_STORAGE_PROTOTYPE.md) — disabled-by-default dev-only JSONL audit storage utility and validation boundaries.
 - [`V0.8E_DEV_ONLY_AUDIT_CLI.md`](V0.8E_DEV_ONLY_AUDIT_CLI.md) — local-only CLI for manually writing sanitized audit records to dev JSONL storage.
 - [`V0.8F_STAGING_REPLAY_CLOSEOUT.md`](V0.8F_STAGING_REPLAY_CLOSEOUT.md) — staging-style sanitized audit replay fixture, CLI regression, and audit export closeout.
+- [`V0.9_AUDIT_REVIEW_REPORT_GENERATION.md`](V0.9_AUDIT_REVIEW_REPORT_GENERATION.md) — Markdown audit review report generator for sanitized JSON / JSONL audit records.
 
 ## Earlier n8n / Codex notes
 

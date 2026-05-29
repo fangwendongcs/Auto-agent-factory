@@ -12,6 +12,7 @@
     "smoke:goal-driven": "node scripts/smoke-test-goal-driven-workflow.mjs",
     "import:check": "node scripts/check-import-readiness.mjs",
     "audit:dev:write": "node scripts/write-dev-audit-record.mjs examples/sample_sanitized_run_record.json",
-    "audit:dev:replay": "node scripts/write-dev-audit-record.mjs examples/audit-replay/v08f-read-only-run-record.json"
+    "audit:dev:replay": "node scripts/write-dev-audit-record.mjs examples/audit-replay/v08f-read-only-run-record.json",
+    "audit:report": "node scripts/generate-audit-review-report.mjs examples/audit-replay/v08f-read-only-run-record.json"
   }
 }
