@@ -15,6 +15,9 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) — one-page project brief for recruiters, interviewers, and portfolio readers.
 - [`PORTFOLIO_CASE_STUDY.md`](PORTFOLIO_CASE_STUDY.md) — product-management-style case study.
 - [`GITHUB_PRESENTATION_CHECKLIST.md`](GITHUB_PRESENTATION_CHECKLIST.md) — checklist for keeping the GitHub repository presentation accurate and resume-ready.
+- [`MILESTONE_SUMMARY.md`](MILESTONE_SUMMARY.md) — compact milestone map from mock-first MVP to local demo RC.
+- [`RELEASE_NOTES_V0_13_RC.md`](RELEASE_NOTES_V0_13_RC.md) — pre-release notes for the V0.13 local demo RC.
+- [`RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md`](RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md) — release notes for the GitHub presentation polish milestone.
 
 ## Product and MVP definition
 

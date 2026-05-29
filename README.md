@@ -11,35 +11,32 @@ Technical positioning: **Goal-Driven Agent Workflow with n8n**.
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
 ![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
 ![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-v0.13%20local%20demo%20RC-yellow)
+![status](https://img.shields.io/badge/status-v0.14%20presentation%20polish-yellow)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 Auto Agent Factory is a **mock-first AI Agent workflow skeleton** built with n8n. It turns an agent request into a bounded workflow contract: define a goal, define success criteria, run a controlled executor step, check the result, and decide whether to finish, revise, stop, or require human review.
 
-Current stage: **V0.13 / Local Demo Release Candidate Packaging**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, criterion-indexed evidence alignment, approval-boundary decisions, sanitized audit records, local audit reports, human sign-off review packages, a dev-only decision ledger, and a one-command local replay.
+Current stage: **V0.14 / GitHub Presentation Polish**, built on the **V0.13 Local Demo Release Candidate**. The project has validated `mock`, `dry-run`, `real-readonly` stub routing, one OpenAI-compatible read-only provider sandbox call, criterion-indexed evidence alignment, approval-boundary decisions, sanitized audit records, local audit reports, human sign-off review packages, a dev-only decision ledger, and a one-command local replay.
 
 This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Current design target: **V0.13 local demo / release-candidate packaging**, still no production autonomous execution.
+Start here:
 
-The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
-The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
-The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md).
-The evaluator-quality phase is documented in [`docs/V0.6_EVALUATOR_QUALITY_PLAN.md`](docs/V0.6_EVALUATOR_QUALITY_PLAN.md).
-The controlled-execution boundary design is tracked in [`docs/V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](docs/V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md).
-The staging pilot, audit, and rollback design is tracked in [`docs/V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md`](docs/V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md).
-The sanitized audit log prototype is tracked in [`docs/V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md`](docs/V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md).
-The dev-only audit storage plan is tracked in [`docs/V0.8C_DEV_ONLY_AUDIT_STORAGE_PLAN.md`](docs/V0.8C_DEV_ONLY_AUDIT_STORAGE_PLAN.md).
-The dev-only JSONL audit storage prototype is tracked in [`docs/V0.8D_DEV_ONLY_JSONL_AUDIT_STORAGE_PROTOTYPE.md`](docs/V0.8D_DEV_ONLY_JSONL_AUDIT_STORAGE_PROTOTYPE.md).
-The dev-only audit CLI is tracked in [`docs/V0.8E_DEV_ONLY_AUDIT_CLI.md`](docs/V0.8E_DEV_ONLY_AUDIT_CLI.md).
-The staging replay closeout is tracked in [`docs/V0.8F_STAGING_REPLAY_CLOSEOUT.md`](docs/V0.8F_STAGING_REPLAY_CLOSEOUT.md).
-The audit review report generator is tracked in [`docs/V0.9_AUDIT_REVIEW_REPORT_GENERATION.md`](docs/V0.9_AUDIT_REVIEW_REPORT_GENERATION.md).
-The dev-only local report artifact option is tracked in [`docs/V0.9B_LOCAL_AUDIT_REPORT_ARTIFACT.md`](docs/V0.9B_LOCAL_AUDIT_REPORT_ARTIFACT.md).
-The local human sign-off review workflow is tracked in [`docs/V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md`](docs/V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md).
-The dev-only sign-off decision ledger is tracked in [`docs/V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md`](docs/V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md).
-The local end-to-end review cycle replay is tracked in [`docs/V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](docs/V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md).
-The local demo runbook is tracked in [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md).
-The V0.13 packaging note is tracked in [`docs/V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md`](docs/V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md).
+- **Run the local demo:** [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md)
+- **Understand the architecture:** [`docs/WORKFLOW_DESIGN.md`](docs/WORKFLOW_DESIGN.md)
+- **Review milestones:** [`docs/MILESTONE_SUMMARY.md`](docs/MILESTONE_SUMMARY.md)
+- **Read pre-release notes:** [`docs/RELEASE_NOTES_V0_13_RC.md`](docs/RELEASE_NOTES_V0_13_RC.md) and [`docs/RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md`](docs/RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md)
+- **Browse all docs:** [`docs/README.md`](docs/README.md)
+
+## Architecture Snapshot
+
+| Layer | Purpose | Current proof point |
+|---|---|---|
+| n8n workflows | Goal intake, executor dispatch, criteria checking, error handling | 4 importable workflow JSON files, validation scripts, import checks |
+| Executor modes | Safe execution-mode routing | `mock`, `dry-run`, `real-readonly` stub, and read-only provider sandbox path validated |
+| Evaluation | Criteria-based result checking | Criterion-indexed evidence contract and exact-match checker path validated |
+| Safety boundary | Prevent unsafe automation | high-risk approval gate, forbidden-action rejection, no-write default |
+| Audit / review | Human-readable local review loop | sanitized audit record → report → sign-off → decision ledger → summary replay |
 
 ## Current Stage
 
@@ -245,48 +242,44 @@ Related docs:
 
 ## Project Status
 
-Current release target: **v0.8 Staging-style Pilot / Audit Logging / Rollback Design**.
+Current release target: **V0.14 GitHub Presentation Polish**, based on the **V0.13 Local Demo Release Candidate**.
 
 Implemented and validated:
 
 - Four official n8n workflow JSON files in `workflows/`
-- Workflow contract validation scripts
-- Import readiness check script
-- Dry-run deployment script
-- Node test suite for schemas, scoring, and workflow contracts
-- `goal`, `task`, and `result` JSON schemas
-- Prompt templates for master, subagent, and criteria checker roles
-- Sample goal, success result, failed result, and final report examples
-- Manual test payloads for valid input, missing fields, high-risk approval, dry-run mode, and real-readonly stub mode
-- Runbook, import order, manual import checklist, production readiness checklist, and real provider adapter design
-- Mode Router regression fix and validation trail
-- Safety documentation around `max_iterations`, `timeout_minutes`, manual review, and inactive workflow exports
+- Workflow contract validation, dry-run deploy check, and import readiness scripts
+- `goal`, `task`, `result`, sanitized audit record, and sign-off decision schemas
+- `mock`, `dry-run`, `real-readonly` stub, and OpenAI-compatible read-only sandbox path
+- Criteria checker alignment with criterion-indexed provider evidence
 - Structured `approval_decision` contract for read-only, approval-gated, and forbidden requests
+- Sanitized audit record, dev-only audit storage, audit report, sign-off review, decision ledger, and local review replay
+- One-command local demo via `npm run demo:local`
+- Runbook, import order, manual import checklist, production readiness checklist, milestone summary, and V0.13/V0.14 release notes
 
 Not implemented yet:
 
-- production LLM execution
+- production autonomous execution
 - real Codex/coding-agent automation
 - provider-driven write execution
-- persistent run history
-- hosted dashboard
-- multi-user permissions
-- production autonomous execution
-- real user data processing
+- hosted dashboard or multi-user approval UI
+- production database-backed run history
+- real user data / SaaS operation processing
 
 ## Roadmap
 
-- Staging-style pilot design with audit logging and rollback expectations
-- Further evaluator quality improvements for ambiguous provider evidence
-- Real provider integration hardening behind the existing adapter contract
-- Codex / coding-agent executor adapter
-- Persistent run history
-- Web dashboard for monitoring executions
-- Human approval UI
-- Evaluation reports
-- Multi-agent task routing
-- RAG / knowledge base integration
-- Better execution metrics and observability
+Near-term:
+
+- keep the local review replay stable as the main demo path
+- add optional screenshots only after they reflect real n8n/UI state
+- prepare a GitHub pre-release once docs and local validation remain stable
+
+Later:
+
+- real provider integration hardening behind the existing read-only adapter contract
+- Codex / coding-agent executor adapter behind explicit human approval
+- hosted dashboard or approval UI
+- production-grade run history and observability
+- multi-agent task routing and RAG / knowledge-base adapters
 
 These are planned milestones, not current capabilities.
 
