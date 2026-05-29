@@ -34,6 +34,8 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md`](V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md) — manual n8n setup checklist before a real provider sandbox call.
 - [`V0.6_EVALUATOR_QUALITY_PLAN.md`](V0.6_EVALUATOR_QUALITY_PLAN.md) — evaluator quality, criteria/evidence alignment, and safety hardening plan after V0.5c.
 - [`V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md) — controlled execution boundary design and V0.7 runtime verification before enabling any real write actions.
+- [`V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md`](V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md) — staging pilot, audit logging, approval record, run history, failure recovery, rollback, and no-write default design.
+- [`V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md`](V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md) — repo-side sanitized audit record schema, mock sanitizer, and no-write audit prototype.
 
 ## Earlier n8n / Codex notes
 

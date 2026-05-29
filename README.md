@@ -20,13 +20,15 @@ Current stage: **v0.7 / Human-in-the-loop Controlled Execution Boundary Verified
 
 This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Next phase: **V0.8 staging-style pilot / audit logging / rollback design**, still no production autonomous execution.
+Current design target: **V0.8b sanitized audit log prototype**, still no production autonomous execution.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
 The minimal implementation plan is tracked in [`docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](docs/V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md).
 The evaluator-quality phase is documented in [`docs/V0.6_EVALUATOR_QUALITY_PLAN.md`](docs/V0.6_EVALUATOR_QUALITY_PLAN.md).
 The controlled-execution boundary design is tracked in [`docs/V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](docs/V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md).
+The staging pilot, audit, and rollback design is tracked in [`docs/V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md`](docs/V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md).
+The sanitized audit log prototype is tracked in [`docs/V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md`](docs/V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md).
 
 ## Current Stage
 
@@ -228,7 +230,7 @@ Related docs:
 
 ## Project Status
 
-Current release target: **v0.7 Human-in-the-loop Controlled Execution Boundary Verified**.
+Current release target: **v0.8 Staging-style Pilot / Audit Logging / Rollback Design**.
 
 Implemented and validated:
 

@@ -8,7 +8,8 @@ const __dirname = path.dirname(__filename);
 const schemaPaths = {
   goal: path.resolve(__dirname, '../schema/goal.schema.json'),
   task: path.resolve(__dirname, '../schema/task.schema.json'),
-  result: path.resolve(__dirname, '../schema/result.schema.json')
+  result: path.resolve(__dirname, '../schema/result.schema.json'),
+  auditRecord: path.resolve(__dirname, '../schema/audit-record.schema.json')
 };
 
 function readSchema(kind) {
