@@ -1,0 +1,61 @@
+{
+  "audit_record_version": "v0.8b-sanitized-audit-record",
+  "run_id": "gd_v08f_replay_001",
+  "task_id": "task_v08f_replay_001",
+  "record_type": "sanitized_run_record",
+  "created_at": "2026-05-29T00:00:00.000Z",
+  "status": "completed",
+  "goal_summary": "Replay a staging-style read-only audit record using sanitized fixture data.",
+  "criteria_count": 3,
+  "risk_level": "low",
+  "action_class": "read_only",
+  "permission_level": "read_only",
+  "provider": {
+    "mode": "mock",
+    "name": "mock-agent-adapter",
+    "model": null,
+    "status": "completed"
+  },
+  "approval_decision": {
+    "decision": "allow",
+    "blocked": false,
+    "approved": false,
+    "requires_human_approval": false,
+    "reason_summary": "Read-only staging replay may proceed after validation."
+  },
+  "timestamps": {
+    "started_at": "2026-05-29T00:00:00.000Z",
+    "finished_at": "2026-05-29T00:00:05.000Z"
+  },
+  "storage": {
+    "mode": "mock_repo_contract",
+    "persisted": false
+  },
+  "safety": {
+    "no_write_default": true,
+    "side_effects_enabled": false,
+    "raw_prompt_stored": false,
+    "raw_provider_response_stored": false,
+    "secrets_stored": false
+  },
+  "redaction": {
+    "applied": true,
+    "excluded_fields": [
+      "prompt",
+      "full_prompt",
+      "raw_prompt",
+      "messages",
+      "provider_request",
+      "provider_response_raw",
+      "provider_response_content",
+      "raw_response",
+      "authorization",
+      "api_key",
+      "token",
+      "secret",
+      "password",
+      "credential",
+      "cookie"
+    ]
+  }
+}
