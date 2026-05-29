@@ -27,7 +27,9 @@
   "properties": {
     "audit_record_version": {
       "type": "string",
-      "enum": ["v0.8b-sanitized-audit-record"]
+      "enum": [
+        "v0.8b-sanitized-audit-record"
+      ]
     },
     "run_id": {
       "type": "string",
@@ -39,7 +41,9 @@
     },
     "record_type": {
       "type": "string",
-      "enum": ["sanitized_run_record"]
+      "enum": [
+        "sanitized_run_record"
+      ]
     },
     "created_at": {
       "type": "string",
@@ -59,7 +63,11 @@
     },
     "risk_level": {
       "type": "string",
-      "enum": ["low", "medium", "high"]
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
     },
     "action_class": {
       "type": "string",
@@ -75,36 +83,67 @@
     },
     "permission_level": {
       "type": "string",
-      "enum": ["read_only", "draft", "write_action", "forbidden"]
+      "enum": [
+        "read_only",
+        "draft",
+        "write_action",
+        "forbidden"
+      ]
     },
     "provider": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode", "name", "model", "status"],
+      "required": [
+        "mode",
+        "name",
+        "model",
+        "status"
+      ],
       "properties": {
         "mode": {
           "type": "string",
           "minLength": 1
         },
         "name": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "model": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "status": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     },
     "approval_decision": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["decision", "blocked", "approved", "requires_human_approval"],
+      "required": [
+        "decision",
+        "blocked",
+        "approved",
+        "requires_human_approval"
+      ],
       "properties": {
         "decision": {
           "type": "string",
-          "enum": ["allow", "approved", "needs_human_approval", "forbidden", "invalid_request", "rejected"]
+          "enum": [
+            "allow",
+            "approved",
+            "needs_human_approval",
+            "forbidden",
+            "invalid_request",
+            "rejected"
+          ]
         },
         "blocked": {
           "type": "boolean"
@@ -116,31 +155,49 @@
           "type": "boolean"
         },
         "reason_summary": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     },
     "timestamps": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["started_at", "finished_at"],
+      "required": [
+        "started_at",
+        "finished_at"
+      ],
       "properties": {
         "started_at": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "finished_at": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     },
     "storage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode", "persisted"],
+      "required": [
+        "mode",
+        "persisted"
+      ],
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["mock_repo_contract"]
+          "enum": [
+            "mock_repo_contract",
+            "dev_jsonl"
+          ]
         },
         "persisted": {
           "type": "boolean"
@@ -150,7 +207,13 @@
     "safety": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["no_write_default", "side_effects_enabled", "raw_prompt_stored", "raw_provider_response_stored", "secrets_stored"],
+      "required": [
+        "no_write_default",
+        "side_effects_enabled",
+        "raw_prompt_stored",
+        "raw_provider_response_stored",
+        "secrets_stored"
+      ],
       "properties": {
         "no_write_default": {
           "type": "boolean"
@@ -172,7 +235,10 @@
     "redaction": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["applied", "excluded_fields"],
+      "required": [
+        "applied",
+        "excluded_fields"
+      ],
       "properties": {
         "applied": {
           "type": "boolean"

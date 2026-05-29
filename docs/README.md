@@ -37,6 +37,7 @@ This directory contains the product, workflow, testing, import, safety, and port
 - [`V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md`](V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md) — staging pilot, audit logging, approval record, run history, failure recovery, rollback, and no-write default design.
 - [`V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md`](V0.8B_SANITIZED_AUDIT_LOG_PROTOTYPE.md) — repo-side sanitized audit record schema, mock sanitizer, and no-write audit prototype.
 - [`V0.8C_DEV_ONLY_AUDIT_STORAGE_PLAN.md`](V0.8C_DEV_ONLY_AUDIT_STORAGE_PLAN.md) — dev-only sanitized audit storage plan, storage option comparison, allowlist, denylist, and disabled-by-default strategy.
+- [`V0.8D_DEV_ONLY_JSONL_AUDIT_STORAGE_PROTOTYPE.md`](V0.8D_DEV_ONLY_JSONL_AUDIT_STORAGE_PROTOTYPE.md) — disabled-by-default dev-only JSONL audit storage utility and validation boundaries.
 
 ## Earlier n8n / Codex notes
 
