@@ -20,7 +20,7 @@ Current stage: **v0.7 / Human-in-the-loop Controlled Execution Boundary Verified
 
 This is **not** a production autonomous agent. The verified real provider path is read-only and returns `needs_review`; it does **not** execute real Codex/coding-agent tasks, shell commands, file writes, Git modifications, external write actions, or live SaaS user workflows.
 
-Current design target: **V0.11 dev-only human sign-off decision ledger**, still no production autonomous execution.
+Current design target: **V0.12 local review cycle replay**, still no production autonomous execution.
 
 The V0.4 preparation checklist is tracked in [`docs/V0_4_PROVIDER_INTEGRATION_PREP.md`](docs/V0_4_PROVIDER_INTEGRATION_PREP.md).
 The first provider interface decision is recorded in [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md).
@@ -37,6 +37,7 @@ The audit review report generator is tracked in [`docs/V0.9_AUDIT_REVIEW_REPORT_
 The dev-only local report artifact option is tracked in [`docs/V0.9B_LOCAL_AUDIT_REPORT_ARTIFACT.md`](docs/V0.9B_LOCAL_AUDIT_REPORT_ARTIFACT.md).
 The local human sign-off review workflow is tracked in [`docs/V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md`](docs/V0.10_HUMAN_SIGNOFF_REVIEW_WORKFLOW.md).
 The dev-only sign-off decision ledger is tracked in [`docs/V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md`](docs/V0.11_DEV_ONLY_SIGNOFF_DECISION_LEDGER.md).
+The local end-to-end review cycle replay is tracked in [`docs/V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](docs/V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md).
 
 ## Current Stage
 
