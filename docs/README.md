@@ -54,6 +54,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 ## Release notes / open-source readiness
 
 - [`RELEASE_NOTES_V1_0_RC.md`](RELEASE_NOTES_V1_0_RC.md) — copy-ready v1.0 release-candidate notes.
+- [`GITHUB_PRERELEASE_DRAFT_V1_0_0_RC_1.md`](GITHUB_PRERELEASE_DRAFT_V1_0_0_RC_1.md) — GitHub pre-release settings and copy-ready draft body.
 - [`RELEASE_NOTES_V0_13_RC.md`](RELEASE_NOTES_V0_13_RC.md) — V0.13 local demo release-candidate notes.
 - [`RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md`](RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md) — V0.14 presentation polish notes.
 - [`OPEN_SOURCE_RELEASE_CHECKLIST.md`](OPEN_SOURCE_RELEASE_CHECKLIST.md) — checklist before tagging an open-source release candidate.
