@@ -184,6 +184,8 @@ test('master payload validator rejects forbidden action classes before executor 
   assert.equal(result.approval_decision.decision, 'forbidden');
   assert.equal(result.forbidden_action_detected, true);
   assert.equal(result.approval_decision.blocked, true);
+  assert.equal(result.approval_decision.approved, false);
+  assert.equal(result.human_approved, false);
 });
 
 test('master blocked response includes approval decision contract', () => {

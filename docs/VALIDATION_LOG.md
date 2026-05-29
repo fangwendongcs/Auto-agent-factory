@@ -643,3 +643,48 @@ Recommended next phase:
 ```text
 V0.8 staging-style pilot / audit logging / rollback design
 ```
+
+## V0.7 Approval Semantics Patch
+
+Result: **PASS**
+
+This verification was completed manually by the user against the local n8n Production Webhook runtime after syncing the approval semantics patch to `[GoalDriven] 01 Master`.
+
+### Root cause
+
+The forbidden `shell_command` path correctly returned:
+
+- `approval_decision.decision = forbidden`
+- `approval_decision.blocked = true`
+
+However, when the incoming payload included `human_approved = true`, the approval decision previously preserved that value as:
+
+```text
+approval_decision.approved = true
+```
+
+That was misleading for audit semantics. A forbidden action must remain unapproved even if the payload claims human approval.
+
+### Runtime verification result
+
+- `status = forbidden_request`
+- `action_class = shell_command`
+- `permission_level = forbidden`
+- `forbidden_action_detected = true`
+- `approval_decision.decision = forbidden`
+- `approval_decision.blocked = true`
+- `approval_decision.approved = false`
+- `note = Forbidden action rejected before task initialization.`
+- rejected before Executor dispatch
+
+The response did not expose a top-level `human_approved = false` field. This is acceptable for the current public response contract because the authoritative audit field is `approval_decision.approved`, and it is now false.
+
+### Safety status
+
+- no Executor dispatch
+- no real provider call
+- no file write
+- no shell execution
+- no Git modification
+- no external write action
+- no production autonomous execution
