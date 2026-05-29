@@ -1,9 +1,9 @@
 {
   "name": "auto-agent-factory",
-  "version": "0.3.0",
+  "version": "1.0.0-rc.1",
   "private": true,
   "type": "module",
-  "description": "A mock-first, goal-driven n8n workflow skeleton for bounded, testable, and human-reviewable AI Agent automation.",
+  "description": "A local-first AI Agent governance toolkit for goal-driven n8n workflows.",
   "scripts": {
     "test": "node --test",
     "workflow:validate": "node scripts/validate-n8n-workflow.mjs workflows/goal_driven_master.workflow.json",

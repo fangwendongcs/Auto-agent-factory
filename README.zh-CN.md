@@ -1,128 +1,59 @@
 # Auto Agent Factory
 
-**一个 mock-first、目标驱动的 n8n workflow skeleton，用于构建有边界、可测试、可人工审核的 AI Agent 自动化。**
+**一个 local-first 的 AI Agent governance toolkit，用于构建目标驱动的 n8n workflow。**
 
-技术定位：**Goal-Driven Agent Workflow with n8n**。
+Auto Agent Factory 帮助开发者在启用任何真实写操作之前，先验证一个有边界、可测试、可审计、可人工审核的 AI Agent workflow。它把一次 Agent 请求变成结构化控制闭环：定义目标、定义成功标准、安全路由执行、评估 evidence、记录审计轨迹，并在风险出现时要求人工 sign-off。
+
+这不是“输入 prompt，Agent 自动乱跑”的 demo。它更像一个 Agent workflow 的治理骨架：先把安全边界、可复现验证和人工审核路径做好，再考虑接入更高风险的执行能力。
 
 **语言：** [English](README.md) | 简体中文
 
 ![n8n workflow](https://img.shields.io/badge/n8n-workflow-FF6D5A)
-![Node.js](https://img.shields.io/badge/Node.js-test%20scripts-339933)
+![Node.js](https://img.shields.io/badge/Node.js-local%20tooling-339933)
+![local-first](https://img.shields.io/badge/design-local--first-blue)
 ![mock-first](https://img.shields.io/badge/design-mock--first-blue)
-![dry-run supported](https://img.shields.io/badge/dry--run-supported-brightgreen)
-![manual approval](https://img.shields.io/badge/safety-manual%20approval-orange)
-![status](https://img.shields.io/badge/status-v0.3.0%20validation-yellow)
+![dry-run](https://img.shields.io/badge/dry--run-supported-brightgreen)
+![human review](https://img.shields.io/badge/safety-human%20review-orange)
+![status](https://img.shields.io/badge/status-v1.0--rc%20prep-yellow)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
-Auto Agent Factory 是一个基于 **n8n** 的 **mock-first AI Agent workflow skeleton**。它把一次 Agent 请求变成一个有边界的 workflow contract：定义目标、定义成功标准、执行一轮受控任务、检查结果，然后决定完成、修订、停止，或进入人工审核。
+## 为什么做这个项目
 
-当前阶段：**v0.3.0 / Mock-First MVP Validation**。项目已验证 `mock`、`dry-run`、`real-readonly` stub 三条路由，同时验证了 invalid payload 阻断和 high-risk 人工审核阻断。当前重点是先证明编排结构、contract、验证流程和安全边界，再接入真实 provider。
+AI Agent 系统真正容易失控的地方，往往不是模型不会生成内容，而是模型外面的控制平面缺失：
 
-这不是生产自主执行 Agent。它目前**不会**执行真实 LLM 调用、真实 Codex/coding-agent 任务、shell 命令、文件写入、Git 修改、外部写操作或真实 SaaS 用户流程。
+- 目标不清楚
+- 成功标准不明确
+- 没有有边界的执行循环
+- 没有稳定 evaluator contract
+- 没有错误恢复路径
+- 没有人工审核边界
+- 没有安全可读的 audit trail
+- 没有可复现的本地 demo 路径
 
-## Current Stage
+Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 prompt 问题。
 
-| Area | v0.3.0 status |
-|---|---|
-| 项目阶段 | Mock-First MVP Validation |
-| Master workflow | 已实现为可导入 n8n workflow JSON |
-| Executor workflow | 已验证 `mock`、`dry-run`、`real-readonly` stub 路由 |
-| Criteria checker | 已实现 provider-agnostic 的 criteria evaluation workflow |
-| Error handler | 已实现 n8n Error Trigger workflow |
-| Payload safety | 已验证 invalid payload 校验和 high-risk 阻断 |
-| 本地验证 | 已提供 tests、workflow validation、dry-run、import check |
-| 真实 LLM provider | 未接入 |
-| 真实 Codex provider | 未接入 |
-| 生产自主执行 | 未实现 |
-| 真实用户数据 / SaaS 运行 | 未包含 |
+## 现在可以做什么
 
-## Verified Paths
+当前仓库支持三条使用路径：
 
-- `mock`：返回受控 mock executor result，用于验证 contract。
-- `dry-run`：验证路由和响应结构，不调用真实 provider。
-- `real-readonly`：当前是 stub route，用于验证未来 adapter 形态。
-- invalid payload：在派发 Executor 前阻断。
-- high-risk request：进入人工审核 / 阻断行为。
-- workflow validation：可在本地检查所有导出的 workflow JSON。
-- import readiness：已文档化并可检查 workflow 导入顺序和绑定提醒。
+| 路径 | 需要 API key？ | 需要 n8n runtime？ | 验证什么 |
+|---|---:|---:|---|
+| 本地 demo path | 不需要 | 不需要 | 使用 sample data 本地回放 sanitized review cycle |
+| n8n workflow path | 不需要 | 需要 | 导入并验证 GoalDriven workflow skeleton |
+| real provider sandbox path | 需要，放在你自己的 n8n Credentials 中 | 需要 | 运行 read-only provider sandbox，输出仍然 `needs_review` |
 
-## Safety Status
+当前能力包括：
 
-- workflow 导出默认 inactive。
-- workflow JSON 中没有真实 API key 或 webhook secret。
-- `.env.example` 只包含 placeholder 变量名。
-- 执行边界由 `max_iterations` 和 `timeout_minutes` 约束。
-- high-risk 请求会被阻断或要求人工审核。
-- 当前 Executor 不执行 shell、文件写入、Git 操作或外部写操作。
-- 真实 provider 接入会放在未来 adapter 和 credential 边界之后。
-
-## Why This Project Exists
-
-很多 AI Agent demo 会直接从 prompt 跳到自动化执行。但在真实产品里，更难的是 Agent 外围的控制平面：
-
-- 系统到底要完成什么目标？
-- 什么标准算成功？
-- workflow 如何停止？
-- 输出无效或不完整时怎么办？
-- 高风险动作在哪里进入人工审核？
-- workflow 如何被测试、导入、review，并以代码方式版本管理？
-
-Auto Agent Factory 把这些问题当成 workflow architecture 问题。这个项目的目标是先做出一个更安全、可复用的 Agent orchestration skeleton，再逐步加入高成本或高风险的 provider integration。
-
-## What It Does
-
-- 接收包含 `goal`、`criteria` 和执行限制的结构化 goal request。
-- 在派发任务前校验 payload。
-- 将 high-risk 请求路由到人工审核边界。
-- 初始化 run 和 task 标识。
-- 派发一轮有边界的 executor iteration。
-- 将 executor 输出标准化为 `agent_result` contract。
-- 根据 acceptance criteria 检查 evidence。
-- 返回 final report、next iteration instruction、stop response、blocked response 或 error context。
-- 将 workflow JSON、examples、tests、validation scripts 和运行文档保存在 Git 中。
-
-## Why Star This Project?
-
-如果你关注以下方向，可以 Star 这个仓库：
-
-- 基于 n8n 的 goal-driven AI Agent workflow pattern
-- 在真实 provider 成本和风险之前先做 mock-first validation
-- 用明确 criteria 取代模糊的“Agent 已完成”说法
-- 面向 high-risk action 的 human-reviewable safety boundary
-- 将 workflow JSON 当作代码管理和测试
-- 后续真实 LLM adapter、Codex/coding-agent adapter、run history 和 observability 的实践路线
-
-## Architecture
-
-```mermaid
-flowchart TD
-    A["Goal Request\n(goal + criteria + limits)"] --> B["[GoalDriven] 01 Master"]
-    B --> C["Payload Validator"]
-    C --> D{"Manual Approval /\nSafety Boundary"}
-    D -->|blocked or invalid| R1["Blocked Response"]
-    D -->|validated| E["Task Initializer\nrun_id + task_id"]
-    E --> F["Agent Dispatcher"]
-    F --> G["[GoalDriven] 02 Agent Task Executor"]
-    G --> H["Mode Router\nmock / dry-run / real-readonly"]
-    H --> I["Result Normalizer\nagent_result contract"]
-    I --> J["[GoalDriven] 03 Criteria Checker"]
-    J --> K["Criteria Router"]
-    K -->|criteria met| L["Final Reporter"]
-    K -->|not met + retry allowed| M["Next Iteration Instruction"]
-    K -->|limit reached| N["Stop Reporter"]
-    B -. execution failure .-> O["[GoalDriven] 04 Error Handler"]
-    G -. execution failure .-> O
-    J -. execution failure .-> O
-```
-
-## Workflow Modules
-
-| Module | File | Responsibility | Current status |
-|---|---|---|---|
-| Goal-Driven Master Workflow | `workflows/goal_driven_master.workflow.json` | 接收 goal payload、校验输入、初始化 run/task ID、调度 Executor 和 Checker、返回最终响应。 | 已实现 |
-| Agent Task Executor Workflow | `workflows/agent_task_executor.workflow.json` | 执行一轮有边界的任务，并返回标准化 `agent_result`。 | 已实现 `mock`、`dry-run`、`real-readonly` stub modes |
-| Criteria Checker Workflow | `workflows/criteria_checker.workflow.json` | 根据 criteria 评估 executor evidence，返回 pass/fail/unknown checks。 | 已实现 |
-| Goal-Driven Error Handler Workflow | `workflows/error_handler.workflow.json` | 处理失败的 workflow execution 并输出恢复上下文。 | 已实现 |
+- 4 个可导入的 n8n workflow JSON
+- `mock`、`dry-run`、`real-readonly` stub 和 read-only provider sandbox 模式
+- 基于 criterion-indexed evidence 的 Criteria Checker 对齐
+- high-risk approval gate 和 forbidden action rejection
+- sanitized audit record schema / sanitizer
+- audit review report generator
+- human sign-off review package generator
+- dev-only human decision ledger
+- 本地端到端 review cycle replay
+- 一条命令运行本地 demo
 
 ## Quick Start
 
@@ -132,190 +63,189 @@ flowchart TD
 npm install
 ```
 
-运行测试：
+运行最安全的本地 demo：
+
+```bash
+npm run demo:local
+```
+
+这个命令只在仓库本地运行。它不会连接 n8n runtime，不会调用真实 provider，也不需要 API key。它可能在 `.local-audit/` 下生成 dev-only artifact，该目录已被 Git 忽略。
+
+运行核心校验：
 
 ```bash
 npm test
-```
-
-校验 workflow JSON：
-
-```bash
 npm run workflow:validate:all
-```
-
-运行 dry-run 部署检查：
-
-```bash
 npm run workflow:dry-run
-```
-
-检查 n8n import readiness：
-
-```bash
 npm run import:check
 ```
 
-可选：生成 smoke-test payload：
+基于 sanitized sample record 生成本地 review artifact：
 
 ```bash
-npm run smoke:goal-driven
+npm run audit:report
+npm run audit:signoff
+npm run audit:cycle:replay
 ```
 
-## Import into n8n
+## Architecture Snapshot
 
-建议按以下顺序导入：
+| 层 | 作用 | 当前验证点 |
+|---|---|---|
+| GoalDriven Master | intake、payload validation、安全路由、Executor/Checker 编排 | 可导入的 inactive workflow JSON |
+| Agent Task Executor | 一轮有边界的执行 iteration | `mock`、`dry-run`、`real-readonly`、read-only provider sandbox |
+| Criteria Checker | 根据 criteria 评估 evidence | 已验证 criterion-indexed evidence contract |
+| Error Handler | 捕获失败 workflow execution | 已实现 n8n Error Trigger workflow |
+| Safety boundary | 防止不安全自动化 | high-risk approval gate 和 forbidden action rejection |
+| Audit / sign-off | 本地可读人工审核闭环 | sanitized record → report → sign-off → decision ledger → summary |
 
-1. `[GoalDriven] 02 Agent Task Executor`  
-   `workflows/agent_task_executor.workflow.json`
-2. `[GoalDriven] 03 Criteria Checker`  
-   `workflows/criteria_checker.workflow.json`
-3. `[GoalDriven] 04 Error Handler`  
-   `workflows/error_handler.workflow.json`
-4. `[GoalDriven] 01 Master`  
-   `workflows/goal_driven_master.workflow.json`
+```mermaid
+flowchart TD
+    A["Goal Request\ngoal + criteria + limits"] --> B["[GoalDriven] 01 Master"]
+    B --> C["Payload Validator"]
+    C --> D{"Safety Boundary\napproval / forbidden checks"}
+    D -->|invalid / blocked| R["Blocked Response"]
+    D -->|validated| E["Task Initializer\nrun_id + task_id"]
+    E --> F["Agent Dispatcher"]
+    F --> G["[GoalDriven] 02 Agent Task Executor"]
+    G --> H{"Mode Router"}
+    H -->|mock| H1["Mock Adapter"]
+    H -->|dry-run| H2["Dry-run Adapter"]
+    H -->|real-readonly| H3["Read-only Provider Path"]
+    H1 --> I["Result Normalizer\nagent_result"]
+    H2 --> I
+    H3 --> I
+    I --> J["[GoalDriven] 03 Criteria Checker"]
+    J --> K{"Criteria Result"}
+    K -->|met| L["Final Reporter"]
+    K -->|not met| M["Next Action / Stop"]
+    B -. execution failure .-> O["[GoalDriven] 04 Error Handler"]
+    G -. execution failure .-> O
+    J -. execution failure .-> O
+```
 
-导入后请确认：
+## 导入 n8n
 
-- workflows 默认保持 inactive
-- Executor 和 Checker 以 `When Executed by Another Workflow` 开头
-- Error Handler 以 `Error Trigger` 开头
-- Master 的 sub-workflow bindings 指向正确的 Executor 和 Checker
-- Master 的 error workflow 指向 Error Handler
+按这个顺序导入 workflow：
 
-详细说明：
+1. `[GoalDriven] 02 Agent Task Executor` — `workflows/agent_task_executor.workflow.json`
+2. `[GoalDriven] 03 Criteria Checker` — `workflows/criteria_checker.workflow.json`
+3. `[GoalDriven] 04 Error Handler` — `workflows/error_handler.workflow.json`
+4. `[GoalDriven] 01 Master` — `workflows/goal_driven_master.workflow.json`
+
+导入后需要人工确认 sub-workflow bindings。跨 n8n 实例导入时，可能需要重新选择 Executor、Checker 和 Error Handler。
+
+相关文档：
 
 - [`docs/IMPORT_ORDER.md`](docs/IMPORT_ORDER.md)
 - [`docs/MANUAL_IMPORT_CHECKLIST.md`](docs/MANUAL_IMPORT_CHECKLIST.md)
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
 - [`docs/VALIDATION_LOG.md`](docs/VALIDATION_LOG.md)
-- [`docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md`](docs/V0_3A_REAL_READONLY_UI_VERIFICATION.md)
 
-## Safety & Cost Boundaries
+## Real Provider Sandbox
 
-这个项目有意不做无边界自治 Agent。
+真实 provider 路径当前保持 read-only。它用于生成结构化 summary、intended actions、evidence 和 risk context，但输出仍然面向 review，不会自动执行真实写操作。
 
-当前边界：
-
-- mock-first 实现
-- dry-run 执行路径
-- `real-readonly` 是 stub，不是真实 provider call
-- high-risk payload 的人工审核门
-- `max_iterations` 限制
-- `timeout_minutes` 限制
-- workflow JSON 导出默认 inactive
-- workflow JSON 中没有真实 API keys 或 secrets
-- `.env.example` 只包含 placeholder 变量名
-- 不执行外部写操作、shell、文件写入或 Git 修改
-
-接入真实 provider 前，应将 provider call 放在 backend、n8n credential 或 adapter 边界之后。不要在 frontend code 或公开 workflow export 中暴露 OpenAI、ElevenLabs、n8n webhook secrets 或其他 credentials。
+如果要测试这条路径，请使用你自己的本地 n8n 和自己的 provider key，并把 key 放在 n8n Credentials 中。不要把 provider key 写进 workflow JSON、docs、examples、prompt 或 Git。
 
 相关文档：
 
-- [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md)
+- [`docs/V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md`](docs/V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md)
+- [`docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md`](docs/ADR_0001_REAL_READONLY_PROVIDER_SELECTION.md)
 - [`docs/REAL_PROVIDER_ADAPTER_DESIGN.md`](docs/REAL_PROVIDER_ADAPTER_DESIGN.md)
-- [`docs/n8n-security-checklist.md`](docs/n8n-security-checklist.md)
 
-## Project Status
+## 安全边界
 
-当前发布目标：**v0.3.0 Mock-First MVP Validation**。
+Auto Agent Factory 默认非常保守：
 
-已实现并验证：
+- workflow 导出默认 inactive
+- workflow JSON 中不写 API key
+- 不提交 `.env`
+- 不提交 `.local-audit/`
+- docs / examples 中不写 credential 明文
+- repo fixture 中不保存 provider raw response
+- audit record 中不保存完整 prompt / messages
+- 不执行 shell
+- 不修改 Git
+- 不启用 workflow file write action
+- 不启用 external write action
+- 不启用 production database 或 hosted user system
+- 不做 production autonomous Agent execution
 
-- `workflows/` 中的 4 个正式 n8n workflow JSON
-- workflow contract validation scripts
-- import readiness check script
-- dry-run deployment script
-- Node test suite，覆盖 schemas、scoring、workflow contracts
-- `goal`、`task`、`result` JSON schemas
-- master、subagent、criteria checker prompt templates
-- sample goal、success result、failed result 和 final report examples
-- valid input、missing fields、high-risk approval、dry-run mode、real-readonly stub mode 的 manual test payloads
-- Runbook、import order、manual import checklist、production readiness checklist、real provider adapter design
-- Mode Router regression fix 和 validation trail
-- 围绕 `max_iterations`、`timeout_minutes`、manual review、inactive workflow exports 的 safety documentation
+提交前请检查 diff 中不要出现：
 
-尚未实现：
+```text
+Bearer <secret>
+真实 API key
+.env
+credential 明文
+.local-audit/
+provider raw response
+full prompt / messages
+```
 
-- 真实 LLM execution
-- 真实 Codex/coding-agent automation
-- 真实 provider API calls
-- persistent run history
-- hosted dashboard
-- multi-user permissions
-- 生产自主执行
-- 真实用户数据处理
+## 这个项目不是什么
+
+它不是：
+
+- SaaS 产品
+- 多用户生产审批系统
+- 生产级自治 coding agent
+- n8n 安全配置的替代品
+- 默认可以安全写文件、改 Git、跑 shell 或调用外部写接口的 workflow
+- 存放 provider key 或私有用户数据的地方
+
+它是一个 open-source、local-first 的工具包，用来学习、验证和扩展更安全的 Agent workflow pattern。
+
+## 仓库结构
+
+```text
+workflows/              n8n workflow JSON exports
+docs/                   architecture、runbook、安全文档、release notes
+examples/               安全 sample payload 和 sanitized fixtures
+src/schema/             workflow / audit contract JSON schemas
+src/utils/              validation、scoring、sanitizer、report utilities
+scripts/                validation、import checks、demo 和 audit CLIs
+tests/                  Node test suite
+.local-audit/           dev-only generated artifacts，已被 Git 忽略
+```
+
+## 文档入口
+
+Start here：
+
+- [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md) — 最快的安全本地 demo 路径
+- [`docs/WORKFLOW_DESIGN.md`](docs/WORKFLOW_DESIGN.md) — workflow 架构和模块职责
+- [`docs/MILESTONE_SUMMARY.md`](docs/MILESTONE_SUMMARY.md) — 项目阶段和当前验证点
+- [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
+- [`docs/README.md`](docs/README.md) — 完整文档索引
+
+开源协作：
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- [`SECURITY.md`](SECURITY.md)
+- [`LICENSE`](LICENSE)
+- [`docs/OPEN_SOURCE_RELEASE_CHECKLIST.md`](docs/OPEN_SOURCE_RELEASE_CHECKLIST.md)
 
 ## Roadmap
 
-- 在现有 adapter contract 后接入真实 LLM provider
-- Codex / coding-agent executor adapter
-- Persistent run history
-- Web dashboard for monitoring executions
-- Human approval UI
-- Evaluation reports
-- Multi-agent task routing
-- RAG / knowledge base integration
-- 更完整的 execution metrics 和 observability
+近期：
 
-这些是计划中的里程碑，不是当前能力。
+- 稳定 v1.0 release-candidate docs 和本地 demo path
+- 继续保持 real provider read-only first
+- 只有在截图真实反映当前仓库状态时才补充截图
+- 增强 ambiguous evidence 的 evaluator quality tests
 
-## GitHub Display Assets
+后续：
 
-当前还没有真实截图，本 README 不使用伪造截图。
+- 在同一个 `agent_result` contract 后增加可选 provider adapters
+- 在显式人工审批之后再设计 Codex / coding-agent executor adapter
+- 如有必要，再设计 production-grade persistence
+- 如果项目超出 local-first 范围，再考虑 hosted dashboard / approval UI
+- multi-agent task routing 和 RAG / knowledge-base adapters
 
-计划补充的素材记录在 [`docs/ASSETS_TODO.md`](docs/ASSETS_TODO.md)，包括：
-
-- n8n master workflow screenshot
-- executor workflow screenshot
-- criteria checker workflow screenshot
-- error handler screenshot
-- sample execution output
-- architecture diagram image
-
-## Repository Structure
-
-```text
-.
-├── README.md
-├── README.zh-CN.md
-├── CHANGELOG.md
-├── LICENSE
-├── docs/
-│   ├── PROJECT_BRIEF.md
-│   ├── PORTFOLIO_CASE_STUDY.md
-│   ├── RUNBOOK.md
-│   ├── IMPORT_ORDER.md
-│   ├── MANUAL_IMPORT_CHECKLIST.md
-│   ├── PRODUCTION_READINESS.md
-│   ├── REAL_PROVIDER_ADAPTER_DESIGN.md
-│   ├── RELEASE_NOTES_V0_3_0.md
-│   └── ASSETS_TODO.md
-├── workflows/
-│   ├── goal_driven_master.workflow.json
-│   ├── agent_task_executor.workflow.json
-│   ├── criteria_checker.workflow.json
-│   └── error_handler.workflow.json
-├── examples/
-│   ├── sample_goal_request.json
-│   ├── sample_agent_result_success.json
-│   ├── sample_agent_result_failed.json
-│   ├── sample_final_report.md
-│   └── manual-test-payloads/
-├── src/
-│   ├── schema/
-│   ├── prompts/
-│   └── utils/
-├── tests/
-├── scripts/
-├── n8n/
-├── .github/
-├── .env.example
-└── package.json
-```
-
-`n8n/` 目录保留了早期 Codex planner/reviewer workflow prototype，作为参考材料。当前 Auto Agent Factory v0.3.0 validation 工作主要位于 `workflows/`、`docs/`、`examples/`、`src/` 和 `tests/`。
+Roadmap 是规划，不是当前能力。
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE).
+MIT。见 [`LICENSE`](LICENSE)。

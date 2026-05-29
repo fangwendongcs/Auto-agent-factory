@@ -4,6 +4,29 @@ All notable changes to Auto Agent Factory will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses semantic versioning where practical during MVP validation.
 
+## [1.0.0-rc.1] - 2026-05-29
+
+### Added
+
+- Open-source release-candidate positioning for Auto Agent Factory as a local-first AI Agent governance toolkit.
+- One-command local demo path with `npm run demo:local`.
+- Sanitized audit record, audit report, human sign-off review, decision ledger, and local review cycle replay documentation.
+- Copy-ready v1.0 release-candidate notes.
+- `CONTRIBUTING.md`, `SECURITY.md`, and open-source release checklist.
+- English and Chinese README updates for local demo, n8n workflow, and real provider sandbox usage paths.
+
+### Changed
+
+- Updated package metadata to `1.0.0-rc.1` for release-candidate preparation while keeping npm publishing disabled.
+- Reframed README as an open-source landing page rather than an internal phase log.
+- Reorganized documentation index by local demo, workflows, safety/governance, audit/sign-off, release notes, and advanced setup.
+
+### Safety
+
+- Reconfirmed that this release candidate is not a production autonomous agent.
+- Reconfirmed that provider use remains read-only / review-oriented.
+- Reconfirmed that no shell execution, Git modification, workflow file write, or external write action is enabled by default.
+
 ## [0.3.0] - 2026-05-26
 
 ### Added
