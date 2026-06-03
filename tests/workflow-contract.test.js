@@ -217,3 +217,171 @@ test('master blocked response includes approval decision contract', () => {
   assert.equal(result.approval_decision.blocked, true);
   assert.equal(result.note, 'Forbidden action rejected before task initialization.');
 });
+
+test('executor provider aliases normalize to real-readonly provider execution', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const promptBuilder = executor.nodes.find((node) => node.name === 'Prompt Builder');
+  const runPromptBuilder = new Function('$json', promptBuilder.parameters.jsCode);
+
+  const baseInput = {
+    run_id: 'gd_test_provider',
+    task_id: 'task_test_provider',
+    goal: 'Generate read-only provider evidence',
+    criteria: ['Return evidence'],
+    iteration: 1,
+    instruction: 'Read-only provider call only',
+    status: 'validated',
+    risk_level: 'low',
+    human_approved: true,
+    provider_credential_ready: true,
+    context: {
+      provider_base_url: 'https://api.deepseek.com',
+      provider_model: 'deepseek-v4-pro',
+      provider_credential_name: 'goald-openai-compatible-readonly',
+    },
+  };
+
+  for (const patch of [
+    { provider_execution: 'provider' },
+    { provider_mode: 'provider' },
+    { requested_provider_mode: 'provider' },
+    { agent_mode: 'provider' },
+    { context: { provider_mode: 'provider' } },
+    { context: { agent_mode: 'provider' } },
+  ]) {
+    const input = {
+      ...baseInput,
+      ...patch,
+      context: {
+        ...baseInput.context,
+        ...(patch.context || {}),
+      },
+    };
+    const result = runPromptBuilder(input)[0].json;
+
+    assert.equal(result.provider_mode, 'real-readonly');
+    assert.equal(result.agent_mode, 'real-readonly');
+    assert.equal(result.provider_execution, 'provider');
+    assert.equal(result.context.provider_mode, 'real-readonly');
+    assert.equal(result.context.agent_mode, 'real-readonly');
+    assert.equal(result.context.provider_execution, 'provider');
+    assert.deepEqual(result.mode_warnings, []);
+  }
+});
+
+test('executor mode router provider path connects to provider request path and mock remains fallback', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+
+  const modeRouterConnections = executor.connections['Mode Router'].main;
+  assert.equal(modeRouterConnections[0][0].node, 'Real-readonly Provider Selector');
+  assert.equal(modeRouterConnections[1][0].node, 'Dry-run Provider Adapter');
+  assert.equal(modeRouterConnections[2][0].node, 'Mock Agent Adapter');
+
+  const selectorConnections = executor.connections['Real-readonly Provider Selector'].main;
+  assert.equal(selectorConnections[0][0].node, 'Resolve Provider Runtime Config');
+  assert.equal(selectorConnections[1][0].node, 'Real-readonly Provider Adapter');
+
+  const requestPath = [
+    ['Resolve Provider Runtime Config', 'Real-readonly Safety Check'],
+    ['Real-readonly Safety Check', 'OpenAI-compatible Provider Request Builder'],
+    ['OpenAI-compatible Provider Request Builder', 'OpenAI-compatible Provider Call Router'],
+    ['OpenAI-compatible Provider Call Router', 'OpenAI-compatible HTTP Request'],
+    ['OpenAI-compatible HTTP Request', 'OpenAI-compatible Response Envelope'],
+    ['OpenAI-compatible Response Envelope', 'Provider Response Normalizer'],
+    ['Provider Response Normalizer', 'Result Normalizer'],
+  ];
+  const edges = flattenEdges(executor.connections);
+
+  for (const [from, to] of requestPath) {
+    assert.equal(
+      edges.some((edge) => edge.from === from && edge.to === to),
+      true,
+      `${from} should connect to ${to}`
+    );
+  }
+});
+
+test('executor mock mode still resolves to mock adapter route', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const promptBuilder = executor.nodes.find((node) => node.name === 'Prompt Builder');
+  const runPromptBuilder = new Function('$json', promptBuilder.parameters.jsCode);
+
+  const result = runPromptBuilder({
+    run_id: 'gd_test_mock',
+    task_id: 'task_test_mock',
+    goal: 'Run mock only',
+    criteria: ['Return mock result'],
+    iteration: 1,
+    instruction: 'Mock path',
+    status: 'validated',
+    agent_mode: 'mock',
+  })[0].json;
+
+  assert.equal(result.provider_mode, 'mock');
+  assert.equal(result.agent_mode, 'mock');
+  assert.equal(result.provider_execution, undefined);
+  assert.equal(result.context.provider_execution, undefined);
+});
+
+test('master payload validator preserves provider runtime config and credential readiness flag', () => {
+  const master = readWorkflow('workflows/goal_driven_master.workflow.json');
+  const validator = master.nodes.find((node) => node.name === 'Payload Validator');
+  const runValidator = new Function('$json', validator.parameters.jsCode);
+
+  const result = runValidator({
+    goal: 'Generate read-only provider evidence',
+    criteria: [{ criterion: 'Return provider evidence without writing files' }],
+    provider_execution: 'provider',
+    provider_mode: 'provider',
+    provider_credential_ready: true,
+    context: {
+      provider_base_url: 'https://api.deepseek.com',
+      provider_model: 'deepseek-v4-pro',
+      provider_credential_name: 'goald-openai-compatible-readonly',
+    },
+    risk_level: 'low',
+    action_class: 'read_only',
+    human_approved: true,
+  })[0].json;
+
+  assert.equal(result.status, 'validated');
+  assert.equal(result.provider_execution, 'provider');
+  assert.equal(result.provider_mode, 'provider');
+  assert.equal(result.provider_credential_ready, true);
+  assert.equal(result.provider_base_url, 'https://api.deepseek.com');
+  assert.equal(result.provider_model, 'deepseek-v4-pro');
+  assert.equal(result.provider_credential_name, 'goald-openai-compatible-readonly');
+  assert.deepEqual(result.criteria, ['Return provider evidence without writing files']);
+  assert.notEqual(result.criteria[0], '[object Object]');
+});
+
+test('executor task validator normalizes criteria objects without [object Object]', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const validator = executor.nodes.find((node) => node.name === 'Task Validator');
+  const runValidator = new Function('$json', validator.parameters.jsCode);
+
+  const result = runValidator({
+    run_id: 'gd_test_criteria',
+    task_id: 'task_test_criteria',
+    goal: 'Normalize criteria',
+    criteria: [
+      { criterion: 'Criterion field wins' },
+      { description: 'Description fallback works' },
+    ],
+    iteration: 1,
+    instruction: 'Validate only',
+    status: 'validated',
+  })[0].json;
+
+  assert.deepEqual(result.validation_errors, []);
+  assert.deepEqual(result.criteria, ['Criterion field wins', 'Description fallback works']);
+  assert.equal(result.criteria.includes('[object Object]'), false);
+});
+
+test('workflow JSON does not contain literal bearer or sk-like secrets', () => {
+  for (const filePath of workflowFiles) {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    assert.equal(/Bearer\s+[A-Za-z0-9._~+/=-]{20,}/.test(raw), false, `${filePath} contains a Bearer-like token`);
+    assert.equal(/sk-[A-Za-z0-9_-]{20,}/.test(raw), false, `${filePath} contains an sk-like token`);
+  }
+});
