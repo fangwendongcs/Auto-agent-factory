@@ -484,3 +484,29 @@ V0.4 real provider adapter design
 - `max_iterations` 与 `timeout_minutes` 不是装饰项，而是停止边界
 - 真实 provider 接入前，先保留 mock 流程
 - 生产环境中的高风险任务必须保留人工审核入口
+
+## DeepSeek V4 Pro provider configuration
+
+For the OpenAI-compatible `real-readonly` provider path, the recommended DeepSeek V4 Pro runtime settings are:
+
+```bash
+OPENAI_COMPATIBLE_BASE_URL=https://api.deepseek.com
+OPENAI_COMPATIBLE_MODEL=deepseek-v4-pro
+```
+
+Create the n8n Header Auth credential named:
+
+```text
+goald-openai-compatible-readonly
+```
+
+Use:
+
+```text
+Header Name: Authorization
+Header Value: Bearer <YOUR_DEEPSEEK_API_KEY>
+```
+
+Never place the real key in workflow JSON, docs, examples, tests, commits, or GitHub. The HTTP Request node must use n8n credential injection and should POST to `/chat/completions`.
+
+Detailed setup: [`DEEPSEEK_V4_PRO_PROVIDER_SETUP.md`](DEEPSEEK_V4_PRO_PROVIDER_SETUP.md).

@@ -35,6 +35,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md`](V0.4C_REAL_READONLY_IMPLEMENTATION_PLAN.md) — minimal implementation plan for the OpenAI-compatible real-readonly provider path.
 - [`V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md`](V0.5_REAL_PROVIDER_SANDBOX_TEST_PLAN.md) — sandbox test plan for the first real provider validation.
 - [`V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md`](V0.5_SANDBOX_MANUAL_SETUP_CHECKLIST.md) — manual n8n setup checklist before a real provider sandbox call.
+- [`DEEPSEEK_V4_PRO_PROVIDER_SETUP.md`](DEEPSEEK_V4_PRO_PROVIDER_SETUP.md) — DeepSeek V4 Pro OpenAI-compatible read-only provider setup without storing API keys in Git.
 - [`V0.6_EVALUATOR_QUALITY_PLAN.md`](V0.6_EVALUATOR_QUALITY_PLAN.md) — evaluator quality, criteria/evidence alignment, and safety hardening plan.
 - [`V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md`](V0.7_CONTROLLED_EXECUTION_BOUNDARIES.md) — controlled execution boundary design and V0.7 runtime verification before enabling any real write actions.
 - [`V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md`](V0.8_STAGING_PILOT_AUDIT_ROLLBACK_DESIGN.md) — staging pilot, audit logging, approval record, run history, failure recovery, rollback, and no-write default design.
