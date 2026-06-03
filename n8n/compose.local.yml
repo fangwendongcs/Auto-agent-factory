@@ -1,0 +1,24 @@
+services:
+  n8n:
+    image: ${N8N_DOCKER_IMAGE:-n8nio/n8n:latest}
+    container_name: auto-agent-factory-n8n
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    environment:
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - NODE_ENV=production
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Shanghai}
+      - TZ=${TZ:-Asia/Shanghai}
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-replace-with-local-value-before-real-credentials}
+      - OPENAI_COMPATIBLE_BASE_URL=${OPENAI_COMPATIBLE_BASE_URL:-https://api.deepseek.com}
+      - OPENAI_COMPATIBLE_MODEL=${OPENAI_COMPATIBLE_MODEL:-deepseek-v4-pro}
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:

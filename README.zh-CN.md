@@ -67,7 +67,8 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | Human sign-off review | 已支持 | `npm run audit:signoff` |
 | Decision ledger replay | dev-only | `npm run audit:cycle:replay` |
 | Action drafts | 只生成草稿 | `npm run action:draft` |
-| DeepSeek provider run | 后续 read-only 路径 | `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` |
+| 本地 n8n runtime health | 离线/在线检查 | `npm run runtime:health:offline` |
+| DeepSeek provider run | read-only sandbox 触发器 | `npm run sandbox:deepseek:readonly` |
 | 生产写操作 | 未启用 | 安全边界 |
 
 ## Quick Start
@@ -107,6 +108,18 @@ npm run audit:cycle:replay
 
 ```bash
 npm run action:draft
+```
+
+不要求 n8n 正在运行的本地 runtime 检查：
+
+```bash
+npm run runtime:health:offline
+```
+
+生成 DeepSeek read-only sandbox payload，但默认不发送：
+
+```bash
+npm run sandbox:deepseek:readonly
 ```
 
 ## Architecture Snapshot
@@ -239,6 +252,8 @@ Start here：
 - [`docs/WORKFLOW_DESIGN.md`](docs/WORKFLOW_DESIGN.md) — workflow 架构和模块职责
 - [`docs/MILESTONE_SUMMARY.md`](docs/MILESTONE_SUMMARY.md) — 项目阶段和当前验证点
 - [`docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — 从 V0.13 RC 走向本地生产工作流的后续路线
+- [`docs/V0.15_LOCAL_RUNTIME_HARDENING.md`](docs/V0.15_LOCAL_RUNTIME_HARDENING.md) — Docker/n8n 本地长期运行和健康检查
+- [`docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md`](docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox 运行说明
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — 完整文档索引
 

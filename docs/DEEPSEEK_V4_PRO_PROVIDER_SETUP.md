@@ -65,6 +65,24 @@ Alternative request/context overrides are supported for local testing:
 
 Do not include an API key in the payload.
 
+## Local sandbox trigger
+
+Generate the DeepSeek read-only sandbox payload without sending it:
+
+```bash
+npm run sandbox:deepseek:readonly
+```
+
+After local n8n is running, workflows are imported, and the credential exists in n8n, explicitly enable the local POST:
+
+```bash
+DEEPSEEK_SANDBOX_SEND_ENABLED=true \
+N8N_TEST_WEBHOOK_URL=http://localhost:5678/webhook/<your-local-test-path> \
+npm run sandbox:deepseek:readonly
+```
+
+The script does not read or send API keys. Authorization must come from n8n Credentials.
+
 ## Workflow nodes to verify
 
 In `[GoalDriven] 02 Agent Task Executor`, verify these nodes:

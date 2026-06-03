@@ -27,8 +27,8 @@ The system is still not a production autonomous agent. It remains local-first, r
 | Milestone | Focus | Exit criteria |
 |---|---|---|
 | V0.14 Project State Closeout | Make the repo easy to evaluate and verify as an Agent governance project | Version language, README, local demo acceptance, capability matrix, roadmap, and safety boundary all describe the current V0.13+ baseline accurately |
-| V0.15 Local Runtime Hardening | Make local Docker and n8n runtime checks repeatable | Local n8n startup, workflow import, workflow binding review, and health checks are documented and reproducible |
-| V0.16 Real DeepSeek Read-only Run | Validate real provider output without enabling writes | DeepSeek runs through the OpenAI-compatible read-only path, returns `agent_result`, writes sanitized run summary, and ends in review-oriented status |
+| V0.15 Local Runtime Hardening | Make local Docker and n8n runtime checks repeatable | Local n8n startup, workflow import, workflow binding review, and offline/online health checks are documented and reproducible |
+| V0.16 Real DeepSeek Read-only Run | Validate real provider output without enabling writes | DeepSeek sandbox payload generation is safe by default; real local POST is gated by explicit env flags and produces a sanitized provider run summary |
 | V0.17 Recovery Policy | Make failures classifiable and recoverable | Failures map to `retry`, `stop`, or `needs_review`; retries and timeouts stay bounded |
 | V0.18 Human Approval Console Lite | Keep high-risk work behind local review | High-risk runs generate local review artifacts; approval or rejection is recorded in the decision ledger only |
 | V0.19 Action Drafts | Generate handoff drafts instead of executing writes | Codex prompt, GitHub Issue draft, commit message, and test commands are generated for human review |
@@ -59,6 +59,7 @@ Baseline validation remains:
 ```bash
 npm test
 npm run workflow:validate:all
+npm run runtime:health:offline
 npm run demo:local
 ```
 
@@ -69,6 +70,21 @@ npm run action:draft
 ```
 
 This prints a Markdown draft to stdout. It does not write files, connect to n8n, modify Git, run shell commands from the draft, or call external write APIs.
+
+Check the local runtime:
+
+```bash
+npm run runtime:health:offline
+npm run runtime:health
+```
+
+Prepare a DeepSeek read-only sandbox payload:
+
+```bash
+npm run sandbox:deepseek:readonly
+```
+
+The DeepSeek sandbox script sends to n8n only when `DEEPSEEK_SANDBOX_SEND_ENABLED=true`.
 
 ## V1.0 safety line
 

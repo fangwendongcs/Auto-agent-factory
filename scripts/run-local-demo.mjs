@@ -22,6 +22,11 @@ const steps = [
     args: ['scripts/validate-all-workflows.mjs', 'workflows']
   },
   {
+    name: 'local runtime offline health',
+    command: process.execPath,
+    args: ['scripts/check-local-runtime-health.mjs', '--offline']
+  },
+  {
     name: 'audit report',
     command: process.execPath,
     args: ['scripts/generate-audit-review-report.mjs', 'examples/audit-replay/v08f-read-only-run-record.json']

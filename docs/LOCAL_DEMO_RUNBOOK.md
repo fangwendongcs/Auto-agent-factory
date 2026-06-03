@@ -15,6 +15,7 @@ V0.13 Local Demo / Release Candidate Packaging
 Validated local capabilities:
 
 - workflow JSON validation
+- local runtime offline health check
 - sanitized audit record fixture
 - audit review report generation
 - human sign-off review package generation
@@ -37,6 +38,7 @@ This runs:
 ```text
 npm test
 npm run workflow:validate:all
+npm run runtime:health:offline
 npm run audit:report
 npm run audit:signoff
 npm run action:draft
@@ -52,6 +54,7 @@ If you prefer to inspect each step manually:
 ```bash
 npm test
 npm run workflow:validate:all
+npm run runtime:health:offline
 npm run audit:report
 npm run audit:signoff
 npm run action:draft

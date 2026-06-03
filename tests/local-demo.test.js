@@ -19,6 +19,8 @@ test('local demo script runs safe repo-side validation and replay flow', {
   assert.match(result.stdout, /Auto Agent Factory Local Demo/);
   assert.match(result.stdout, /Local demo step: test suite/);
   assert.match(result.stdout, /Local demo step: workflow validation/);
+  assert.match(result.stdout, /Local demo step: local runtime offline health/);
+  assert.match(result.stdout, /Local demo step: action draft handoff/);
   assert.match(result.stdout, /Local demo step: local review cycle replay/);
   assert.match(result.stdout, /Local demo completed/);
   assert.equal(combined.includes(`${'Author'}ization`), false);

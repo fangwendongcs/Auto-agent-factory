@@ -67,7 +67,8 @@ Current capabilities include:
 | Human sign-off review | Supported | `npm run audit:signoff` |
 | Decision ledger replay | Dev-only | `npm run audit:cycle:replay` |
 | Action drafts | Draft-only | `npm run action:draft` |
-| DeepSeek provider run | Planned read-only path | `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` |
+| Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
+| DeepSeek provider run | Read-only sandbox trigger | `npm run sandbox:deepseek:readonly` |
 | Production write execution | Not enabled | Safety boundary |
 
 ## Quick start
@@ -107,6 +108,18 @@ Generate a draft-only handoff package for Codex, GitHub Issue, commit message, a
 
 ```bash
 npm run action:draft
+```
+
+Check local runtime readiness without requiring n8n to be running:
+
+```bash
+npm run runtime:health:offline
+```
+
+Prepare a DeepSeek read-only sandbox payload without sending it:
+
+```bash
+npm run sandbox:deepseek:readonly
 ```
 
 ## Architecture snapshot
@@ -239,6 +252,8 @@ Start here:
 - [`docs/WORKFLOW_DESIGN.md`](docs/WORKFLOW_DESIGN.md) — workflow architecture and module responsibilities
 - [`docs/MILESTONE_SUMMARY.md`](docs/MILESTONE_SUMMARY.md) — project evolution and current proof points
 - [`docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — next roadmap from V0.13 RC to local production workflow readiness
+- [`docs/V0.15_LOCAL_RUNTIME_HARDENING.md`](docs/V0.15_LOCAL_RUNTIME_HARDENING.md) — Docker/n8n local runtime and health checks
+- [`docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md`](docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox runbook
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — full documentation index
 
