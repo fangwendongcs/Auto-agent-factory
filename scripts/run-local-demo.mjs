@@ -32,6 +32,11 @@ const steps = [
     args: ['scripts/generate-human-signoff-review.mjs', 'examples/audit-replay/v08f-read-only-run-record.json']
   },
   {
+    name: 'action draft handoff',
+    command: process.execPath,
+    args: ['scripts/generate-action-draft.mjs', 'examples/audit-replay/v08f-read-only-run-record.json']
+  },
+  {
     name: 'local review cycle replay',
     command: process.execPath,
     args: ['scripts/replay-local-review-cycle.mjs'],

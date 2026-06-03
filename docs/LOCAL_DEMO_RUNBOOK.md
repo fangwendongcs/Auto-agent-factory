@@ -18,6 +18,7 @@ Validated local capabilities:
 - sanitized audit record fixture
 - audit review report generation
 - human sign-off review package generation
+- draft-only action handoff generation
 - sanitized human decision record generation
 - dev-only local sign-off ledger append
 - ledger summary report
@@ -38,6 +39,7 @@ npm test
 npm run workflow:validate:all
 npm run audit:report
 npm run audit:signoff
+npm run action:draft
 npm run audit:cycle:replay
 ```
 
@@ -52,6 +54,7 @@ npm test
 npm run workflow:validate:all
 npm run audit:report
 npm run audit:signoff
+npm run action:draft
 npm run audit:cycle:replay
 ```
 
@@ -82,6 +85,7 @@ A successful demo should show:
 - all workflow JSON files validate with no warnings or errors
 - audit report prints a sanitized run summary
 - sign-off review prints a human checklist and manual sign-off block
+- action draft prints a Codex prompt, GitHub Issue draft, commit message, and test commands
 - cycle replay appends one dev-only decision record
 - ledger summary shows `Needs review: 1`
 - no real provider call is made

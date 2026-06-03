@@ -10,6 +10,8 @@ V0.13 Local Demo Release Candidate
 
 The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a read-only provider sandbox and a reproducible local demo path.
 
+The forward roadmap now starts from this V0.13 baseline. Do not restart the roadmap at V0.6; the audit, sign-off, local replay, and demo foundations already exist.
+
 ## Milestones
 
 | Milestone | Focus | Result |
@@ -46,10 +48,18 @@ The project is still not a production autonomous agent. It is a local, mock-firs
 - real Codex/coding-agent execution
 - public unauthenticated production webhook use
 
-## Next likely milestone
+## Next roadmap
 
 ```text
-V0.14 GitHub Presentation Polish / Release Notes
+V0.14 Project State Closeout
+V0.15 Local Runtime Hardening
+V0.16 Real DeepSeek Read-only Run
+V0.17 Recovery Policy
+V0.18 Human Approval Console Lite
+V0.19 Action Drafts
+V1.0 Local Production Workflow
 ```
 
-The goal is project presentation, not new automation capability.
+V0.14 is not presentation-only. It is the formal closeout of the current project state: version language, README, local demo acceptance, capability matrix, forward roadmap, and safety boundary must all be clear and verifiable.
+
+See `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` for the implementation-oriented path from the current release-candidate baseline to local production workflow readiness.

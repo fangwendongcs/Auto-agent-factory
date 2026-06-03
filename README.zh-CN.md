@@ -53,7 +53,22 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 - human sign-off review package generator
 - dev-only human decision ledger
 - 本地端到端 review cycle replay
+- 只生成草稿的 Codex / GitHub Issue / commit message / test commands 交接包
 - 一条命令运行本地 demo
+
+## 当前能力矩阵
+
+| 能力 | 状态 | 本地检查 |
+|---|---|---|
+| 版本和路线口径 | V0.14 正式收口 | `docs/MILESTONE_SUMMARY.md` |
+| 安全本地 demo | 已支持 | `npm run demo:local` |
+| Workflow JSON 校验 | 已支持 | `npm run workflow:validate:all` |
+| Audit report | 已支持 | `npm run audit:report` |
+| Human sign-off review | 已支持 | `npm run audit:signoff` |
+| Decision ledger replay | dev-only | `npm run audit:cycle:replay` |
+| Action drafts | 只生成草稿 | `npm run action:draft` |
+| DeepSeek provider run | 后续 read-only 路径 | `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` |
+| 生产写操作 | 未启用 | 安全边界 |
 
 ## Quick Start
 
@@ -86,6 +101,12 @@ npm run import:check
 npm run audit:report
 npm run audit:signoff
 npm run audit:cycle:replay
+```
+
+生成只读草稿交接包，包括 Codex 提示词、GitHub Issue 草稿、提交说明和测试命令：
+
+```bash
+npm run action:draft
 ```
 
 ## Architecture Snapshot
@@ -217,6 +238,7 @@ Start here：
 - [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md) — 最快的安全本地 demo 路径
 - [`docs/WORKFLOW_DESIGN.md`](docs/WORKFLOW_DESIGN.md) — workflow 架构和模块职责
 - [`docs/MILESTONE_SUMMARY.md`](docs/MILESTONE_SUMMARY.md) — 项目阶段和当前验证点
+- [`docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — 从 V0.13 RC 走向本地生产工作流的后续路线
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — 完整文档索引
 

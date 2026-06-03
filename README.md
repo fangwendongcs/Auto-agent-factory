@@ -53,7 +53,22 @@ Current capabilities include:
 - human sign-off review package generator
 - dev-only human decision ledger
 - local end-to-end review cycle replay
+- draft-only action handoff generator for Codex, GitHub Issue, commit message, and test commands
 - one-command local demo
+
+## Current capability matrix
+
+| Capability | Status | Local check |
+|---|---|---|
+| Version and roadmap clarity | V0.14 closeout | `docs/MILESTONE_SUMMARY.md` |
+| Safe local demo | Supported | `npm run demo:local` |
+| Workflow JSON validation | Supported | `npm run workflow:validate:all` |
+| Audit report | Supported | `npm run audit:report` |
+| Human sign-off review | Supported | `npm run audit:signoff` |
+| Decision ledger replay | Dev-only | `npm run audit:cycle:replay` |
+| Action drafts | Draft-only | `npm run action:draft` |
+| DeepSeek provider run | Planned read-only path | `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` |
+| Production write execution | Not enabled | Safety boundary |
 
 ## Quick start
 
@@ -86,6 +101,12 @@ Generate local review artifacts from sanitized sample records:
 npm run audit:report
 npm run audit:signoff
 npm run audit:cycle:replay
+```
+
+Generate a draft-only handoff package for Codex, GitHub Issue, commit message, and test commands:
+
+```bash
+npm run action:draft
 ```
 
 ## Architecture snapshot
@@ -217,6 +238,7 @@ Start here:
 - [`docs/LOCAL_DEMO_RUNBOOK.md`](docs/LOCAL_DEMO_RUNBOOK.md) — fastest safe local demo path
 - [`docs/WORKFLOW_DESIGN.md`](docs/WORKFLOW_DESIGN.md) — workflow architecture and module responsibilities
 - [`docs/MILESTONE_SUMMARY.md`](docs/MILESTONE_SUMMARY.md) — project evolution and current proof points
+- [`docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — next roadmap from V0.13 RC to local production workflow readiness
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — full documentation index
 

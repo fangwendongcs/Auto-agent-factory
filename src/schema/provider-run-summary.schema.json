@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/provider-run-summary.schema.json",
+  "title": "Provider Run Summary",
+  "description": "Sanitized provider execution summary. It must not include API keys, Authorization headers, raw provider responses, or full prompt messages.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "summary_version",
+    "run_id",
+    "task_id",
+    "provider",
+    "status",
+    "latency_ms",
+    "score",
+    "error"
+  ],
+  "properties": {
+    "summary_version": {
+      "type": "string",
+      "enum": [
+        "v0.16-provider-run-summary"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^gd_[A-Za-z0-9_-]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^task_[A-Za-z0-9_-]+$"
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "name",
+        "model"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "mock",
+            "dry-run",
+            "real-readonly"
+          ]
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "failed",
+        "timeout",
+        "needs_review",
+        "blocked"
+      ]
+    },
+    "latency_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "error": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "message"
+      ],
+      "properties": {
+        "class": {
+          "type": "string",
+          "enum": [
+            "input_error",
+            "provider_error",
+            "workflow_config_error",
+            "timeout",
+            "approval_blocked",
+            "forbidden_action",
+            "unknown"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

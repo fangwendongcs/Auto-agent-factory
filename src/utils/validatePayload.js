@@ -10,7 +10,10 @@ const schemaPaths = {
   task: path.resolve(__dirname, '../schema/task.schema.json'),
   result: path.resolve(__dirname, '../schema/result.schema.json'),
   auditRecord: path.resolve(__dirname, '../schema/audit-record.schema.json'),
-  signoffDecision: path.resolve(__dirname, '../schema/signoff-decision.schema.json')
+  signoffDecision: path.resolve(__dirname, '../schema/signoff-decision.schema.json'),
+  recoveryPolicy: path.resolve(__dirname, '../schema/recovery-policy.schema.json'),
+  providerRunSummary: path.resolve(__dirname, '../schema/provider-run-summary.schema.json'),
+  actionDraft: path.resolve(__dirname, '../schema/action-draft.schema.json')
 };
 
 function readSchema(kind) {
@@ -142,4 +145,3 @@ export function assertValidPayload(kind, payload) {
 
   return payload;
 }
-

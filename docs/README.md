@@ -7,12 +7,14 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`LOCAL_DEMO_RUNBOOK.md`](LOCAL_DEMO_RUNBOOK.md) — fastest safe path to run the repo-side local demo.
 - [`WORKFLOW_DESIGN.md`](WORKFLOW_DESIGN.md) — architecture and workflow module responsibilities.
 - [`MILESTONE_SUMMARY.md`](MILESTONE_SUMMARY.md) — compact map from mock-first MVP to local demo RC.
+- [`LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — roadmap from V0.13 RC to local production workflow readiness.
 - [`VALIDATION_LOG.md`](VALIDATION_LOG.md) — recorded runtime and local validation milestones.
 - [`RUNBOOK.md`](RUNBOOK.md) — operational runbook for validation, import, troubleshooting, and rollback.
 
 ## Local demo
 
 - [`LOCAL_DEMO_RUNBOOK.md`](LOCAL_DEMO_RUNBOOK.md) — practical local demo walkthrough for GitHub readers.
+- [`LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — staged path for runtime hardening, DeepSeek read-only runs, recovery policy, approval console, and action drafts.
 - [`V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md) — one-command local replay from sanitized audit record to ledger summary.
 - [`V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md`](V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md) — local demo / release-candidate packaging note.
 
@@ -57,7 +59,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`RELEASE_NOTES_V1_0_RC.md`](RELEASE_NOTES_V1_0_RC.md) — copy-ready v1.0 release-candidate notes.
 - [`GITHUB_PRERELEASE_DRAFT_V1_0_0_RC_1.md`](GITHUB_PRERELEASE_DRAFT_V1_0_0_RC_1.md) — GitHub pre-release settings and copy-ready draft body.
 - [`RELEASE_NOTES_V0_13_RC.md`](RELEASE_NOTES_V0_13_RC.md) — V0.13 local demo release-candidate notes.
-- [`RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md`](RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md) — V0.14 presentation polish notes.
+- [`RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md`](RELEASE_NOTES_V0_14_PRESENTATION_POLISH.md) — V0.14 project state closeout notes.
 - [`OPEN_SOURCE_RELEASE_CHECKLIST.md`](OPEN_SOURCE_RELEASE_CHECKLIST.md) — checklist before tagging an open-source release candidate.
 - [`GITHUB_PRESENTATION_CHECKLIST.md`](GITHUB_PRESENTATION_CHECKLIST.md) — checklist for keeping the GitHub repository presentation accurate and resume-ready.
 

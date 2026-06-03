@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/recovery-policy.schema.json",
+  "title": "Recovery Policy",
+  "description": "Local-first recovery decision for failed, timed-out, or review-gated agent runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policy_version",
+    "run_id",
+    "task_id",
+    "error_class",
+    "decision",
+    "max_retries",
+    "retry_count",
+    "timeout_minutes",
+    "reason"
+  ],
+  "properties": {
+    "policy_version": {
+      "type": "string",
+      "enum": [
+        "v0.17-local-recovery-policy"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^gd_[A-Za-z0-9_-]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^task_[A-Za-z0-9_-]+$"
+    },
+    "error_class": {
+      "type": "string",
+      "enum": [
+        "input_error",
+        "provider_error",
+        "workflow_config_error",
+        "timeout",
+        "approval_blocked",
+        "forbidden_action",
+        "unknown"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "retry",
+        "stop",
+        "needs_review"
+      ]
+    },
+    "max_retries": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "retry_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "timeout_minutes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

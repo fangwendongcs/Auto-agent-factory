@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/action-draft.schema.json",
+  "title": "Local Action Draft",
+  "description": "Human-reviewable draft package for Codex, GitHub, commit, and test handoff. It must not execute write actions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "draft_version",
+    "run_id",
+    "task_id",
+    "goal_summary",
+    "safety",
+    "codex_prompt",
+    "github_issue_draft",
+    "commit_message",
+    "test_commands"
+  ],
+  "properties": {
+    "draft_version": {
+      "type": "string",
+      "enum": [
+        "v0.19-local-action-draft"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^gd_[A-Za-z0-9_-]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^task_[A-Za-z0-9_-]+$"
+    },
+    "goal_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft_only",
+        "write_actions_enabled",
+        "requires_human_review"
+      ],
+      "properties": {
+        "draft_only": {
+          "type": "boolean"
+        },
+        "write_actions_enabled": {
+          "type": "boolean"
+        },
+        "requires_human_review": {
+          "type": "boolean"
+        }
+      }
+    },
+    "codex_prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "github_issue_draft": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commit_message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "test_commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
