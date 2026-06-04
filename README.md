@@ -71,7 +71,7 @@ Current capabilities include:
 | Action drafts | Draft-only | `npm run action:draft` |
 | Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
-| Recovery policy | V0.17 local CLI | `npm run recovery:policy` |
+| Recovery policy | V0.17 Error Handler aligned | `npm run recovery:policy` |
 | Production write execution | Not enabled | Safety boundary |
 
 ## Quick start

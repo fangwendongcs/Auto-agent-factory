@@ -71,7 +71,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | Action drafts | 只生成草稿 | `npm run action:draft` |
 | 本地 n8n runtime health | 离线/在线检查 | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract 已验收 | `npm run sandbox:deepseek:readonly` |
-| Recovery policy | V0.17 local CLI | `npm run recovery:policy` |
+| Recovery policy | V0.17 Error Handler 已对齐 | `npm run recovery:policy` |
 | 生产写操作 | 未启用 | 安全边界 |
 
 ## Quick Start

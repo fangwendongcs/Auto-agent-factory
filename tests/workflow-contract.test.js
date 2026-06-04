@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import { validatePayload } from '../src/utils/validatePayload.js';
 
 const workflowFiles = [
   'workflows/goal_driven_master.workflow.json',
@@ -91,6 +92,50 @@ test('error handler starts with an Error Trigger', () => {
   const errorWorkflow = readWorkflow('workflows/error_handler.workflow.json');
 
   assert.equal(errorWorkflow.nodes[0].type, 'n8n-nodes-base.errorTrigger');
+});
+
+test('error handler recovery advisor emits recovery policy contract without auto retry', () => {
+  const errorWorkflow = readWorkflow('workflows/error_handler.workflow.json');
+  const advisor = errorWorkflow.nodes.find((node) => node.name === 'Recovery Advisor');
+  const runAdvisor = new Function('$json', advisor.parameters.jsCode);
+
+  const result = runAdvisor({
+    workflow_name: '[GoalDriven] 02 Agent Task Executor',
+    workflow_id: 'workflow_executor',
+    execution_id: 'exec_v017_timeout',
+    last_node_executed: 'OpenAI-compatible HTTP Request',
+    error_message: 'Provider timeout before returning reviewable output.',
+    input_summary: 'mode=webhook',
+    captured_at: '2026-06-04T00:00:00.000Z'
+  })[0].json;
+
+  assert.equal(result.recovery_policy.decision, 'retry');
+  assert.equal(result.recovery_policy.next_action, 'retry_provider_readonly');
+  assert.equal(result.recovery_policy.safety.write_actions_enabled, false);
+  assert.equal(result.recovery_policy.safety.requires_human_review, true);
+  assert.equal(validatePayload('recoveryPolicy', result.recovery_policy).valid, true);
+  assert.match(result.notification_markdown, /do not retry automatically/);
+});
+
+test('error handler recovery advisor stops forbidden action failures', () => {
+  const errorWorkflow = readWorkflow('workflows/error_handler.workflow.json');
+  const advisor = errorWorkflow.nodes.find((node) => node.name === 'Recovery Advisor');
+  const runAdvisor = new Function('$json', advisor.parameters.jsCode);
+
+  const result = runAdvisor({
+    workflow_name: '[GoalDriven] 01 Master',
+    workflow_id: 'workflow_master',
+    execution_id: 'exec_v017_forbidden',
+    last_node_executed: 'Payload Validator',
+    error_message: 'Forbidden action detected before executor dispatch.',
+    input_summary: 'mode=webhook',
+    captured_at: '2026-06-04T00:00:00.000Z'
+  })[0].json;
+
+  assert.equal(result.recovery_policy.decision, 'stop');
+  assert.equal(result.recovery_policy.next_action, 'stop_run');
+  assert.equal(result.recovery_policy.error_class, 'forbidden_action');
+  assert.equal(validatePayload('recoveryPolicy', result.recovery_policy).valid, true);
 });
 
 

@@ -30,7 +30,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 | V0.14 | Project state closeout | Version language, README, capability matrix, roadmap, safety boundary, action drafts |
 | V0.15 | Local runtime hardening | Docker compose for local n8n, offline/online runtime health checks |
 | V0.16 | DeepSeek read-only contract | Real DeepSeek V4 Pro read-only provider call verified; normalized output remains `needs_review` |
-| V0.17 | Recovery policy | Repo-side recovery schema and classifier map failures to `retry`, `stop`, or `needs_review` |
+| V0.17 | Recovery policy | Repo-side recovery schema, local CLI, and Error Handler output map failures to `retry`, `stop`, or `needs_review` |
 
 ## What has been proven
 
@@ -42,7 +42,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 - The local demo can be replayed without n8n runtime access or provider calls.
 - Local runtime readiness can be checked offline, and a running local n8n can be probed online.
 - DeepSeek V4 Pro can complete the real read-only provider contract through local n8n with normalized `summary`, criterion-indexed `evidence`, and `risk_summary`.
-- Provider and workflow failures can be classified into bounded recovery decisions without enabling write actions.
+- Provider and workflow failures can be classified into bounded recovery decisions without enabling write actions or automatic retry.
 
 ## What is intentionally not enabled
 
