@@ -23,6 +23,49 @@ test('generateRecoveryPolicy retries transient provider timeout within budget', 
   assert.equal(validatePayload('recoveryPolicy', policy).valid, true);
 });
 
+test('generateRecoveryPolicy classifies controlled provider_5xx messages as review-gated retry', () => {
+  const policy = generateRecoveryPolicy({
+    run_id: 'gd_v017_5xx_001',
+    task_id: 'task_v017_5xx_001',
+    error_message: 'provider_5xx [line 1]',
+    retry_count: 0,
+    max_retries: 2
+  });
+
+  assert.equal(policy.error_class, 'provider_5xx');
+  assert.equal(policy.decision, 'retry');
+  assert.equal(policy.next_action, 'retry_provider_readonly');
+  assert.equal(policy.safety.requires_human_review, true);
+  assert.equal(policy.safety.write_actions_enabled, false);
+  assert.equal(validatePayload('recoveryPolicy', policy).valid, true);
+});
+
+test('generateRecoveryPolicy classifies provider status and safety failures', () => {
+  const cases = [
+    ['provider_401 unauthorized', 'provider_401', 'needs_review', 'manual_review'],
+    ['provider_429 rate limit', 'provider_429', 'retry', 'retry_provider_readonly'],
+    ['provider_5xx server error', 'provider_5xx', 'retry', 'retry_provider_readonly'],
+    ['provider_timeout timed out', 'provider_timeout', 'retry', 'retry_provider_readonly'],
+    ['provider_output_truncated finish_reason=length', 'provider_output_truncated', 'retry', 'retry_provider_readonly'],
+    ['safety_blocked by policy', 'safety_blocked', 'stop', 'stop_run'],
+    ['unknown_error from adapter', 'unknown_error', 'needs_review', 'manual_review']
+  ];
+
+  for (const [message, errorClass, decision, nextAction] of cases) {
+    const policy = generateRecoveryPolicy({
+      run_id: 'gd_v017_matrix_001',
+      task_id: 'task_v017_matrix_001',
+      error_message: message
+    });
+
+    assert.equal(policy.error_class, errorClass);
+    assert.equal(policy.decision, decision);
+    assert.equal(policy.next_action, nextAction);
+    assert.equal(policy.safety.requires_human_review, true);
+    assert.equal(validatePayload('recoveryPolicy', policy).valid, true);
+  }
+});
+
 test('generateRecoveryPolicy stops transient provider failures after retry limit', () => {
   const policy = generateRecoveryPolicy({
     run_id: 'gd_v017_stop_001',

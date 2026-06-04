@@ -117,6 +117,30 @@ test('error handler recovery advisor emits recovery policy contract without auto
   assert.match(result.notification_markdown, /do not retry automatically/);
 });
 
+test('error handler recovery advisor classifies controlled provider_5xx failures', () => {
+  const errorWorkflow = readWorkflow('workflows/error_handler.workflow.json');
+  const advisor = errorWorkflow.nodes.find((node) => node.name === 'Recovery Advisor');
+  const runAdvisor = new Function('$json', advisor.parameters.jsCode);
+
+  const result = runAdvisor({
+    workflow_name: '[GoalDriven] 02 Agent Task Executor',
+    workflow_id: 'workflow_executor',
+    execution_id: 'exec_v017_5xx',
+    last_node_executed: 'Throw Controlled Error',
+    error_message: 'provider_5xx [line 1]',
+    input_summary: 'mode=controlled-failure',
+    captured_at: '2026-06-04T00:00:00.000Z'
+  })[0].json;
+
+  assert.equal(result.recovery_policy.error_class, 'provider_5xx');
+  assert.equal(result.recovery_policy.decision, 'retry');
+  assert.equal(result.recovery_policy.next_action, 'retry_provider_readonly');
+  assert.equal(result.recovery_policy.safety.write_actions_enabled, false);
+  assert.equal(result.recovery_policy.safety.requires_human_review, true);
+  assert.equal(validatePayload('recoveryPolicy', result.recovery_policy).valid, true);
+  assert.match(result.notification_markdown, /do not retry automatically/);
+});
+
 test('error handler recovery advisor stops forbidden action failures', () => {
   const errorWorkflow = readWorkflow('workflows/error_handler.workflow.json');
   const advisor = errorWorkflow.nodes.find((node) => node.name === 'Recovery Advisor');

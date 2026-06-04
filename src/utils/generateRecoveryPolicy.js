@@ -9,6 +9,8 @@ const SECRET_PATTERNS = [
 
 const TRANSIENT_PROVIDER_ERRORS = new Set([
   'timeout',
+  'provider_429',
+  'provider_5xx',
   'provider_timeout',
   'provider_aborted',
   'provider_output_truncated'
@@ -16,17 +18,27 @@ const TRANSIENT_PROVIDER_ERRORS = new Set([
 
 const REVIEW_ERRORS = new Set([
   'approval_blocked',
+  'provider_401',
+  'provider_error',
   'provider_invalid_json',
   'provider_response_missing',
   'malformed_evidence',
   'empty_response',
+  'unknown_error',
   'unknown'
 ]);
 
 const STOP_ERRORS = new Set([
   'forbidden_action',
   'input_error',
-  'workflow_config_error'
+  'workflow_config_error',
+  'safety_blocked'
+]);
+
+const KNOWN_ERROR_CLASSES = new Set([
+  ...TRANSIENT_PROVIDER_ERRORS,
+  ...REVIEW_ERRORS,
+  ...STOP_ERRORS
 ]);
 
 function safeString(value, fallback) {
@@ -60,7 +72,7 @@ function normalizeErrorClass(input = {}) {
   const explicitClass = safeString(
     input.error_class || providerError.class || providerError.code || error.class || error.code,
     ''
-  );
+  ).toLowerCase();
   const message = [
     input.error_message,
     providerError.message,
@@ -69,7 +81,22 @@ function normalizeErrorClass(input = {}) {
     input.status
   ].filter(Boolean).join(' ').toLowerCase();
 
-  if (explicitClass) return explicitClass;
+  if (KNOWN_ERROR_CLASSES.has(explicitClass)) return explicitClass;
+  if (message.includes('safety_blocked') || message.includes('safety blocked')) {
+    return 'safety_blocked';
+  }
+  if (message.includes('provider_401') || message.includes(' 401') || message.includes('unauthorized')) {
+    return 'provider_401';
+  }
+  if (message.includes('provider_429') || message.includes(' 429') || message.includes('rate limit')) {
+    return 'provider_429';
+  }
+  if (message.includes('provider_5xx') || /\b5\d\d\b/.test(message) || message.includes('server error')) {
+    return 'provider_5xx';
+  }
+  if (message.includes('unknown_error')) {
+    return 'unknown_error';
+  }
   if (message.includes('truncated') || message.includes('finish_reason=length')) {
     return 'provider_output_truncated';
   }

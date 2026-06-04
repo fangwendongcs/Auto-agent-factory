@@ -39,6 +39,9 @@
       "enum": [
         "input_error",
         "provider_error",
+        "provider_401",
+        "provider_429",
+        "provider_5xx",
         "provider_timeout",
         "provider_aborted",
         "provider_output_truncated",
@@ -50,6 +53,8 @@
         "timeout",
         "approval_blocked",
         "forbidden_action",
+        "safety_blocked",
+        "unknown_error",
         "unknown"
       ]
     },
