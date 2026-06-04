@@ -7,7 +7,7 @@ This roadmap replaces the earlier V0.6-to-V1.0 planning shorthand. The repositor
 The current baseline is:
 
 ```text
-V0.17 Recovery Policy Started
+V0.17 Recovery Policy Verified
 ```
 
 Already proven:
@@ -19,7 +19,8 @@ Already proven:
 - local review-cycle replay
 - mock, dry-run, real-readonly, and read-only provider sandbox boundaries
 - verified real DeepSeek V4 Pro read-only provider contract
-- repo-side and Error Handler recovery policy classification for retry, stop, and needs-review outcomes
+- verified repo-side and Error Handler recovery policy classification for retry, stop, and needs-review outcomes
+- runtime-verified controlled `provider_5xx` recovery advice with human review required and write actions disabled
 - one-command safe local demo
 
 The system is still not a production autonomous agent. It remains local-first, review-first, and no-write by default.
@@ -31,8 +32,8 @@ The system is still not a production autonomous agent. It remains local-first, r
 | V0.14 Project State Closeout | Make the repo easy to evaluate and verify as an Agent governance project | Version language, README, local demo acceptance, capability matrix, roadmap, and safety boundary all describe the current V0.13+ baseline accurately |
 | V0.15 Local Runtime Hardening | Make local Docker and n8n runtime checks repeatable | Local n8n startup, workflow import, workflow binding review, and offline/online health checks are documented and reproducible |
 | V0.16 Real DeepSeek Read-only Run | Validate real provider output without enabling writes | Verified: local n8n calls DeepSeek V4 Pro through the read-only provider path and normalizes the result into `agent_result.status = needs_review` |
-| V0.17 Recovery Policy | Make failures classifiable and recoverable | In progress: schema, CLI, and Error Handler output map failures to `retry`, `stop`, or `needs_review`; retries are advisory and require human review |
-| V0.18 Human Approval Console Lite | Keep high-risk work behind local review | High-risk runs generate local review artifacts; approval or rejection is recorded in the decision ledger only |
+| V0.17 Recovery Policy | Make failures classifiable and recoverable | Verified: schema, CLI, and Error Handler runtime output map failures to `retry`, `stop`, or `needs_review`; controlled `provider_5xx` maps to `retry_provider_readonly` with human review required and no automatic retry |
+| V0.18 Human Approval Console Lite | Keep high-risk and recovery work behind local review | Pending: local console lists reviewable recovery/high-risk decisions and records approve/reject/needs-review decisions into the dev-only decision ledger only |
 | V0.19 Action Drafts | Generate handoff drafts instead of executing writes | Codex prompt, GitHub Issue draft, commit message, and test commands are generated for human review |
 | V1.0 Local Production Workflow | Combine long-running local n8n, read-only provider execution, audit, recovery, and manual execution handoff | Local tasks are triggerable, traceable, recoverable, and reviewable before any Codex/Git/GitHub write action |
 

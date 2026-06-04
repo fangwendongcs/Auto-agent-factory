@@ -5,10 +5,10 @@ This project is intentionally staged. Each milestone tightens one part of the Ag
 ## Current status
 
 ```text
-V0.17 Recovery Policy Started
+V0.17 Recovery Policy Verified
 ```
 
-The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, and a repo-side recovery policy contract.
+The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, and a verified Error Handler recovery policy contract.
 
 The forward roadmap now starts from this V0.13 baseline. Do not restart the roadmap at V0.6; the audit, sign-off, local replay, and demo foundations already exist.
 
@@ -30,7 +30,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 | V0.14 | Project state closeout | Version language, README, capability matrix, roadmap, safety boundary, action drafts |
 | V0.15 | Local runtime hardening | Docker compose for local n8n, offline/online runtime health checks |
 | V0.16 | DeepSeek read-only contract | Real DeepSeek V4 Pro read-only provider call verified; normalized output remains `needs_review` |
-| V0.17 | Recovery policy | Repo-side recovery schema, local CLI, and Error Handler output map failures to `retry`, `stop`, or `needs_review` |
+| V0.17 | Recovery policy | Verified: Error Handler runtime emits `recovery_policy`; controlled `provider_5xx` failure maps to `retry_provider_readonly` while keeping human review required and write actions disabled |
 
 ## What has been proven
 
@@ -43,6 +43,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 - Local runtime readiness can be checked offline, and a running local n8n can be probed online.
 - DeepSeek V4 Pro can complete the real read-only provider contract through local n8n with normalized `summary`, criterion-indexed `evidence`, and `risk_summary`.
 - Provider and workflow failures can be classified into bounded recovery decisions without enabling write actions or automatic retry.
+- Error Handler runtime can turn a controlled `provider_5xx` failure into `error_class = provider_5xx`, `decision = retry`, and `next_action = retry_provider_readonly` while preserving `notification_markdown` and `recovery_advice`.
 
 ## What is intentionally not enabled
 
@@ -61,12 +62,12 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 V0.14 Project State Closeout
 V0.15 Local Runtime Hardening
 V0.16 Real DeepSeek Read-only Run
-V0.17 Recovery Policy
+V0.17 Recovery Policy Verified
 V0.18 Human Approval Console Lite
 V0.19 Action Drafts
 V1.0 Local Production Workflow
 ```
 
-V0.14 is not presentation-only. It is the formal closeout of the current project state: version language, README, local demo acceptance, capability matrix, forward roadmap, and safety boundary must all be clear and verifiable.
+V0.18 starts the Human Approval Console Lite stage. It should stay local-first and review-only: show pending recovery or high-risk decisions, record approve/reject/needs-review decisions into the existing dev-only decision ledger, and avoid enabling workflow writes or automatic execution.
 
 See `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` for the implementation-oriented path from the current release-candidate baseline to local production workflow readiness.
