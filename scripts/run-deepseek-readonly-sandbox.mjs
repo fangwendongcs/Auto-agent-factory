@@ -54,6 +54,7 @@ function buildPayload() {
     requested_provider_mode: 'provider',
     agent_mode: 'provider',
     provider_credential_ready: true,
+    provider_max_tokens: 4000,
     context: {
       provider_execution: 'provider',
       provider_mode: 'provider',

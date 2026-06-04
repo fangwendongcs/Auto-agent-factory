@@ -419,10 +419,47 @@ test('executor real provider branch becomes ready_to_send for low-risk read-only
   const requestResult = runRequestBuilder(safetyResult)[0].json;
   assert.equal(requestResult.provider_call_status, 'ready_to_send');
   assert.equal(requestResult.provider_request.model, 'deepseek-v4-pro');
-  assert.equal(requestResult.provider_request.max_tokens, 300);
+  assert.equal(requestResult.provider_request.max_tokens, 8000);
+  assert.equal(requestResult.provider_max_tokens, 8000);
+  assert.equal(requestResult.provider_config.max_tokens_limit, 16000);
   assert.equal(requestResult.provider_request.temperature, 0.2);
   assert.equal(requestResult.provider_request.stream, false);
   assert.equal(Array.isArray(requestResult.provider_request.messages), true);
+});
+
+test('executor provider request clamps max_tokens above provider limit', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const safetyCheck = executor.nodes.find((node) => node.name === 'Real-readonly Safety Check');
+  const requestBuilder = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible Provider Request Builder'
+  );
+  const runSafetyCheck = new Function('$json', safetyCheck.parameters.jsCode);
+  const runRequestBuilder = new Function('$json', requestBuilder.parameters.jsCode);
+
+  const safetyResult = runSafetyCheck({
+    run_id: 'gd_test_max_tokens_clamp',
+    task_id: 'task_test_max_tokens_clamp',
+    goal: 'Generate read-only provider evidence',
+    criteria: ['Return a structured response.'],
+    risk_level: 'low',
+    action_class: 'read_only',
+    provider_execution: 'provider',
+    provider_credential_ready: true,
+    provider_runtime_endpoint: 'https://api.deepseek.com',
+    provider_runtime_model: 'deepseek-v4-pro',
+    provider_max_tokens: 12000,
+    context: {
+      provider_base_url: 'https://api.deepseek.com',
+      provider_model: 'deepseek-v4-pro',
+      provider_credential_ready: true,
+      provider_max_tokens: 20000
+    }
+  })[0].json;
+
+  const requestResult = runRequestBuilder(safetyResult)[0].json;
+
+  assert.equal(requestResult.provider_request.max_tokens, 16000);
+  assert.equal(requestResult.provider_max_tokens, 16000);
 });
 
 test('executor OpenAI-compatible HTTP request uses extended timeout and safe credential name', () => {
@@ -466,6 +503,46 @@ test('provider response normalizer converts aborted HTTP errors into structured 
   assert.equal(result.provider_error.provider.mode, 'real-readonly');
   assert.equal(result.provider_error.provider.model, 'deepseek-v4-pro');
   assert.equal(result.provider_error.next_action, 'retry');
+});
+
+test('provider response normalizer converts length finish_reason into truncation error', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const normalizer = executor.nodes.find(
+    (node) => node.name === 'Provider Response Normalizer'
+  );
+  const runNormalizer = new Function('$json', normalizer.parameters.jsCode);
+
+  const result = runNormalizer({
+    goal: 'Check read-only provider',
+    criteria: ['Return structured JSON.'],
+    risk_level: 'low',
+    action_class: 'read_only',
+    provider_call_status: 'response_received',
+    provider_config: {
+      mode: 'real-readonly',
+      model: 'deepseek-v4-pro'
+    },
+    provider_response_raw: {
+      id: 'provider-response-test',
+      choices: [
+        {
+          finish_reason: 'length',
+          message: {
+            content: '',
+            reasoning_content: 'Reasoning was present but final JSON was truncated.'
+          }
+        }
+      ],
+      usage: {
+        completion_tokens: 300
+      }
+    }
+  })[0].json;
+
+  assert.equal(result.status, 'failed');
+  assert.equal(result.provider_error.class, 'provider_output_truncated');
+  assert.equal(result.provider_error.next_action, 'retry');
+  assert.match(result.provider_error.message, /Increase provider_max_tokens or split the task/);
 });
 
 test('executor call router sends ready_to_send items to HTTP Request output', () => {
