@@ -55,6 +55,7 @@ Current capabilities include:
 - local end-to-end review cycle replay
 - draft-only action handoff generator for Codex, GitHub Issue, commit message, and test commands
 - verified real DeepSeek V4 Pro read-only provider contract with review-oriented output
+- repo-side V0.17 recovery policy for bounded retry / stop / review decisions
 - one-command local demo
 
 ## Current capability matrix
@@ -70,6 +71,7 @@ Current capabilities include:
 | Action drafts | Draft-only | `npm run action:draft` |
 | Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
+| Recovery policy | V0.17 started | `npm test` |
 | Production write execution | Not enabled | Safety boundary |
 
 ## Quick start
@@ -256,6 +258,7 @@ Start here:
 - [`docs/V0.15_LOCAL_RUNTIME_HARDENING.md`](docs/V0.15_LOCAL_RUNTIME_HARDENING.md) — Docker/n8n local runtime and health checks
 - [`docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md`](docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox runbook
 - [`docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — verified real DeepSeek read-only contract result
+- [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — bounded retry, stop, and needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — full documentation index
 

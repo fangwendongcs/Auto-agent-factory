@@ -60,11 +60,19 @@ test('local production workflow contracts validate happy-path samples', () => {
     run_id: 'gd_v017_sample_001',
     task_id: 'task_v017_sample_001',
     error_class: 'provider_error',
-    decision: 'retry',
+    decision: 'needs_review',
+    next_action: 'manual_review',
     max_retries: 2,
     retry_count: 0,
     timeout_minutes: 30,
-    reason: 'Provider returned a transient error before producing reviewable output.'
+    stop_conditions: ['human_review_required_before_retry'],
+    reason: 'Provider returned an ambiguous error before producing reviewable output.',
+    safety: {
+      read_only: true,
+      write_actions_enabled: false,
+      requires_human_review: true,
+      secrets_included: false
+    }
   };
 
   const providerRunSummary = {

@@ -11,10 +11,13 @@
     "task_id",
     "error_class",
     "decision",
+    "next_action",
     "max_retries",
     "retry_count",
     "timeout_minutes",
-    "reason"
+    "stop_conditions",
+    "reason",
+    "safety"
   ],
   "properties": {
     "policy_version": {
@@ -36,6 +39,13 @@
       "enum": [
         "input_error",
         "provider_error",
+        "provider_timeout",
+        "provider_aborted",
+        "provider_output_truncated",
+        "provider_invalid_json",
+        "provider_response_missing",
+        "malformed_evidence",
+        "empty_response",
         "workflow_config_error",
         "timeout",
         "approval_blocked",
@@ -49,6 +59,14 @@
         "retry",
         "stop",
         "needs_review"
+      ]
+    },
+    "next_action": {
+      "type": "string",
+      "enum": [
+        "retry_provider_readonly",
+        "manual_review",
+        "stop_run"
       ]
     },
     "max_retries": {
@@ -66,9 +84,40 @@
       "minimum": 1,
       "maximum": 30
     },
+    "stop_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "reason": {
       "type": "string",
       "minLength": 1
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_only",
+        "write_actions_enabled",
+        "requires_human_review",
+        "secrets_included"
+      ],
+      "properties": {
+        "read_only": {
+          "type": "boolean"
+        },
+        "write_actions_enabled": {
+          "type": "boolean"
+        },
+        "requires_human_review": {
+          "type": "boolean"
+        },
+        "secrets_included": {
+          "type": "boolean"
+        }
+      }
     }
   }
 }

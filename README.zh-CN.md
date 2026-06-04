@@ -55,6 +55,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 - 本地端到端 review cycle replay
 - 只生成草稿的 Codex / GitHub Issue / commit message / test commands 交接包
 - 已验收真实 DeepSeek V4 Pro read-only provider contract，输出仍然面向人工 review
+- repo-side V0.17 recovery policy，用于有边界的 retry / stop / review 决策
 - 一条命令运行本地 demo
 
 ## 当前能力矩阵
@@ -70,6 +71,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | Action drafts | 只生成草稿 | `npm run action:draft` |
 | 本地 n8n runtime health | 离线/在线检查 | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract 已验收 | `npm run sandbox:deepseek:readonly` |
+| Recovery policy | V0.17 已启动 | `npm test` |
 | 生产写操作 | 未启用 | 安全边界 |
 
 ## Quick Start
@@ -256,6 +258,7 @@ Start here：
 - [`docs/V0.15_LOCAL_RUNTIME_HARDENING.md`](docs/V0.15_LOCAL_RUNTIME_HARDENING.md) — Docker/n8n 本地长期运行和健康检查
 - [`docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md`](docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox 运行说明
 - [`docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — 真实 DeepSeek read-only contract 验收结果
+- [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — 有边界的 retry / stop / needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — 完整文档索引
 
