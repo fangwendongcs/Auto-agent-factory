@@ -54,6 +54,7 @@ Current capabilities include:
 - dev-only human decision ledger
 - local end-to-end review cycle replay
 - draft-only action handoff generator for Codex, GitHub Issue, commit message, and test commands
+- verified real DeepSeek V4 Pro read-only provider contract with review-oriented output
 - one-command local demo
 
 ## Current capability matrix
@@ -68,7 +69,7 @@ Current capabilities include:
 | Decision ledger replay | Dev-only | `npm run audit:cycle:replay` |
 | Action drafts | Draft-only | `npm run action:draft` |
 | Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
-| DeepSeek provider run | Read-only sandbox trigger | `npm run sandbox:deepseek:readonly` |
+| DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
 | Production write execution | Not enabled | Safety boundary |
 
 ## Quick start
@@ -254,6 +255,7 @@ Start here:
 - [`docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — next roadmap from V0.13 RC to local production workflow readiness
 - [`docs/V0.15_LOCAL_RUNTIME_HARDENING.md`](docs/V0.15_LOCAL_RUNTIME_HARDENING.md) — Docker/n8n local runtime and health checks
 - [`docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md`](docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox runbook
+- [`docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — verified real DeepSeek read-only contract result
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — full documentation index
 
@@ -269,6 +271,7 @@ Open-source process:
 Near-term:
 
 - stabilize v1.0 release-candidate docs and local demo path
+- implement V0.17 Recovery Policy for bounded retry / stop / review decisions
 - keep real provider usage read-only first
 - improve screenshots or diagrams only when they reflect real repository state
 - expand evaluator quality tests for ambiguous evidence

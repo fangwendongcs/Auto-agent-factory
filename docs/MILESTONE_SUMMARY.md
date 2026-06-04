@@ -5,10 +5,10 @@ This project is intentionally staged. Each milestone tightens one part of the Ag
 ## Current status
 
 ```text
-V0.16 DeepSeek Read-only Sandbox Prepared
+V0.16 Real DeepSeek Read-only Contract Verified
 ```
 
-The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, and a safe-by-default DeepSeek read-only sandbox trigger.
+The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, and a verified real DeepSeek read-only provider contract.
 
 The forward roadmap now starts from this V0.13 baseline. Do not restart the roadmap at V0.6; the audit, sign-off, local replay, and demo foundations already exist.
 
@@ -29,7 +29,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 | V0.13 | GitHub/local demo packaging | `npm run demo:local`, docs navigation, release-candidate packaging |
 | V0.14 | Project state closeout | Version language, README, capability matrix, roadmap, safety boundary, action drafts |
 | V0.15 | Local runtime hardening | Docker compose for local n8n, offline/online runtime health checks |
-| V0.16 | DeepSeek read-only sandbox | Safe-by-default sandbox payload and explicitly gated local webhook POST |
+| V0.16 | DeepSeek read-only contract | Real DeepSeek V4 Pro read-only provider call verified; normalized output remains `needs_review` |
 
 ## What has been proven
 
@@ -40,7 +40,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 - Audit and human-review artifacts can be generated locally from sanitized records.
 - The local demo can be replayed without n8n runtime access or provider calls.
 - Local runtime readiness can be checked offline, and a running local n8n can be probed online.
-- DeepSeek read-only sandbox payloads can be generated without exposing API keys or sending by default.
+- DeepSeek V4 Pro can complete the real read-only provider contract through local n8n with normalized `summary`, criterion-indexed `evidence`, and `risk_summary`.
 
 ## What is intentionally not enabled
 

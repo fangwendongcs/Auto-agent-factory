@@ -10,6 +10,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — roadmap from V0.13 RC to local production workflow readiness.
 - [`V0.15_LOCAL_RUNTIME_HARDENING.md`](V0.15_LOCAL_RUNTIME_HARDENING.md) — Docker/n8n long-running local runtime and health checks.
 - [`V0.16_DEEPSEEK_READONLY_SANDBOX.md`](V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox trigger and acceptance checklist.
+- [`V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — verified real DeepSeek read-only contract result.
 - [`VALIDATION_LOG.md`](VALIDATION_LOG.md) — recorded runtime and local validation milestones.
 - [`RUNBOOK.md`](RUNBOOK.md) — operational runbook for validation, import, troubleshooting, and rollback.
 
@@ -19,6 +20,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md`](LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md) — staged path for runtime hardening, DeepSeek read-only runs, recovery policy, approval console, and action drafts.
 - [`V0.15_LOCAL_RUNTIME_HARDENING.md`](V0.15_LOCAL_RUNTIME_HARDENING.md) — local Docker/n8n runtime hardening.
 - [`V0.16_DEEPSEEK_READONLY_SANDBOX.md`](V0.16_DEEPSEEK_READONLY_SANDBOX.md) — real provider read-only sandbox path.
+- [`V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — real provider read-only contract verification.
 - [`V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md) — one-command local replay from sanitized audit record to ledger summary.
 - [`V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md`](V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md) — local demo / release-candidate packaging note.
 

@@ -7,7 +7,7 @@ This roadmap replaces the earlier V0.6-to-V1.0 planning shorthand. The repositor
 The current baseline is:
 
 ```text
-V0.13 Local Demo Release Candidate / v1.0-rc preparation
+V0.16 Real DeepSeek Read-only Contract Verified
 ```
 
 Already proven:
@@ -18,6 +18,7 @@ Already proven:
 - dev-only decision ledger
 - local review-cycle replay
 - mock, dry-run, real-readonly, and read-only provider sandbox boundaries
+- verified real DeepSeek V4 Pro read-only provider contract
 - one-command safe local demo
 
 The system is still not a production autonomous agent. It remains local-first, review-first, and no-write by default.
@@ -28,7 +29,7 @@ The system is still not a production autonomous agent. It remains local-first, r
 |---|---|---|
 | V0.14 Project State Closeout | Make the repo easy to evaluate and verify as an Agent governance project | Version language, README, local demo acceptance, capability matrix, roadmap, and safety boundary all describe the current V0.13+ baseline accurately |
 | V0.15 Local Runtime Hardening | Make local Docker and n8n runtime checks repeatable | Local n8n startup, workflow import, workflow binding review, and offline/online health checks are documented and reproducible |
-| V0.16 Real DeepSeek Read-only Run | Validate real provider output without enabling writes | DeepSeek sandbox payload generation is safe by default; real local POST is gated by explicit env flags and produces a sanitized provider run summary |
+| V0.16 Real DeepSeek Read-only Run | Validate real provider output without enabling writes | Verified: local n8n calls DeepSeek V4 Pro through the read-only provider path and normalizes the result into `agent_result.status = needs_review` |
 | V0.17 Recovery Policy | Make failures classifiable and recoverable | Failures map to `retry`, `stop`, or `needs_review`; retries and timeouts stay bounded |
 | V0.18 Human Approval Console Lite | Keep high-risk work behind local review | High-risk runs generate local review artifacts; approval or rejection is recorded in the decision ledger only |
 | V0.19 Action Drafts | Generate handoff drafts instead of executing writes | Codex prompt, GitHub Issue draft, commit message, and test commands are generated for human review |
