@@ -40,11 +40,10 @@ function isLocalUrl(value) {
 
 function buildPayload() {
   return {
-    goal: 'Run a DeepSeek read-only sandbox check for the local Agent workflow governance loop.',
+    goal: 'Check the read-only agent workflow contract.',
     criteria: [
-      'Return a structured agent_result contract.',
-      'Keep provider output review-oriented and read-only.',
-      'Do not enable shell, Git, file-write, deployment, or external write actions.'
+      'Return structured JSON.',
+      'Stay read-only.'
     ],
     max_iterations: 1,
     timeout_minutes: 15,
@@ -104,6 +103,14 @@ function sanitizeResponse(value) {
       approved: safety.approved ?? null
     }
   };
+}
+
+function hasUsableResponseSummary(summary) {
+  if (!summary || typeof summary !== 'object') return false;
+  const hasStatus = Boolean(summary.agent_result_status || summary.status);
+  const hasProviderMode = Boolean(summary.provider && summary.provider.mode);
+  const hasProviderModel = Boolean(summary.provider && summary.provider.model);
+  return hasStatus && hasProviderMode && hasProviderModel;
 }
 
 function buildProviderRunSummary(payload, result = {}) {
@@ -189,10 +196,30 @@ async function postToWebhook(payload) {
     };
   }
 
+  if (!parsed || typeof parsed !== 'object') {
+    return {
+      ok: false,
+      latency_ms: latencyMs,
+      error_class: 'empty_response',
+      error_message: 'n8n webhook returned an empty or non-JSON response.'
+    };
+  }
+
+  const responseSummary = sanitizeResponse(parsed);
+  if (!hasUsableResponseSummary(responseSummary)) {
+    return {
+      ok: false,
+      latency_ms: latencyMs,
+      response_summary: responseSummary,
+      error_class: 'empty_response',
+      error_message: 'n8n webhook response did not include a usable provider result summary.'
+    };
+  }
+
   return {
     ok: true,
     latency_ms: latencyMs,
-    response_summary: sanitizeResponse(parsed)
+    response_summary: responseSummary
   };
 }
 
@@ -225,6 +252,12 @@ const output = {
   ok: !SEND_ENABLED || runResult.ok,
   sent: SEND_ENABLED,
   webhook_configured: Boolean(WEBHOOK_URL),
+  error: runResult.ok
+    ? null
+    : {
+        class: runResult.error_class,
+        message: runResult.error_message
+      },
   provider: {
     base_url: PROVIDER_BASE_URL,
     model: PROVIDER_MODEL,

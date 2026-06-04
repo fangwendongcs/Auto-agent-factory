@@ -419,7 +419,53 @@ test('executor real provider branch becomes ready_to_send for low-risk read-only
   const requestResult = runRequestBuilder(safetyResult)[0].json;
   assert.equal(requestResult.provider_call_status, 'ready_to_send');
   assert.equal(requestResult.provider_request.model, 'deepseek-v4-pro');
+  assert.equal(requestResult.provider_request.max_tokens, 300);
+  assert.equal(requestResult.provider_request.temperature, 0.2);
+  assert.equal(requestResult.provider_request.stream, false);
   assert.equal(Array.isArray(requestResult.provider_request.messages), true);
+});
+
+test('executor OpenAI-compatible HTTP request uses extended timeout and safe credential name', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const httpRequest = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible HTTP Request'
+  );
+
+  assert.equal(httpRequest.parameters.options.timeout, '={{ $json.provider_config.timeout_ms || 120000 }}');
+  assert.equal(httpRequest.continueOnFail, true);
+  assert.equal(httpRequest.credentials.httpHeaderAuth.name, 'goald-openai-compatible-readonly');
+});
+
+test('provider response normalizer converts aborted HTTP errors into structured provider_error', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const normalizer = executor.nodes.find(
+    (node) => node.name === 'Provider Response Normalizer'
+  );
+  const runNormalizer = new Function('$json', normalizer.parameters.jsCode);
+
+  const result = runNormalizer({
+    goal: 'Check read-only provider',
+    criteria: ['Return structured JSON.'],
+    risk_level: 'low',
+    action_class: 'read_only',
+    provider_call_status: 'provider_error',
+    provider_config: {
+      mode: 'real-readonly',
+      model: 'deepseek-v4-pro'
+    },
+    provider_error: {
+      code: 'provider_http_error',
+      class: 'provider_error',
+      message: 'The HTTP Request node was aborted by TLSSocket.socketCloseListener.'
+    }
+  })[0].json;
+
+  assert.equal(result.status, 'failed');
+  assert.equal(result.provider_error.class, 'provider_aborted');
+  assert.equal(result.provider_error.code, 'provider_aborted');
+  assert.equal(result.provider_error.provider.mode, 'real-readonly');
+  assert.equal(result.provider_error.provider.model, 'deepseek-v4-pro');
+  assert.equal(result.provider_error.next_action, 'retry');
 });
 
 test('executor call router sends ready_to_send items to HTTP Request output', () => {
