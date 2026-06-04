@@ -378,6 +378,130 @@ test('executor task validator normalizes criteria objects without [object Object
   assert.equal(result.criteria.includes('[object Object]'), false);
 });
 
+test('executor real provider branch becomes ready_to_send for low-risk read-only payload', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const safetyCheck = executor.nodes.find((node) => node.name === 'Real-readonly Safety Check');
+  const requestBuilder = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible Provider Request Builder'
+  );
+  const runSafetyCheck = new Function('$json', safetyCheck.parameters.jsCode);
+  const runRequestBuilder = new Function('$json', requestBuilder.parameters.jsCode);
+
+  const safetyResult = runSafetyCheck({
+    run_id: 'gd_test_ready_send',
+    task_id: 'task_test_ready_send',
+    goal: 'Generate read-only provider evidence',
+    criteria: [
+      'Return a structured agent_result contract.',
+      'Do not enable shell, Git, file-write, deployment, or external write actions.'
+    ],
+    risk_level: 'low',
+    action_class: 'read_only',
+    provider_execution: 'provider',
+    provider_credential_ready: true,
+    provider_runtime_endpoint: 'https://api.deepseek.com',
+    provider_runtime_model: 'deepseek-v4-pro',
+    context: {
+      provider_base_url: 'https://api.deepseek.com',
+      provider_model: 'deepseek-v4-pro',
+      provider_credential_name: 'goald-openai-compatible-readonly',
+      provider_credential_ready: true
+    }
+  })[0].json;
+
+  assert.equal(safetyResult.provider_safety_check.blocked, false);
+  assert.equal(safetyResult.provider_config.endpoint, 'https://api.deepseek.com');
+  assert.equal(safetyResult.provider_config.model, 'deepseek-v4-pro');
+  assert.equal(safetyResult.provider_config.credential_name, 'goald-openai-compatible-readonly');
+  assert.equal(safetyResult.provider_config.credential_ready, true);
+  assert.equal(safetyResult.context.provider_credential_ready, true);
+
+  const requestResult = runRequestBuilder(safetyResult)[0].json;
+  assert.equal(requestResult.provider_call_status, 'ready_to_send');
+  assert.equal(requestResult.provider_request.model, 'deepseek-v4-pro');
+  assert.equal(Array.isArray(requestResult.provider_request.messages), true);
+});
+
+test('executor call router sends ready_to_send items to HTTP Request output', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const callRouter = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible Provider Call Router'
+  );
+  const sendRule = callRouter.parameters.rules.values[0];
+  const fallbackRule = callRouter.parameters.rules.values[1];
+  const connections = executor.connections['OpenAI-compatible Provider Call Router'].main;
+
+  assert.equal(sendRule.outputKey, 'send');
+  assert.equal(sendRule.conditions.conditions[0].rightValue, 'ready_to_send');
+  assert.equal(connections[0][0].node, 'OpenAI-compatible HTTP Request');
+  assert.equal(fallbackRule.outputKey, 'fallback');
+  assert.equal(fallbackRule.conditions.conditions[0].rightValue, 'fallback');
+  assert.equal(connections[1][0].node, 'Provider Response Normalizer');
+});
+
+test('executor real provider branch falls back with structured error when credential is missing', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const safetyCheck = executor.nodes.find((node) => node.name === 'Real-readonly Safety Check');
+  const requestBuilder = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible Provider Request Builder'
+  );
+  const runSafetyCheck = new Function('$json', safetyCheck.parameters.jsCode);
+  const runRequestBuilder = new Function('$json', requestBuilder.parameters.jsCode);
+
+  const safetyResult = runSafetyCheck({
+    run_id: 'gd_test_missing_credential',
+    task_id: 'task_test_missing_credential',
+    goal: 'Generate read-only provider evidence',
+    criteria: ['Return evidence'],
+    risk_level: 'low',
+    action_class: 'read_only',
+    provider_execution: 'provider',
+    provider_runtime_endpoint: 'https://api.deepseek.com',
+    provider_runtime_model: 'deepseek-v4-pro',
+    provider_credential_ready: false,
+    context: {
+      provider_credential_name: 'goald-openai-compatible-readonly',
+      provider_credential_ready: false
+    }
+  })[0].json;
+  const requestResult = runRequestBuilder(safetyResult)[0].json;
+
+  assert.equal(requestResult.provider_call_status, 'fallback');
+  assert.equal(requestResult.provider_error.code, 'provider_credential_missing');
+  assert.equal(requestResult.status, 'needs_review');
+  assert.ok(requestResult.known_issues.includes('provider_credential_missing'));
+});
+
+test('executor real provider branch blocks high-risk requests without approval', () => {
+  const executor = readWorkflow('workflows/agent_task_executor.workflow.json');
+  const safetyCheck = executor.nodes.find((node) => node.name === 'Real-readonly Safety Check');
+  const requestBuilder = executor.nodes.find(
+    (node) => node.name === 'OpenAI-compatible Provider Request Builder'
+  );
+  const runSafetyCheck = new Function('$json', safetyCheck.parameters.jsCode);
+  const runRequestBuilder = new Function('$json', requestBuilder.parameters.jsCode);
+
+  const safetyResult = runSafetyCheck({
+    run_id: 'gd_test_high_risk',
+    task_id: 'task_test_high_risk',
+    goal: 'Review a high-risk provider request',
+    criteria: ['Return evidence'],
+    risk_level: 'high',
+    action_class: 'read_only',
+    human_approved: false,
+    provider_execution: 'provider',
+    provider_runtime_endpoint: 'https://api.deepseek.com',
+    provider_runtime_model: 'deepseek-v4-pro',
+    provider_credential_ready: true
+  })[0].json;
+  const requestResult = runRequestBuilder(safetyResult)[0].json;
+
+  assert.equal(safetyResult.provider_safety_check.blocked, true);
+  assert.ok(safetyResult.provider_safety_check.blocked_reasons.includes('high_risk_requires_human_approval'));
+  assert.equal(requestResult.provider_call_status, 'fallback');
+  assert.equal(requestResult.provider_error.code, 'safety_check_failed');
+});
+
 test('workflow JSON does not contain literal bearer or sk-like secrets', () => {
   for (const filePath of workflowFiles) {
     const raw = fs.readFileSync(filePath, 'utf8');

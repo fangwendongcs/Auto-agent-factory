@@ -21,6 +21,11 @@ test('DeepSeek read-only sandbox defaults to dry-run payload generation', () => 
   assert.equal(output.sent, false);
   assert.equal(output.payload.action_class, 'read_only');
   assert.equal(output.payload.provider_execution, 'provider');
+  assert.equal(output.payload.provider_mode, 'provider');
+  assert.equal(output.payload.requested_provider_mode, 'provider');
+  assert.equal(output.payload.agent_mode, 'provider');
+  assert.equal(output.payload.context.provider_mode, 'provider');
+  assert.equal(output.payload.context.agent_mode, 'provider');
   assert.equal(output.payload.context.expected_provider_mode, 'real-readonly');
   assert.equal(output.safety.no_api_key_in_payload, true);
   assert.equal(output.write_result.written, false);
