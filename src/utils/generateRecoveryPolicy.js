@@ -180,7 +180,7 @@ export function generateRecoveryPolicy(input = {}, options = {}) {
     safety: {
       read_only: true,
       write_actions_enabled: false,
-      requires_human_review: decision.decision !== 'retry',
+      requires_human_review: true,
       secrets_included: false
     }
   };

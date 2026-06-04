@@ -19,6 +19,7 @@ test('generateRecoveryPolicy retries transient provider timeout within budget', 
   assert.equal(policy.next_action, 'retry_provider_readonly');
   assert.equal(policy.error_class, 'provider_timeout');
   assert.equal(policy.safety.write_actions_enabled, false);
+  assert.equal(policy.safety.requires_human_review, true);
   assert.equal(validatePayload('recoveryPolicy', policy).valid, true);
 });
 

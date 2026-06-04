@@ -1,0 +1,11 @@
+{
+  "run_id": "gd_v017_sample_timeout_001",
+  "task_id": "task_v017_sample_timeout_001",
+  "provider_error": {
+    "class": "provider_timeout",
+    "message": "Provider timed out before returning reviewable output."
+  },
+  "retry_count": 0,
+  "max_retries": 2,
+  "timeout_minutes": 15
+}
