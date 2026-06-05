@@ -45,6 +45,12 @@ This is the first open-source v1.0 release candidate.
 - Human sign-off review package generator.
 - Dev-only human decision ledger.
 - One-command local review cycle replay.
+- Local runtime hardening and offline/online health checks.
+- Verified DeepSeek V4 Pro read-only provider contract.
+- Bounded recovery policy for retry/stop/needs-review advice.
+- Human Approval Console Lite for local recovery and high-risk decisions.
+- Draft-only Codex/GitHub handoff generation from human decisions.
+- V1.0 local production workflow readiness runbook.
 - One-command local demo.
 - Open-source docs: `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, release notes, and release checklist.
 
@@ -67,6 +73,10 @@ npm run import:check
 npm run audit:report
 npm run audit:signoff
 npm run audit:cycle:replay
+npm run runtime:health:offline
+npm run recovery:policy
+npm run approval:console
+npm run action:draft
 ```
 
 ## Usage paths
@@ -84,6 +94,7 @@ npm run audit:cycle:replay
 - a safe local demo path that does not require API keys
 - a read-only provider sandbox design
 - a human-reviewable audit/sign-off prototype
+- a verified repo-side/local readiness path from runtime health to draft-only handoff
 - an open-source foundation for safer Agent workflow experiments
 
 ## What this release is not
@@ -124,9 +135,10 @@ This release candidate is useful for:
 - The real provider path is read-only and review-oriented.
 - There is no hosted dashboard or production approval UI.
 - The local ledger is a dev-only JSONL prototype, not a production audit database.
+- V1.0 readiness is local production workflow readiness, not autonomous production execution.
 - No real user data processing is included.
 - No production autonomous execution is enabled.
 
 ## Suggested next milestone
 
-Keep the release candidate focused on local-first governance. The next milestone should improve documentation, examples, and evaluator quality before any production write capability is considered.
+Keep the release candidate focused on local-first governance. Future milestones should improve operator UX, examples, and observability before any production write capability is considered.

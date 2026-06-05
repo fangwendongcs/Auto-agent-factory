@@ -717,3 +717,63 @@ The release remains bounded to the documented local-first and read-only-first sc
 ### Post-release note
 
 If a local Git tag is needed for future local release checks, fetch or create `v1.0.0-rc.1` intentionally after confirming it points to the same commit as the GitHub pre-release.
+
+## V1.0 Local Production Workflow Readiness
+
+Result: **PASS**
+
+This verification was completed repo-side/local only. It ties together the verified V0.15-V0.19 path:
+
+- V0.15 local runtime health
+- V0.16 DeepSeek read-only sandbox contract
+- V0.17 recovery policy
+- V0.18 Human Approval Console Lite
+- V0.19 Action Drafts
+
+### Scope
+
+- online n8n runtime was not re-run in this pass
+- real DeepSeek send was not re-run in this pass
+- provider send stayed disabled by default
+- no real credential was read, printed, or stored
+- no workflow runtime file was modified
+
+The real DeepSeek read-only contract remains covered by the V0.16 verified result. This pass verifies local production workflow readiness around the repo-side control plane and safety artifacts.
+
+### Commands verified
+
+```bash
+npm test
+npm run workflow:validate:all
+npm run runtime:health:offline
+npm run sandbox:deepseek:readonly
+npm run recovery:policy
+npm run approval:console
+npm run action:draft
+npm run demo:local
+git diff --check
+```
+
+### Observed results
+
+- `npm test`: PASS, 111 pass / 1 skipped
+- `npm run workflow:validate:all`: PASS, 4 workflow exports, no warnings, no errors
+- `npm run runtime:health:offline`: PASS, `ok = true`
+- `npm run sandbox:deepseek:readonly`: PASS, `sent = false` by default
+- `npm run recovery:policy`: PASS, advisory retry policy with human review required
+- `npm run approval:console`: PASS, default ledger write disabled
+- `npm run action:draft`: PASS, `blocked_rejected` draft-only handoff
+- dev-only ledger summary: PASS, 2 valid records, 1 rejected, 1 needs-review, review status `manual_review_required`
+- `npm run demo:local`: PASS
+- `git diff --check`: PASS
+
+### Safety status
+
+- no automatic retry enabled
+- no automatic approval enabled
+- no file write action from workflow
+- no shell execution enabled
+- no Git modification enabled
+- no deployment action enabled
+- no external write action enabled
+- no secret-like values found in committed docs, examples, workflow JSON, tests, scripts, or source files
