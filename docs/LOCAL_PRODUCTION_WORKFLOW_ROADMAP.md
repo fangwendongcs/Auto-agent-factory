@@ -7,7 +7,7 @@ This roadmap replaces the earlier V0.6-to-V1.0 planning shorthand. The repositor
 The current baseline is:
 
 ```text
-V0.19 Action Drafts Verified
+V1.0 Local Production Workflow Readiness Verified
 ```
 
 Already proven:
@@ -23,6 +23,7 @@ Already proven:
 - runtime-verified controlled `provider_5xx` recovery advice with human review required and write actions disabled
 - verified local Human Approval Console Lite for recovery/high-risk review decisions
 - verified draft-only Codex/GitHub handoff generation from V0.18 human decision records
+- verified V1.0 end-to-end readiness runbook connecting local runtime, read-only provider, recovery, approval console, and action drafts
 - one-command safe local demo
 
 The system is still not a production autonomous agent. It remains local-first, review-first, and no-write by default.
@@ -37,7 +38,7 @@ The system is still not a production autonomous agent. It remains local-first, r
 | V0.17 Recovery Policy | Make failures classifiable and recoverable | Verified: schema, CLI, and Error Handler runtime output map failures to `retry`, `stop`, or `needs_review`; controlled `provider_5xx` maps to `retry_provider_readonly` with human review required and no automatic retry |
 | V0.18 Human Approval Console Lite | Keep high-risk and recovery work behind local review | Verified: local console records recovery/high-risk decisions into the dev-only ledger and summary report confirms valid needs-review/rejected records without automatic execution |
 | V0.19 Action Drafts | Generate handoff drafts instead of executing writes | Verified: rejected, needs-review, and approved decisions generate blocked or draft-only Codex/GitHub handoffs for human review only |
-| V1.0 Local Production Workflow | Combine long-running local n8n, read-only provider execution, audit, recovery, and manual execution handoff | Local tasks are triggerable, traceable, recoverable, and reviewable before any Codex/Git/GitHub write action |
+| V1.0 Local Production Workflow | Combine long-running local n8n, read-only provider execution, audit, recovery, and manual execution handoff | Verified: repo-side/local readiness path passes from runtime health through recovery, approval console, ledger summary, and action draft before any Codex/Git/GitHub write action |
 
 ## Contract additions
 
@@ -66,6 +67,12 @@ npm test
 npm run workflow:validate:all
 npm run runtime:health:offline
 npm run demo:local
+```
+
+Run the V1.0 readiness path:
+
+```text
+docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md
 ```
 
 Generate a local action draft from a sanitized audit record:

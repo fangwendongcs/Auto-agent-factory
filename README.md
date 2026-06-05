@@ -58,6 +58,7 @@ Current capabilities include:
 - verified V0.17 recovery policy for bounded retry / stop / review decisions from the Error Handler
 - verified V0.18 Human Approval Console Lite for local recovery and high-risk decision review
 - verified V0.19 draft-only Codex/GitHub handoff generation from human decision records
+- verified V1.0 local production workflow readiness runbook
 - one-command local demo
 
 ## Current capability matrix
@@ -75,9 +76,10 @@ Current capabilities include:
 | DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime verified | `npm run recovery:policy` |
 | Human approval console | V0.18 verified local console | `npm run approval:console` |
+| V1.0 readiness runbook | Verified repo-side/local path | `docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md` |
 | Production write execution | Not enabled | Safety boundary |
 
-Current stage: `V0.19 Action Drafts Verified`. Action drafts convert V0.18 human decisions into clearer Codex/GitHub handoffs without enabling automatic retry or workflow write actions.
+Current stage: `V1.0 Local Production Workflow Readiness Verified`. The V1.0 runbook connects local runtime health, DeepSeek read-only execution, recovery policy, approval console, decision ledger, and action drafts without enabling automatic retry or workflow write actions.
 
 ## Quick start
 
@@ -272,6 +274,7 @@ Start here:
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — verified Error Handler recovery policy result and classification contract
 - [`docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — local approval console and dev-only decision ledger bridge
 - [`docs/V0.19_ACTION_DRAFTS.md`](docs/V0.19_ACTION_DRAFTS.md) — draft-only Codex/GitHub handoff from human decision records
+- [`docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md`](docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md) — end-to-end local production workflow readiness runbook
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — bounded retry, stop, and needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — full documentation index

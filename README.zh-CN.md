@@ -58,6 +58,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 - 已验收 V0.17 recovery policy，Error Handler 可输出有边界的 retry / stop / review 决策
 - 已验收 V0.18 Human Approval Console Lite，用于本地 review recovery / high-risk decision
 - 已验收 V0.19 draft-only Codex/GitHub handoff generation，可从人工 decision record 生成交接草稿
+- 已验收 V1.0 local production workflow readiness runbook
 - 一条命令运行本地 demo
 
 ## 当前能力矩阵
@@ -75,9 +76,10 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | DeepSeek provider run | V0.16 real read-only contract 已验收 | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime 已验收 | `npm run recovery:policy` |
 | Human approval console | V0.18 本地 console 已验收 | `npm run approval:console` |
+| V1.0 readiness runbook | repo-side/local path 已验收 | `docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md` |
 | 生产写操作 | 未启用 | 安全边界 |
 
-当前阶段：`V0.19 Action Drafts Verified`。Action drafts 会把 V0.18 人工 decision 转成更清晰的 Codex/GitHub handoff，但不启用自动 retry 或 workflow 写操作。
+当前阶段：`V1.0 Local Production Workflow Readiness Verified`。V1.0 runbook 把本地 runtime health、DeepSeek read-only、recovery policy、approval console、decision ledger 和 action drafts 串成一条可验收路径，但不启用自动 retry 或 workflow 写操作。
 
 ## Quick Start
 
@@ -272,6 +274,7 @@ Start here：
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — Error Handler recovery policy 验收结果和分类规则
 - [`docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — 本地 approval console 和 dev-only decision ledger bridge
 - [`docs/V0.19_ACTION_DRAFTS.md`](docs/V0.19_ACTION_DRAFTS.md) — 从人工 decision record 生成 draft-only Codex/GitHub handoff
+- [`docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md`](docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md) — 本地生产工作流 readiness 端到端 runbook
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — 有边界的 retry / stop / needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — 完整文档索引

@@ -5,10 +5,10 @@ This project is intentionally staged. Each milestone tightens one part of the Ag
 ## Current status
 
 ```text
-V0.19 Action Drafts Verified
+V1.0 Local Production Workflow Readiness Verified
 ```
 
-The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, a verified Error Handler recovery policy contract, a verified local approval console, and draft-only Codex/GitHub handoff generation.
+The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, a verified Error Handler recovery policy contract, a verified local approval console, draft-only Codex/GitHub handoff generation, and a V1.0 readiness runbook.
 
 The forward roadmap now starts from this V0.13 baseline. Do not restart the roadmap at V0.6; the audit, sign-off, local replay, and demo foundations already exist.
 
@@ -33,6 +33,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 | V0.17 | Recovery policy | Verified: Error Handler runtime emits `recovery_policy`; controlled `provider_5xx` failure maps to `retry_provider_readonly` while keeping human review required and write actions disabled |
 | V0.18 | Human Approval Console Lite | Verified: local console records recovery and high-risk human decisions into the dev-only ledger; summary report shows 2 valid records, 1 rejected, 1 needs-review, no automatic execution |
 | V0.19 | Action Drafts | Verified: rejected, needs-review, and approved human decisions map to blocked or draft-only Codex/GitHub handoff states without automatic execution |
+| V1.0 | Local Production Workflow Readiness | Verified: repo-side/local readiness path passes runtime health, recovery, approval console, dev-only ledger summary, and action draft checks without autonomous writes |
 
 ## What has been proven
 
@@ -48,6 +49,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 - Error Handler runtime can turn a controlled `provider_5xx` failure into `error_class = provider_5xx`, `decision = retry`, and `next_action = retry_provider_readonly` while preserving `notification_markdown` and `recovery_advice`.
 - Local approval console can review recovery and high-risk decisions, create sanitized human decision records, and produce a ledger summary without modifying workflow runtime.
 - Action drafts can turn V0.18 human decision records into `blocked_rejected`, `blocked_needs_review`, or `draft_after_approval` Codex/GitHub handoffs without enabling implementation.
+- V1.0 readiness has a verified repo-side/local runbook from local runtime health to draft-only handoff.
 
 ## What is intentionally not enabled
 
@@ -69,9 +71,9 @@ V0.16 Real DeepSeek Read-only Run
 V0.17 Recovery Policy Verified
 V0.18 Human Approval Console Lite
 V0.19 Action Drafts
-V1.0 Local Production Workflow
+V1.0 Local Production Workflow Readiness
 ```
 
-V1.0 should combine the verified local runtime, read-only provider path, recovery policy, approval console, decision ledger, and action drafts into a local production workflow readiness package without enabling autonomous writes.
+V1.0 readiness is recorded in `docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md`; the verified path does not enable autonomous writes.
 
 See `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` for the implementation-oriented path from the current release-candidate baseline to local production workflow readiness.

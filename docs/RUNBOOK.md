@@ -10,6 +10,14 @@
 - 不需要真实 Codex API
 - 先验证 contract、workflow JSON 和人工操作路径
 
+如果你要执行当前 V1.0 local production workflow readiness 的端到端验收路径，请优先使用：
+
+```text
+docs/V1.0_LOCAL_PRODUCTION_WORKFLOW_READINESS_RUNBOOK.md
+```
+
+该 V1.0 runbook 会串联本地 runtime health、DeepSeek read-only、recovery policy、approval console、decision ledger 和 action draft，同时继续保持 no-write / human-review boundary。
+
 ## 2. 前置条件
 
 ### 本地
