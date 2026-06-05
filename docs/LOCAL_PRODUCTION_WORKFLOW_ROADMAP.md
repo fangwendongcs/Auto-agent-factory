@@ -7,7 +7,7 @@ This roadmap replaces the earlier V0.6-to-V1.0 planning shorthand. The repositor
 The current baseline is:
 
 ```text
-V0.19 Action Drafts Started
+V0.19 Action Drafts Verified
 ```
 
 Already proven:
@@ -22,7 +22,7 @@ Already proven:
 - verified repo-side and Error Handler recovery policy classification for retry, stop, and needs-review outcomes
 - runtime-verified controlled `provider_5xx` recovery advice with human review required and write actions disabled
 - verified local Human Approval Console Lite for recovery/high-risk review decisions
-- draft-only Codex/GitHub handoff generation from V0.18 human decision records
+- verified draft-only Codex/GitHub handoff generation from V0.18 human decision records
 - one-command safe local demo
 
 The system is still not a production autonomous agent. It remains local-first, review-first, and no-write by default.
@@ -36,7 +36,7 @@ The system is still not a production autonomous agent. It remains local-first, r
 | V0.16 Real DeepSeek Read-only Run | Validate real provider output without enabling writes | Verified: local n8n calls DeepSeek V4 Pro through the read-only provider path and normalizes the result into `agent_result.status = needs_review` |
 | V0.17 Recovery Policy | Make failures classifiable and recoverable | Verified: schema, CLI, and Error Handler runtime output map failures to `retry`, `stop`, or `needs_review`; controlled `provider_5xx` maps to `retry_provider_readonly` with human review required and no automatic retry |
 | V0.18 Human Approval Console Lite | Keep high-risk and recovery work behind local review | Verified: local console records recovery/high-risk decisions into the dev-only ledger and summary report confirms valid needs-review/rejected records without automatic execution |
-| V0.19 Action Drafts | Generate handoff drafts instead of executing writes | Started: Codex prompt, GitHub Issue draft, commit message, and test commands are generated from V0.18 human decisions for human review only |
+| V0.19 Action Drafts | Generate handoff drafts instead of executing writes | Verified: rejected, needs-review, and approved decisions generate blocked or draft-only Codex/GitHub handoffs for human review only |
 | V1.0 Local Production Workflow | Combine long-running local n8n, read-only provider execution, audit, recovery, and manual execution handoff | Local tasks are triggerable, traceable, recoverable, and reviewable before any Codex/Git/GitHub write action |
 
 ## Contract additions

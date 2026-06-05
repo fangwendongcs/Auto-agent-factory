@@ -57,7 +57,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 - 已验收真实 DeepSeek V4 Pro read-only provider contract，输出仍然面向人工 review
 - 已验收 V0.17 recovery policy，Error Handler 可输出有边界的 retry / stop / review 决策
 - 已验收 V0.18 Human Approval Console Lite，用于本地 review recovery / high-risk decision
-- V0.19 draft-only Codex/GitHub handoff generation，可从人工 decision record 生成交接草稿
+- 已验收 V0.19 draft-only Codex/GitHub handoff generation，可从人工 decision record 生成交接草稿
 - 一条命令运行本地 demo
 
 ## 当前能力矩阵
@@ -70,14 +70,14 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | Audit report | 已支持 | `npm run audit:report` |
 | Human sign-off review | 已支持 | `npm run audit:signoff` |
 | Decision ledger replay | dev-only | `npm run audit:cycle:replay` |
-| Action drafts | V0.19 只生成交接草稿 | `npm run action:draft` |
+| Action drafts | V0.19 draft-only handoff 已验收 | `npm run action:draft` |
 | 本地 n8n runtime health | 离线/在线检查 | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract 已验收 | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime 已验收 | `npm run recovery:policy` |
 | Human approval console | V0.18 本地 console 已验收 | `npm run approval:console` |
 | 生产写操作 | 未启用 | 安全边界 |
 
-当前阶段：`V0.19 Action Drafts Started`。Action drafts 会把 V0.18 人工 decision 转成更清晰的 Codex/GitHub handoff，但不启用自动 retry 或 workflow 写操作。
+当前阶段：`V0.19 Action Drafts Verified`。Action drafts 会把 V0.18 人工 decision 转成更清晰的 Codex/GitHub handoff，但不启用自动 retry 或 workflow 写操作。
 
 ## Quick Start
 

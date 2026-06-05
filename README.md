@@ -57,7 +57,7 @@ Current capabilities include:
 - verified real DeepSeek V4 Pro read-only provider contract with review-oriented output
 - verified V0.17 recovery policy for bounded retry / stop / review decisions from the Error Handler
 - verified V0.18 Human Approval Console Lite for local recovery and high-risk decision review
-- V0.19 draft-only Codex/GitHub handoff generation from human decision records
+- verified V0.19 draft-only Codex/GitHub handoff generation from human decision records
 - one-command local demo
 
 ## Current capability matrix
@@ -70,14 +70,14 @@ Current capabilities include:
 | Audit report | Supported | `npm run audit:report` |
 | Human sign-off review | Supported | `npm run audit:signoff` |
 | Decision ledger replay | Dev-only | `npm run audit:cycle:replay` |
-| Action drafts | V0.19 draft-only handoff | `npm run action:draft` |
+| Action drafts | V0.19 verified draft-only handoff | `npm run action:draft` |
 | Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime verified | `npm run recovery:policy` |
 | Human approval console | V0.18 verified local console | `npm run approval:console` |
 | Production write execution | Not enabled | Safety boundary |
 
-Current stage: `V0.19 Action Drafts Started`. Action drafts convert V0.18 human decisions into clearer Codex/GitHub handoffs without enabling automatic retry or workflow write actions.
+Current stage: `V0.19 Action Drafts Verified`. Action drafts convert V0.18 human decisions into clearer Codex/GitHub handoffs without enabling automatic retry or workflow write actions.
 
 ## Quick start
 
