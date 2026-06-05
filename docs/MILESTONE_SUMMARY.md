@@ -5,10 +5,10 @@ This project is intentionally staged. Each milestone tightens one part of the Ag
 ## Current status
 
 ```text
-V0.18 Human Approval Console Lite Verified
+V0.19 Action Drafts Started
 ```
 
-The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, a verified Error Handler recovery policy contract, and a verified local approval console.
+The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, a verified Error Handler recovery policy contract, a verified local approval console, and draft-only Codex/GitHub handoff generation.
 
 The forward roadmap now starts from this V0.13 baseline. Do not restart the roadmap at V0.6; the audit, sign-off, local replay, and demo foundations already exist.
 
@@ -32,6 +32,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 | V0.16 | DeepSeek read-only contract | Real DeepSeek V4 Pro read-only provider call verified; normalized output remains `needs_review` |
 | V0.17 | Recovery policy | Verified: Error Handler runtime emits `recovery_policy`; controlled `provider_5xx` failure maps to `retry_provider_readonly` while keeping human review required and write actions disabled |
 | V0.18 | Human Approval Console Lite | Verified: local console records recovery and high-risk human decisions into the dev-only ledger; summary report shows 2 valid records, 1 rejected, 1 needs-review, no automatic execution |
+| V0.19 | Action Drafts | Started: V0.18 human decision records can be converted into clearer Codex/GitHub handoff drafts while remaining draft-only |
 
 ## What has been proven
 
@@ -46,6 +47,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 - Provider and workflow failures can be classified into bounded recovery decisions without enabling write actions or automatic retry.
 - Error Handler runtime can turn a controlled `provider_5xx` failure into `error_class = provider_5xx`, `decision = retry`, and `next_action = retry_provider_readonly` while preserving `notification_markdown` and `recovery_advice`.
 - Local approval console can review recovery and high-risk decisions, create sanitized human decision records, and produce a ledger summary without modifying workflow runtime.
+- Action drafts can turn V0.18 human decision records into blocked or review-only Codex/GitHub handoffs without enabling implementation.
 
 ## What is intentionally not enabled
 
@@ -70,6 +72,6 @@ V0.19 Action Drafts
 V1.0 Local Production Workflow
 ```
 
-V0.18 should stay local-first and review-only: show pending recovery or high-risk decisions, record approve/reject/needs-review decisions into the existing dev-only decision ledger, and avoid enabling workflow writes or automatic execution.
+V0.19 should stay draft-only: generate clearer Codex/GitHub handoffs from V0.18 decisions, but do not execute rejected, needs-review, or approved records automatically.
 
 See `docs/LOCAL_PRODUCTION_WORKFLOW_ROADMAP.md` for the implementation-oriented path from the current release-candidate baseline to local production workflow readiness.

@@ -57,6 +57,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 - 已验收真实 DeepSeek V4 Pro read-only provider contract，输出仍然面向人工 review
 - 已验收 V0.17 recovery policy，Error Handler 可输出有边界的 retry / stop / review 决策
 - 已验收 V0.18 Human Approval Console Lite，用于本地 review recovery / high-risk decision
+- V0.19 draft-only Codex/GitHub handoff generation，可从人工 decision record 生成交接草稿
 - 一条命令运行本地 demo
 
 ## 当前能力矩阵
@@ -69,14 +70,14 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | Audit report | 已支持 | `npm run audit:report` |
 | Human sign-off review | 已支持 | `npm run audit:signoff` |
 | Decision ledger replay | dev-only | `npm run audit:cycle:replay` |
-| Action drafts | 只生成草稿 | `npm run action:draft` |
+| Action drafts | V0.19 只生成交接草稿 | `npm run action:draft` |
 | 本地 n8n runtime health | 离线/在线检查 | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract 已验收 | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime 已验收 | `npm run recovery:policy` |
 | Human approval console | V0.18 本地 console 已验收 | `npm run approval:console` |
 | 生产写操作 | 未启用 | 安全边界 |
 
-当前阶段：`V0.18 Human Approval Console Lite Verified`。它是 local-only console，只记录人工 decision，不启用自动 retry 或 workflow 写操作。
+当前阶段：`V0.19 Action Drafts Started`。Action drafts 会把 V0.18 人工 decision 转成更清晰的 Codex/GitHub handoff，但不启用自动 retry 或 workflow 写操作。
 
 ## Quick Start
 
@@ -270,6 +271,7 @@ Start here：
 - [`docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — 真实 DeepSeek read-only contract 验收结果
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — Error Handler recovery policy 验收结果和分类规则
 - [`docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — 本地 approval console 和 dev-only decision ledger bridge
+- [`docs/V0.19_ACTION_DRAFTS.md`](docs/V0.19_ACTION_DRAFTS.md) — 从人工 decision record 生成 draft-only Codex/GitHub handoff
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — 有边界的 retry / stop / needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — 完整文档索引

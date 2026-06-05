@@ -57,6 +57,7 @@ Current capabilities include:
 - verified real DeepSeek V4 Pro read-only provider contract with review-oriented output
 - verified V0.17 recovery policy for bounded retry / stop / review decisions from the Error Handler
 - verified V0.18 Human Approval Console Lite for local recovery and high-risk decision review
+- V0.19 draft-only Codex/GitHub handoff generation from human decision records
 - one-command local demo
 
 ## Current capability matrix
@@ -69,14 +70,14 @@ Current capabilities include:
 | Audit report | Supported | `npm run audit:report` |
 | Human sign-off review | Supported | `npm run audit:signoff` |
 | Decision ledger replay | Dev-only | `npm run audit:cycle:replay` |
-| Action drafts | Draft-only | `npm run action:draft` |
+| Action drafts | V0.19 draft-only handoff | `npm run action:draft` |
 | Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime verified | `npm run recovery:policy` |
 | Human approval console | V0.18 verified local console | `npm run approval:console` |
 | Production write execution | Not enabled | Safety boundary |
 
-Current stage: `V0.18 Human Approval Console Lite Verified`. The console is local-only and records human decisions without enabling automatic retry or workflow write actions.
+Current stage: `V0.19 Action Drafts Started`. Action drafts convert V0.18 human decisions into clearer Codex/GitHub handoffs without enabling automatic retry or workflow write actions.
 
 ## Quick start
 
@@ -270,6 +271,7 @@ Start here:
 - [`docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — verified real DeepSeek read-only contract result
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — verified Error Handler recovery policy result and classification contract
 - [`docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — local approval console and dev-only decision ledger bridge
+- [`docs/V0.19_ACTION_DRAFTS.md`](docs/V0.19_ACTION_DRAFTS.md) — draft-only Codex/GitHub handoff from human decision records
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — bounded retry, stop, and needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — full documentation index

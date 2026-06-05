@@ -92,9 +92,12 @@ test('local production workflow contracts validate happy-path samples', () => {
 
   const actionDraft = {
     draft_version: 'v0.19-local-action-draft',
+    source_type: 'audit_record',
     run_id: sampleAuditRecord.run_id,
     task_id: sampleAuditRecord.task_id,
     goal_summary: sampleAuditRecord.goal_summary,
+    human_decision: 'not_recorded',
+    handoff_status: 'draft_for_review',
     safety: {
       draft_only: true,
       write_actions_enabled: false,

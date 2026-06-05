@@ -13,6 +13,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — verified real DeepSeek read-only contract result.
 - [`V0.17_RECOVERY_POLICY.md`](V0.17_RECOVERY_POLICY.md) — bounded retry, stop, and needs-review recovery policy.
 - [`V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — local human approval console for recovery and high-risk decisions.
+- [`V0.19_ACTION_DRAFTS.md`](V0.19_ACTION_DRAFTS.md) — draft-only Codex/GitHub handoff from human decision records.
 - [`VALIDATION_LOG.md`](VALIDATION_LOG.md) — recorded runtime and local validation milestones.
 - [`RUNBOOK.md`](RUNBOOK.md) — operational runbook for validation, import, troubleshooting, and rollback.
 
@@ -25,6 +26,7 @@ This directory contains the architecture, operations, safety, validation, audit,
 - [`V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — real provider read-only contract verification.
 - [`V0.17_RECOVERY_POLICY.md`](V0.17_RECOVERY_POLICY.md) — local recovery policy contract and classifier.
 - [`V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — local review console and dev-only decision ledger bridge.
+- [`V0.19_ACTION_DRAFTS.md`](V0.19_ACTION_DRAFTS.md) — local action draft handoff from V0.18 decisions.
 - [`V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md`](V0.12_LOCAL_REVIEW_CYCLE_REPLAY.md) — one-command local replay from sanitized audit record to ledger summary.
 - [`V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md`](V0.13_LOCAL_DEMO_RELEASE_CANDIDATE_PACKAGING.md) — local demo / release-candidate packaging note.
 

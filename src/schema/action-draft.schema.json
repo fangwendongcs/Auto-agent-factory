@@ -7,9 +7,12 @@
   "additionalProperties": false,
   "required": [
     "draft_version",
+    "source_type",
     "run_id",
     "task_id",
     "goal_summary",
+    "human_decision",
+    "handoff_status",
     "safety",
     "codex_prompt",
     "github_issue_draft",
@@ -23,6 +26,13 @@
         "v0.19-local-action-draft"
       ]
     },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "audit_record",
+        "human_signoff_decision"
+      ]
+    },
     "run_id": {
       "type": "string",
       "pattern": "^gd_[A-Za-z0-9_-]+$"
@@ -34,6 +44,24 @@
     "goal_summary": {
       "type": "string",
       "minLength": 1
+    },
+    "human_decision": {
+      "type": "string",
+      "enum": [
+        "not_recorded",
+        "approved",
+        "rejected",
+        "needs_review"
+      ]
+    },
+    "handoff_status": {
+      "type": "string",
+      "enum": [
+        "draft_for_review",
+        "draft_after_approval",
+        "blocked_rejected",
+        "blocked_needs_review"
+      ]
     },
     "safety": {
       "type": "object",

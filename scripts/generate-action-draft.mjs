@@ -10,10 +10,10 @@ function printError(value) {
 
 function usage() {
   return {
-    usage: 'node scripts/generate-action-draft.mjs <sanitized-audit-record.json>',
+    usage: 'node scripts/generate-action-draft.mjs <sanitized-audit-record.json | signoff-decision-record.json>',
     output: 'Markdown action draft to stdout',
     safety: [
-      'reads sanitized audit records only',
+      'reads sanitized audit records or sanitized human sign-off decision records only',
       'does not connect to n8n runtime',
       'does not run shell commands',
       'does not modify Git',
@@ -21,6 +21,17 @@ function usage() {
       'does not execute external write actions'
     ]
   };
+}
+
+function schemaKindForInput(record = {}) {
+  if (
+    record.record_type === 'human_signoff_decision' ||
+    record.signoff_decision_version === 'v0.11-dev-signoff-decision'
+  ) {
+    return 'signoffDecision';
+  }
+
+  return 'auditRecord';
 }
 
 const inputPath = process.argv[2];
@@ -37,12 +48,14 @@ if (!inputPath || inputPath === '--help' || inputPath === '-h') {
 try {
   const absoluteInputPath = path.resolve(process.cwd(), inputPath);
   const record = JSON.parse(fs.readFileSync(absoluteInputPath, 'utf8'));
-  const auditValidation = validatePayload('auditRecord', record);
+  const inputKind = schemaKindForInput(record);
+  const auditValidation = validatePayload(inputKind, record);
 
   if (!auditValidation.valid) {
     printError({
       ok: false,
       reason: 'action_draft_input_validation_failed',
+      input_kind: inputKind,
       errors: auditValidation.errors
     });
     process.exit(1);
