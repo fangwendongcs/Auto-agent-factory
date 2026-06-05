@@ -5,10 +5,10 @@ This project is intentionally staged. Each milestone tightens one part of the Ag
 ## Current status
 
 ```text
-V0.18 Human Approval Console Lite Started
+V0.18 Human Approval Console Lite Verified
 ```
 
-The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, a verified Error Handler recovery policy contract, and a local approval console prototype.
+The project is still not a production autonomous agent. It is a local, mock-first, human-reviewable workflow skeleton with a reproducible local demo path, local n8n runtime checks, a verified real DeepSeek read-only provider contract, a verified Error Handler recovery policy contract, and a verified local approval console.
 
 The forward roadmap now starts from this V0.13 baseline. Do not restart the roadmap at V0.6; the audit, sign-off, local replay, and demo foundations already exist.
 
@@ -31,7 +31,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 | V0.15 | Local runtime hardening | Docker compose for local n8n, offline/online runtime health checks |
 | V0.16 | DeepSeek read-only contract | Real DeepSeek V4 Pro read-only provider call verified; normalized output remains `needs_review` |
 | V0.17 | Recovery policy | Verified: Error Handler runtime emits `recovery_policy`; controlled `provider_5xx` failure maps to `retry_provider_readonly` while keeping human review required and write actions disabled |
-| V0.18 | Human Approval Console Lite | Started: local console reads recovery/high-risk review inputs and records human `approved`, `rejected`, or `needs_review` decisions through the dev-only decision ledger without automatic execution |
+| V0.18 | Human Approval Console Lite | Verified: local console records recovery and high-risk human decisions into the dev-only ledger; summary report shows 2 valid records, 1 rejected, 1 needs-review, no automatic execution |
 
 ## What has been proven
 
@@ -45,7 +45,7 @@ The forward roadmap now starts from this V0.13 baseline. Do not restart the road
 - DeepSeek V4 Pro can complete the real read-only provider contract through local n8n with normalized `summary`, criterion-indexed `evidence`, and `risk_summary`.
 - Provider and workflow failures can be classified into bounded recovery decisions without enabling write actions or automatic retry.
 - Error Handler runtime can turn a controlled `provider_5xx` failure into `error_class = provider_5xx`, `decision = retry`, and `next_action = retry_provider_readonly` while preserving `notification_markdown` and `recovery_advice`.
-- Local approval console can review recovery decisions and create sanitized human decision records without modifying workflow runtime.
+- Local approval console can review recovery and high-risk decisions, create sanitized human decision records, and produce a ledger summary without modifying workflow runtime.
 
 ## What is intentionally not enabled
 

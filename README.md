@@ -56,7 +56,7 @@ Current capabilities include:
 - draft-only action handoff generator for Codex, GitHub Issue, commit message, and test commands
 - verified real DeepSeek V4 Pro read-only provider contract with review-oriented output
 - verified V0.17 recovery policy for bounded retry / stop / review decisions from the Error Handler
-- V0.18 Human Approval Console Lite for local recovery and high-risk decision review
+- verified V0.18 Human Approval Console Lite for local recovery and high-risk decision review
 - one-command local demo
 
 ## Current capability matrix
@@ -73,10 +73,10 @@ Current capabilities include:
 | Local n8n runtime health | Offline/online checks | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract verified | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime verified | `npm run recovery:policy` |
-| Human approval console | V0.18 local lite console | `npm run approval:console` |
+| Human approval console | V0.18 verified local console | `npm run approval:console` |
 | Production write execution | Not enabled | Safety boundary |
 
-Current stage: `V0.18 Human Approval Console Lite`. The console is local-only and records human decisions without enabling automatic retry or workflow write actions.
+Current stage: `V0.18 Human Approval Console Lite Verified`. The console is local-only and records human decisions without enabling automatic retry or workflow write actions.
 
 ## Quick start
 

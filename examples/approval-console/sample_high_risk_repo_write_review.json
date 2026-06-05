@@ -1,0 +1,25 @@
+{
+  "console_review_version": "v0.18-human-approval-console-lite",
+  "review_type": "high_risk_decision",
+  "run_id": "gd_v018_high_risk_001",
+  "task_id": "task_v018_high_risk_001",
+  "status": "needs_human_approval",
+  "goal_summary": "Review a proposed repository write follow-up before any manual implementation handoff is allowed.",
+  "criteria_count": 2,
+  "risk_level": "high",
+  "action_class": "repo_write",
+  "permission_level": "write_action",
+  "provider": {
+    "mode": "local-review",
+    "name": "human-approval-console-lite",
+    "model": null,
+    "status": "review_pending"
+  },
+  "approval_decision": {
+    "decision": "needs_human_approval",
+    "blocked": true,
+    "approved": false,
+    "requires_human_approval": true,
+    "reason_summary": "Repository write follow-up remains blocked until a human reviewer explicitly rejects, approves, or keeps it in review."
+  }
+}

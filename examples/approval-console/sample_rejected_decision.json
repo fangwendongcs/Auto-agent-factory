@@ -1,0 +1,8 @@
+{
+  "reviewer": {
+    "id": "local-human-reviewer"
+  },
+  "decision": "rejected",
+  "reason_summary": "Reviewer rejects this high-risk repository write until scope, rollback, and exact file changes are reviewed separately.",
+  "notes_summary": "V0.18 sample rejection. No workflow write action is enabled."
+}
