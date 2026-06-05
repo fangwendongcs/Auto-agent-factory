@@ -1,0 +1,8 @@
+{
+  "reviewer": {
+    "id": "local-human-reviewer"
+  },
+  "decision": "needs_review",
+  "reason_summary": "Reviewer keeps the recovery request in manual review until retry timing and provider health are checked.",
+  "notes_summary": "V0.18 sample decision. No automatic retry or write action is enabled."
+}

@@ -20,6 +20,7 @@
     "audit:cycle:replay": "node scripts/replay-local-review-cycle.mjs",
     "action:draft": "node scripts/generate-action-draft.mjs examples/audit-replay/v08f-read-only-run-record.json",
     "recovery:policy": "node scripts/generate-recovery-policy.mjs examples/recovery/sample_provider_timeout.json",
+    "approval:console": "node scripts/run-human-approval-console-lite.mjs examples/approval-console/sample_recovery_provider_5xx_review.json examples/approval-console/sample_needs_review_decision.json",
     "runtime:health": "node scripts/check-local-runtime-health.mjs",
     "runtime:health:offline": "node scripts/check-local-runtime-health.mjs --offline",
     "sandbox:deepseek:readonly": "node scripts/run-deepseek-readonly-sandbox.mjs",

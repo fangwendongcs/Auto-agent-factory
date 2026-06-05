@@ -56,6 +56,7 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 - 只生成草稿的 Codex / GitHub Issue / commit message / test commands 交接包
 - 已验收真实 DeepSeek V4 Pro read-only provider contract，输出仍然面向人工 review
 - 已验收 V0.17 recovery policy，Error Handler 可输出有边界的 retry / stop / review 决策
+- V0.18 Human Approval Console Lite，用于本地 review recovery / high-risk decision
 - 一条命令运行本地 demo
 
 ## 当前能力矩阵
@@ -72,9 +73,10 @@ Auto Agent Factory 把这些问题当成产品和工程问题，而不是单纯 
 | 本地 n8n runtime health | 离线/在线检查 | `npm run runtime:health:offline` |
 | DeepSeek provider run | V0.16 real read-only contract 已验收 | `npm run sandbox:deepseek:readonly` |
 | Recovery policy | V0.17 runtime 已验收 | `npm run recovery:policy` |
+| Human approval console | V0.18 本地轻量 console | `npm run approval:console` |
 | 生产写操作 | 未启用 | 安全边界 |
 
-当前阶段：`V0.17 Recovery Policy Verified`。下一步是 `V0.18 Human Approval Console Lite`：提供一个本地 review 界面，用于查看 recovery / high-risk decision，并把人工 approve / reject / needs-review 结果记录到 dev-only decision ledger，不启用自动 retry 或 workflow 写操作。
+当前阶段：`V0.18 Human Approval Console Lite`。它是 local-only console，只记录人工 decision，不启用自动 retry 或 workflow 写操作。
 
 ## Quick Start
 
@@ -113,6 +115,12 @@ npm run audit:cycle:replay
 
 ```bash
 npm run action:draft
+```
+
+在本地 approval console 中 review recovery decision：
+
+```bash
+npm run approval:console
 ```
 
 不要求 n8n 正在运行的本地 runtime 检查：
@@ -261,6 +269,7 @@ Start here：
 - [`docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md`](docs/V0.16_DEEPSEEK_READONLY_SANDBOX.md) — DeepSeek read-only sandbox 运行说明
 - [`docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md`](docs/V0.16_DEEPSEEK_READONLY_VERIFICATION.md) — 真实 DeepSeek read-only contract 验收结果
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — Error Handler recovery policy 验收结果和分类规则
+- [`docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md`](docs/V0.18_HUMAN_APPROVAL_CONSOLE_LITE.md) — 本地 approval console 和 dev-only decision ledger bridge
 - [`docs/V0.17_RECOVERY_POLICY.md`](docs/V0.17_RECOVERY_POLICY.md) — 有边界的 retry / stop / needs-review recovery policy
 - [`docs/RELEASE_NOTES_V1_0_RC.md`](docs/RELEASE_NOTES_V1_0_RC.md) — v1.0 release-candidate notes
 - [`docs/README.md`](docs/README.md) — 完整文档索引

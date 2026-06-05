@@ -42,6 +42,15 @@ const steps = [
     args: ['scripts/generate-action-draft.mjs', 'examples/audit-replay/v08f-read-only-run-record.json']
   },
   {
+    name: 'human approval console lite',
+    command: process.execPath,
+    args: [
+      'scripts/run-human-approval-console-lite.mjs',
+      'examples/approval-console/sample_recovery_provider_5xx_review.json',
+      'examples/approval-console/sample_needs_review_decision.json'
+    ]
+  },
+  {
     name: 'local review cycle replay',
     command: process.execPath,
     args: ['scripts/replay-local-review-cycle.mjs'],

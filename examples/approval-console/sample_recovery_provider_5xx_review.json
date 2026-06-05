@@ -1,0 +1,32 @@
+{
+  "console_review_version": "v0.18-human-approval-console-lite",
+  "review_type": "recovery_policy",
+  "goal_summary": "Review controlled provider_5xx recovery advice before any manual retry is requested.",
+  "provider": {
+    "mode": "real-readonly",
+    "name": "openai-compatible-readonly",
+    "model": "deepseek-v4-pro",
+    "status": "failed"
+  },
+  "recovery_policy": {
+    "policy_version": "v0.17-local-recovery-policy",
+    "run_id": "gd_v018_recovery_5xx_001",
+    "task_id": "task_v018_recovery_5xx_001",
+    "error_class": "provider_5xx",
+    "decision": "retry",
+    "next_action": "retry_provider_readonly",
+    "max_retries": 2,
+    "retry_count": 0,
+    "timeout_minutes": 15,
+    "stop_conditions": [
+      "retry_count_reaches_2"
+    ],
+    "reason": "provider_5xx appears transient; retry the read-only provider path only after human review.",
+    "safety": {
+      "read_only": true,
+      "write_actions_enabled": false,
+      "requires_human_review": true,
+      "secrets_included": false
+    }
+  }
+}
